@@ -48,6 +48,22 @@
 　　　　$user['age'] = 28;
 　　　　$user['desc'] = '弟要永远的28岁';
 　　　　中的user统一改成member，可以双击选中user，然后Ctrl+D，会向下连选user，重复，直到你满意的位置，然后就可以统一编辑了。
+　　　　
+　　　　
+　
+　
+　{
+	"color_scheme": "Packages/Nil-Theme/Sanakan.tmTheme",
+	"font_size": 11.0,
+	"ignored_packages":
+	[
+	],
+	"update_check": false,
+	"word_wrap": "auto",
+	"font_options": ["no_bold", "no_italic", "no_antialias", "gray_antialias"],
+	"font_size": 12,
+	"font_face": "Simplified Arabic Fixed",
+}
 　　
 　　
 　　
