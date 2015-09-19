@@ -1,0 +1,52 @@
+2015-09-18
+
+sublime text
+1.emmet
+2.jquery
+3.sublime prefixer
+4.JS Format
+5.SublimeLinter
+6.sublime codeIntel (这个安装时间会很长 或者不要安装)
+7.bracket Highlighter
+8.phpcs
+9.alignment
+10. sublimeREPL
+11.DocBlockr
+12.FTPSync
+
+自定义颜色
+生成自定义颜色的地址是:  http://tmtheme-editor.herokuapp.com/    生成好之后可以保存下来.
+Sublime Text 2 和 Sublime Text 3都支持
+
+把生成的文件放到安装目录的:Data\Packages\Color Scheme - Default文件夹下就可以了.
+
+生成的颜色值请参考：
+background:               #002B13
+foreground:               #C4BEBE
+lineHighLight:            #75756F
+select:                   #75756F
+comment                   #417F5F     
+string                    #8080C0
+number                    #8080C0
+built-in constant:        #8080C0
+user-defined constant:    #8080C0
+keyword:                  #8080C0
+storage:                  #8080C0
+storage type；            #8080C0
+class name:               #8080C0
+inherited class:          #8080C0
+function name:            #8080C0
+function argument:        #8080C0
+Tag name:                 #8080C0
+Tag attribute:            #8080C0
+Library function:         #8080C0
+Library constant:         #8080C0
+Library class/type:       #8080C0
+Library variable:         #139447
+Invalid:                  #878782
+Invalid deprecated:       #878782
+
+
+
+
+
