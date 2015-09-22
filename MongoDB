@@ -1,0 +1,2 @@
+MongoDB 由databases组成，databases由collections组成，collections由documents（相当于行）组成，而documents有fields（相当于列)组成。
+MongoDB是异步写数据
