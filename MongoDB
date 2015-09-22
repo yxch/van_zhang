@@ -1,2 +1,9 @@
+
 MongoDB 由databases组成，databases由collections组成，collections由documents（相当于行）组成，而documents有fields（相当于列)组成。
 MongoDB是异步写数据
+
+文档是MongoDB中数据的基本单元，非常类似于关系数据库管理系统中的行(但比行要复杂得多)
+类似地，集合可以被看做是没有模式的表
+MongoDB的单个实例可以容纳从外独立的数据库，每一个都有自己的集合和权限
+MongoDB自带简洁但功能 强大的JavaScript Shell,这个工具对于管理MongoDB实例和操作数据作用非常大。
+每一个文档都有一个特殊的键"_id"，它在文档所处的集合是唯一的。
