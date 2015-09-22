@@ -47,6 +47,18 @@ Invalid:                  #878782
 Invalid deprecated:       #878782
 
 
-
+submline设置：
+{
+	"color_scheme": "Packages/User/SublimeLinter/van_zhang (SL).tmTheme",
+	"font_face": "Simplified Arabic Fixed",
+	"font_size": 11.0,
+	"ignored_packages":
+	[
+	],
+	"update_check": false,
+	"word_wrap": "auto",
+	"word_wrap":true,
+	"wrap_width":80
+}
 
 
