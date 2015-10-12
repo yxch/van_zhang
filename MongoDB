@@ -72,6 +72,13 @@ db.people.ensureIndex({"username":1})
 。因此，要尽可能少创建索引。每个集合默认的最大索引个数为64个，能够应付绝大多数情况。
 一定不要索引每一个键，这会导致插入非常慢，还会占用很多空间，并且很可能对查询速度提升不大。
 
+创建唯一索引
+>db.people.ensureIndex({"username":1},{"unique":true})
+
+聚合
+>db.foo.count() //返回集合中的文档数量
+>db.runCommand({"distinct":"people","key":"age"}) //用来找出给定健的所有不同的值。使用时必须指定集合和键
+
 
 
 
