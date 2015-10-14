@@ -79,6 +79,16 @@ db.people.ensureIndex({"username":1})
 >db.foo.count() //返回集合中的文档数量
 >db.runCommand({"distinct":"people","key":"age"}) //用来找出给定健的所有不同的值。使用时必须指定集合和键
 
+>db.runCommand({"distinct":"people","key","age"}); 用来找出给定键的所有不同的值，使用时必须指定集合和键
+有没有一种方法获得集合里面所有不同的的键呢？没有！！
+
+>db.runCommand("group":{"ns":"stocks","key":"day","initial":{"time":0},"$reduce":function(doc,prev){
+    if(doc.time > prev.time){prev.price = doc.price;prev.time = doc.time;}
+  },
+  "condition":{"day":{"$gt":"2010/09/30"}} //这里的condition可以写成cond或q
+});
+group做的聚合稍微复杂一些。先选定分组所依据的键，而后MongoDB就会将集合依据选定键值的不同分成若干组。然后可以通过聚合每
+一组内的文档，产生一个结果文档。
 
 
 
