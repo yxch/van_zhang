@@ -7,3 +7,5 @@
     alert(strict);
 </script>
 
+//有限的正整数
+if(isFinite(n) && n > 0 && n == Math.round(n)){ ... }
