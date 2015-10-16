@@ -7,6 +7,14 @@
     alert(strict);
 </script>
 
+/*--------------------可选函数----------------------------*/
+function counter(n){
+	var n = 0;
+	return {
+		count:function(){ return n++; },
+		reset:function(m){ if( m >= n ){ n = m; }else{ throw Error ("count can only be set to a larger value");} }
+	}
+}
 
 /*--------------------f.js文件的全部内容------------------*/
 
