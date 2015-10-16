@@ -9,7 +9,8 @@
 
 /*--------------------可选函数----------------------------*/
 function counter(n){
-	var n = 0;
+	n = n || 0;
+	//if(!(isFinite(n) && n > 0 && n == Math.round(n))) return null;
 	return {
 		count:function(){ return n++; },
 		reset:function(m){ if( m >= n ){ n = m; }else{ throw Error ("count can only be set to a larger value");} }
