@@ -17,6 +17,9 @@ function counter(n){
 	}
 }
 
+//检查对象是否是一个函数
+function isFunction(f){ return Object.prototype.toString.call(x) === "[object Function]"; }
+
 /*--------------------f.js文件的全部内容------------------*/
 
 
