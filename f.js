@@ -20,6 +20,9 @@ function counter(n){
 //检查对象是否是一个函数
 function isFunction(f){ return Object.prototype.toString.call(x) === "[object Function]"; }
 
+//返回数组的一部分或全部
+function sliceArr(a,n){ return Array.prototype.slice.call(a,n||0); }
+
 /*--------------------f.js文件的全部内容------------------*/
 
 
