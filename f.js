@@ -7,6 +7,11 @@
     alert(strict);
 </script>
 
+//javascript中定义类的步骤
+1.先定义一个构造函数，并设置初始化新对象的实例属性。
+2.给构造函数的prototype对象定义实例的方法
+3.给构造定义类字段和类属性
+
 /*--------------------可选函数----------------------------*/
 function counter(n){
 	n = n || 0;
@@ -46,6 +51,10 @@ function trim(str)
     var sar = [];
     for(var i=0,len=ar.length;i<len;i++){ if(ar[i] != ' '){ sar.push(ar[i]); } }
     return sar.join('');
+}
+String.prototype.trim = String.prototype.trim || function(){
+    if(!this) return this;  //空字符串不做处理
+    return this.replace(/^\s+|\s+$/g,''); //使用正则表达式进行空空格替换
 }
 
 //检查字符串是否全为中文
