@@ -31,7 +31,23 @@ $("input[name=subBox][value=3]").attr("checked", '');// 将name=subBox, value=3 
 $("input[type=checkbox][name=subBox]").get(2).checked = true;// 设置index = 2，即第三项为选中状态  
 $("input[type=checkbox]:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出选中的值  
     alert($(this).val());  
-}); 
+});
+另一个checkbox的例子：
+ <input type="checkbox" class="group" value="AAA" />AAA
+ <input type="checkbox" class="group" value="BBB" />BBB
+ <input type="checkbox" class="group" value="CCC" />CCC
+ <input type="button" id="button" value="处理" />
+ 
+<script type="text/javascript">
+        $('#button').click(function(){
+            var group = $('.group');
+            for(var i=0;i<group.length;i++)
+            {
+                if(group[i].checked) {  alert(group[i].value);  }
+            }
+        });
+</script>
+
 2、radio的jquery日常操作及属性
 <input type="radio" name="radio" id="radio1" value="1" />1  
 <input type="radio" name="radio" id="radio2" value="2" />2  
