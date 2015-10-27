@@ -314,7 +314,10 @@ function trim(str)
 String.prototype.trim = String.prototype.trim || function(){
     if(!this) return this;  //空字符串不做处理
     return this.replace(/^\s+|\s+$/g,''); //使用正则表达式进行空空格替换
-}
+};
+ String.prototype.empty = function(){
+    return this == '' || this == ' ' || typeof(this) == 'undefined';
+ };
 
 //检查字符串是否全为中文
 function isChinese(str){  var reg=/^[\u0391-\uFFE5]+$/;   return reg.test(str);  };
