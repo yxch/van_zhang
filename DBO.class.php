@@ -144,7 +144,7 @@ abstract class DBO
 	}
     $sFields = implode(',',$fieldsAr);
     $where = ($this->where != '$$') ? $this->where : '';
-    $sSQL =  'SELECT ' . $sFields . ' FROM ' . $this->strTableName . $where . $this->order . $this->limit; var_dump($sSQL);//exit;
+    $sSQL =  'SELECT ' . $sFields . ' FROM ' . $this->strTableName . $where . $this->order . $this->limit; //var_dump($sSQL);//exit;
 	unset($stmt);
     //准备一条sql语句
     $stmt = $this->oDBLink->prepare($sSQL);
