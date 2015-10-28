@@ -16,6 +16,11 @@ sublime text
 13.colorpicker  ctrl+shift+c
 14.sidebarenhancements
 
+15. WebInspector
+在 JavaScript调试方面，这是一个令人惊讶的工具，Sublime上的完整的代码检查工具。
+功能：使用绝对路径储存在用户设置中的项目断点，控制台，分步和断点调试器，栈追踪。
+这些都能够很棒的工作！而且Mozilla还提供了一个插件Fireplay让你连接到Firefox 开发工具和最简单的调试器JSHint
+
 
 自定义颜色
 生成自定义颜色的地址是:  http://tmtheme-editor.herokuapp.com/    生成好之后可以保存下来.
