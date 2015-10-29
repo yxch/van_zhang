@@ -10,7 +10,7 @@ class STR
 {
   //输入是否可用
   // $str = ' ' $str = null  $str = false $str = ''都返回假
-  public static function isReal($str){  return $str == '0' && $str !== false ? true : !(empty($str) || $str == ' ');  }
+  public static function fine($str){  return $str == '0' && $str !== false ? true : !(empty($str) || $str == ' ');  }
   
   //检查输入是否全是中文
   public static function isChinese($str){   return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u',trim($str)) ? $str : false;  }
