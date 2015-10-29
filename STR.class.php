@@ -147,12 +147,11 @@ class STR
    *注：这只是检查SQL注入的第一步，通常应该判断传入值的长度进一步确定SQL安全。
    *最短的SQL delete from a 值传递的长度通应该小于这个字符长度加1
    *这里使用消耗内存更少的strpos内置php函数而不使用strpos
-   *如果要添加新的单词，请注意空格的写法!!
    */
   public static function SQLNotWords($str)
   {
-    $str = strtolower($str); //全部转换为小写
-    $arr = array(' delete ',' update ',' left join ',' right join ',';',"'");
+    $str = strtolower(trim($str)); //删除前后空白后全部转换为小写
+    $arr = array('delete','update','left join','right join',';',"'");
     for($i=0,$l=count($arr);$i<$l;$i++){ if(strpos($str,$arr[$i]) !== false){ return $arr[$i]; }   }
     return 0;
   }
