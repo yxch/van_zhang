@@ -34,154 +34,74 @@
 drupal_add_css ( (path_to_theme () . '/css/zs.css'), 'theme', 'all' );
 ?>
 <?php
+
+/**
+ * 幻灯片显示数组即banner的显示定义
+ * 根据不同url，幻灯片的显示顺序可能不同，由变量$imgsort决定，即如果没有定义$imgsort则默认按数组$imgArr的顺序显示
+ * 图片的格式都必须是jpg
+ * imgsrc 是图片的名称，将与$pathPrefix一起组成完整的路径
+ * href 是用户点击图片的跳转地址将与常量 CMCURL  一起组完整的路径
+ * alt 是用户在图片上停留时的提示
+ * van_zhang 2015/11/02
+ */
+$pathPrefix = '/sites/default/themes/cigna_cmc/images/'; //图片路径前缀
+$imgArr = array(array('imgsrc'=>'zx_banner5.jpg','href'=>'shop/zhongjixian.html','alt'=>'重疾险'),
+	            array('imgsrc'=>'zx_banner8.jpg','href'=>'shop/lekangwuyou.html','alt'=>'乐康无忧'),
+	            array('imgsrc'=>'zx_banner6.jpg','href'=>'shop/zhouquanbao.html','alt'=>'周全保'),
+	            array('imgsrc'=>'zx_banner10.jpg','href'=>'shop/huanqiuzunxiang.html','alt'=>'寰球至尊')	);
+
+$imgsort = '0,1,2,3';  //默认的显示顺序
+
 $tflag = (stripos ( request_path (), 'baoxianwenda' ) !== false) ? 1 : 0;
 $link = 'baoxianzhishi/';
 $keyid = 0;
 $ktit = '';
 $brgz = '';
 $is_faq = false;
-if (stripos ( request_path (), 'baoxianzhishi' ) !== false) {
-	$ptype='保险知识';
-}elseif (stripos ( request_path (), 'baoxiananli' ) !== false) {
-	$ptype='保险案例';
-}elseif (stripos ( request_path (), 'zhuanti' ) !== false) {
-	$ptype='保险专题';
-}elseif (stripos ( request_path (), 'faq' ) !== false) {
-	$ptype='保险问答';
-}
-if (stripos ( request_path (), 'baoxianzhishi/yiliao' ) !== false) {
-	$keyid = 10011;
-	$ktit = '健康与医疗保险知识';
-	$brgz = '5|8|6|10';
-	$link = 'baoxianzhishi/yiliao';
-} else if (stripos ( request_path (), 'baoxianzhishi/shaoer' ) !== false) {
-	$keyid = 10021;
-	$ktit = '少儿险知识';
-	$brgz = '9|5|8|10';//9458;
-	$link = 'baoxianzhishi/shaoer';
-} else if (stripos ( request_path (), 'baoxianzhishi/yiwai' ) !== false) {
-	$keyid = 10031;
-	$ktit = '意外险知识';
-	$brgz = '4|9|5|8';
-	$link = 'baoxianzhishi/yiwai';
-} else if (stripos ( request_path (), 'baoxianzhishi/lvyou' ) !== false) {
-	$keyid = 10041;
-	$ktit = '旅游险知识';
-	$brgz = '4|7|9|8';
-	$link = 'baoxianzhishi/lvyou';
-} else if (stripos ( request_path (), 'baoxianzhishi/toulianxian' ) !== false) {
-	$keyid = 10051;
-	$ktit = '投资分红险知识';
-	$brgz = '9|5|8|4';//3456;
-	$link = 'baoxianzhishi/toulianxian';
-} else if (stripos ( request_path (), 'baoxianzhishi/shouxian' ) !== false) {
-	$keyid = 10061;
-	$ktit = '高端医疗险知识';
-	$brgz = '10|9|11|12';
-	$link = 'baoxianzhishi/shouxian';
-} else if (stripos ( request_path (), 'baoxianzhishi/yanglao' ) !== false) {
-	$keyid = 10071;
-	$ktit = '养老险知识';
-	$brgz = '2|8|5|10';
-	$link = 'baoxianzhishi/yanglao';
-} else if (stripos ( request_path (), 'baoxianzhishi/qita' ) !== false) {
-	$keyid = 10081;
-	$ktit = '其他知识';
-	$brgz = '9|5|8|10';
-	$link = 'baoxianzhishi/qita';
-}else if (stripos ( request_path (), 'baoxiananli/yiliao' ) !== false) {
-	$keyid = 11011;
-	$ktit = '健康医疗险案例';
-	$brgz = '5|8|6|10';
-	$link = 'baoxiananli/yiliao';
-} else if (stripos ( request_path (), 'baoxiananli/shaoer' ) !== false) {
-	$keyid = 11021;
-	$ktit = '少儿险案例';
-	$brgz = '9|4|5|10';
-	$link = 'baoxiananli/shaoer';
-} else if (stripos ( request_path (), 'baoxiananli/yiwai' ) !== false) {
-	$keyid = 11031;
-	$ktit = '意外险案例';
-	$brgz = '4|9|5|8';
-	$link = 'baoxiananli/yiwai';
-} else if (stripos ( request_path (), 'baoxiananli/lvyou' ) !== false) {
-	$keyid = 11041;
-	$ktit = '旅游险案例';
-	$brgz = '4|7|9|8';
-	$link = 'baoxiananli/lvyou';
-} else if (stripos ( request_path (), 'baoxiananli/toulianxian' ) !== false) {
-	$keyid = 11051;
-	$ktit = '投资分红险案例';
-	$brgz = '3|4|5|6';
-	$link = 'baoxiananli/toulianxian';
-} else if (stripos ( request_path (), 'baoxiananli/shouxian' ) !== false) {
-	$keyid = 11061;
-	$ktit = '高端医疗险案例';
-	$brgz = '10|9|11|12';
-	$link = 'baoxiananli/shouxian';
-} else if (stripos ( request_path (), 'baoxiananli/yanglao' ) !== false) {
-	$keyid = 11071;
-	$ktit = '养老险案例';
-	$brgz = '2|8|5|10';
-	$link = 'baoxiananli/yanglao';
-} else if (stripos ( request_path (), 'baoxiananli/qita' ) !== false) {
-	$keyid = 11081;
-	$ktit = '其他案例';
-	$brgz = '9|5|8|10';
-	$link = 'baoxiananli/qita';
-} else if (stripos ( request_path (), 'faq/baby' ) !== false) {
-	$keyid = 12010;
-	$ktit = '给孩子买保险';
-	//$brgz = '9|5|8|4';
-	$link = 'faq/baby';
-	$is_faq = true;
-} else if (stripos ( request_path (), 'faq/honey' ) !== false) {
-	$keyid = 12011;
-	$ktit = '给自己和爱人买保险';
-	//$brgz = '9|5|8|4';
-	$link = 'faq/honey';
-	$is_faq = true;
-} else if (stripos ( request_path (), 'faq/parents' ) !== false) {
-	$keyid = 12012;
-	$ktit = '给父母买保险';
-	//$brgz = '9|5|8|4';
-	$link = 'faq/parents';
-	$is_faq = true;
-} else if (stripos ( request_path (), 'faq/baike' ) !== false) {
-	$keyid = 12013;
-	$ktit = '保险百科';
-	//$brgz = '9|5|8|4';
-	$link = 'faq/baike';
-	$is_faq = true;
-} else if (stripos ( request_path (), 'faq/lipei' ) !== false) {
-	$keyid = 12014;
-	$ktit = '保险理赔';
-	//$brgz = '9|5|8|4';
-	$link = 'faq/lipei';
-	$is_faq = true;
-} else if (stripos ( request_path (), 'faq/zengzhi' ) !== false) {
-	$keyid = 12015;
-	$ktit = '保险增值';
-	//$brgz = '9|5|8|4';
-	$link = 'faq/zengzhi';
-	$is_faq = true;
-} else {
-	if (stripos ( request_path (), 'zhuanti' ) !== false) {
-		$keyid = 30011;
-		$ktit = '保险专题';
-		$brgz = '9|5|8|4';//9458;
-		$link = 'zhuanti';
-	}else{
-		/*$brgz = '9|5|8|4';//9458;//保险问答
-		$ktit = '保险问答';*/
-		$keyid = 12010;
-		$ktit = '给孩子买保险';
-		//$brgz = '9|5|8|4';
-		$link = 'faq/baby';
-		$is_faq = true;
+
+$relations = array('baoxianzhishi/yiliao'=>array('ptype'=>'保险知识','keyid'=>10011,'ktit'=>'健康与医疗保险知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/yiliao'),
+				   'baoxianzhishi/shaoer'=>array('ptype'=>'保险知识','keyid'=>10021,'ktit'=>'少儿险知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/shaoer'),
+				   'baoxianzhishi/yiwai'=>array('ptype'=>'保险知识','keyid'=>10031,'ktit'=>'意外险知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/yiwai'),
+				   'baoxianzhishi/lvyou'=>array('ptype'=>'保险知识','keyid'=>10041,'ktit'=>'旅游险知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/lvyou'),
+				   'baoxianzhishi/toulianxian'=>array('ptype'=>'保险知识','keyid'=>10051,'ktit'=>'投资分红险知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/toulianxian'),
+				   'baoxianzhishi/shouxian'=>array('ptype'=>'保险知识','keyid'=>10061,'ktit'=>'高端医疗险知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/shouxian'),
+				   'baoxianzhishi/yanglao'=>array('ptype'=>'保险知识','keyid'=>10071,'ktit'=>'养老险知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/yanglao'),
+				   'baoxianzhishi/qita'=>array('ptype'=>'保险知识','keyid'=>10081,'ktit'=>'其他知识','imgsort'=>'0,1,2,3','link'=>'baoxianzhishi/qita'),
+				   'baoxiananli/yiliao'=>array('ptype'=>'保险案例','keyid'=>11011,'ktit'=>'健康医疗险案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/yiliao'),
+				   'baoxiananli/shaoer'=>array('ptype'=>'保险案例','keyid'=>11021,'ktit'=>'少儿险案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/shaoer'),
+				   'baoxiananli/yiwai'=>array('ptype'=>'保险案例','keyid'=>11031,'ktit'=>'意外险案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/yiwai'),
+				   'baoxiananli/lvyou'=>array('ptype'=>'保险案例','keyid'=>11041,'ktit'=>'旅游险案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/lvyou'),
+				   'baoxiananli/toulianxian'=>array('ptype'=>'保险案例','keyid'=>11051,'ktit'=>'投资分红险案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/toulianxian'),
+				   'baoxiananli/shouxian'=>array('ptype'=>'保险案例','keyid'=>11061,'ktit'=>'高端医疗险案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/shouxian'),
+				   'baoxiananli/yanglao'=>array('ptype'=>'保险案例','keyid'=>11071,'ktit'=>'养老险案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/yanglao'),
+				   'baoxiananli/qita'=>array('ptype'=>'保险案例','keyid'=>11081,'ktit'=>'其他案例','imgsort'=>'0,1,2,3','link'=>'baoxiananli/qita'),
+				   'faq/baby'=>array('ptype'=>'保险问答','keyid'=>12010,'ktit'=>'给孩子买保险','imgsort'=>'0,1,2,3','link'=>'faq/baby'),
+				   'faq/honey'=>array('ptype'=>'保险问答','keyid'=>12011,'ktit'=>'给自己和爱人买保险','imgsort'=>'0,1,2,3','link'=>'faq/honey'),
+				   'faq/parents'=>array('ptype'=>'保险问答','keyid'=>12012,'ktit'=>'给父母买保险','imgsort'=>'0,1,2,3','link'=>'faq/parents'),
+				   'faq/baike'=>array('ptype'=>'保险问答','keyid'=>12013,'ktit'=>'保险百科','imgsort'=>'0,1,2,3','link'=>'faq/baike'),
+				   'faq/lipei'=>array('ptype'=>'保险问答','keyid'=>12014,'ktit'=>'保险理赔','imgsort'=>'0,1,2,3','link'=>'faq/lipei'),
+				   'faq/zengzhi'=>array('ptype'=>'保险问答','keyid'=>12015,'ktit'=>'保险增值','imgsort'=>'0,1,2,3','link'=>'faq/zengzhi'),
+				   'zhuanti'=>array('ptype'=>'保险专题','keyid'=>30011,'ktit'=>'保险增值','imgsort'=>'0,1,2,3','link'=>'zhuanti')										   );
+
+$ptype = '';
+$keyid = 12010;
+$ktit = '给孩子买保险';
+$link = 'faq/baby';
+$is_faq = false;
+
+if(stripos(request_path (), 'faq' ) !== false){ $is_faq = true; }
+foreach($relations as $key => $val)
+{
+	if(stripos(request_path (),$key) !== false)
+	{
+		$ptype = $val['ptype'];
+		$keyid = $val['keyid'];
+		$ktit = $val['ktit'];
+		$imgsort = $val['imgsort'];
+		$link = $val['link'];
+		break;
 	}
 }
-
 // 获取分页
 //and (not exists(select p.field_platform_value from cigna_cmc_field_data_field_platform p where b.nid= p.entity_id) or(select p.field_platform_value from cigna_cmc_field_data_field_platform p where b.nid=p.entity_id)=1)
 $sql = "SELECT COUNT(*) num FROM cigna_cmc_field_data_field_category AS a LEFT JOIN cigna_cmc_node AS b ON a.entity_id = b.nid LEFT JOIN cigna_cmc_url_alias AS c ON c.source =CONCAT('node/',b.nid) WHERE b.status = 1 AND c.alias NOT IN('ipmi2/zhuanti/zhifu.html','ipmi2/zhuanti/yakebaoxian.html','ipmi2/zhuanti/gaoduanyiliao.html','ipmi2/zhuanti/xieheyiyuan.html','ipmi2/zhuanti/business.html','ipmi2/zhuanti/babycare.html') AND a.field_category_value = $keyid and (not exists(select p.field_platform_value from cigna_cmc_field_data_field_platform p where b.nid= p.entity_id) or(select p.field_platform_value from cigna_cmc_field_data_field_platform p where b.nid=p.entity_id)=1) ORDER BY b.nid DESC";
@@ -463,86 +383,56 @@ function linkTab(obj){
 		?>
 		 <!-- shopping mall left region -->
 			<div id="ZixunColumn">
-				<?php
-					$hdpimgs = 4;//幻灯片图片数量;
-					//去掉 乐享睿健产品链接
-					if(strpos($_SERVER['REQUEST_URI'],'/baoxiananli/shouxian/') !== false){ $hdpimgs = 3;}
-					$imgpfx = "zx_banner";//图片名称前缀，图片的格式都必须是jpg
-					//以下是图片的链接url，链接url的数量要和幻灯片图片的数量一致
-					$hdpurl1 = CMCURL . "shop/chengzhangzhinuo.html";
-					$hdpurl2 = CMCURL . "shop/changqingshou.html";
-					$hdpurl3 = CMCURL . "shop/lirenyounuo.html";
-					$hdpurl4 = CMCURL . "shop/xinyunwuyou.html";
-					$hdpurl5 = CMCURL . "shop/zhongjixian.html";
-					$hdpurl6 = CMCURL . "shop/zhouquanbao.html";
-					$hdpurl7 = CMCURL . "shop/p/jingneilvyou.html ";
-					$hdpurl8 = CMCURL . "shop/lekangwuyou.html";
-					$hdpurl9 = CMCURL . "shop/huodong/yiwaixian.html";
-					$hdpurl10 = CMCURL . "shop/product/jiaoyujinbbnew.html";
-					$hdpurl11 = CMCURL . "huodong/dianhuayisheng.html";
-					$hdpurl12 = CMCURL . "shop/huodong/yiwaixian.html";
-					if(strpos($_SERVER['REQUEST_URI'],'/baoxiananli/shouxian/') === false) { $hdpurl12 = CMCURL . "shop/zhixiangruijian.html"; }
-					$alt1 = "成长之诺";
-					$alt2 = "长青寿险";
-					$alt3 = "丽人优诺";
-					$alt4 = "信运无忧";
-					$alt5 = "重疾险";
-					$alt6 = "周全保";
-					$alt7 = "境内旅游";
-					$alt8 = "乐康无忧";
-					$alt9 = "少儿险";
-					$alt10 = "寰球至尊";
-					$alt11 = "乐享睿健";
-					$alt12 = '智享睿健';
-					if(strpos($_SERVER['REQUEST_URI'],'/baoxiananli/shouxian/') === false) { $alt12 = "智享睿健"; }
-					$brgz = strval($brgz);
-					$splvals = explode('|', $brgz);
-					$splval = '';
-				?>
 				<div class="field-item">
 					<div class="block_1 zslist" style="margin-top:0px;">
-                    				<div style="margin-bottom:10px;">
-						<?php if($brgz!=''){?>
-						<script type="text/javascript" >
-						$(function(){
-						     var len  = $(".cb_num > li").length;
-							 var index = 0;
-							 var adTimer;
-							 $(".cb_num li").mouseover(function(){
-								index  =   $(".cb_num li").index(this);
-								showImg(index);
-							 }).eq(0).mouseover();
-							 $('.cb_adbox').hover(function(){
-									 clearInterval(adTimer);
-								 },function(){
-									 adTimer = setInterval(function(){
-									    showImg(index)
-										index++;
-										if(index==len){index=0;}
-									  } , 5000);
-							 }).trigger("mouseleave");
-						})
-						function showImg(index){
-						        var adHeight = $(".cb_adbox").height();
-								$(".cb_slider").stop(true,false).animate({top : -adHeight*index},0);
-								$(".cb_num li").removeClass("on")
-									.eq(index).addClass("on");
-						}
-					</script>
-					<div class="cb_adbox" >
-						 <ul class="cb_slider" >
-							<?php for ($hdi = 1; $hdi <= $hdpimgs;$hdi++) { $splval = $splvals[$hdi - 1];?>
-							<li><a onclick="_gaq.push(['_trackEvent', '<?php echo $ktit;?>', 'click', 'banner<?php echo $hdi;?>']);" href="<?php echo ${"hdpurl" . $splval};?>" target="_blank" otype="<?php echo $ptype;?>" otitle="<?php echo ${"alt" . $splval};?>" oarea="banner"><img src="/sites/default/themes/cigna_cmc/images/<?php echo $imgpfx;?><?php echo $splval;?>.jpg" alt="<?php echo ${"alt" . $splval};?>"/></a></li>
-							<?php }?>
-						  </ul>
-						  <ul class="cb_num" >
-						  	<?php for ($hdj = 1; $hdj <= $hdpimgs;$hdj++) {?>
-							<li><?php echo $hdj;?></li>
-							<?php }?>
-						  </ul>
-					</div>
-					<?php }?>
-				</div>
+                    	<div style="margin-bottom:10px;">
+
+                    		<div class="cb_adbox" >
+								<ul class="cb_slider" >
+								<?php
+									$imgsortArr = explode(',',$imgsort); $len = count($imgsortArr);
+									for($i=0;$i<$len;$i++){
+								<?php } ?>				  							
+									<li>
+										<a name="<?php echo $imgArr[$i]['imgsrc']; ?>" class="gaq" href="<?php echo CMCURL . $imgArr[$i]['href'];?>" target="_blank">
+											<img src="<?php echo $pathPrefix . $imgArr[$i]['imgsrc']; ?>" alt="<?php echo $imgArr[$i]['alt']; ?>"/>
+										</a>
+									</li>
+									<?php }?>
+								</ul>
+								<ul class="cb_num" ><?php for($j = 0; $j <= $len;$j++){ ?><li> <?php echo $j;?></li> <?php }?> </ul>
+							</div>
+							<script type="text/javascript">	
+								//可能是跟踪代码需要？？
+								$('.gaq').click(function(){ var banner = $(this).attr('name'); _gaq.push(['_trackEvent', '<?php echo $hdpmc;?>', 'click', banner]); });
+
+								//图片切换		
+								var len  = <?php echo $len; ?>;
+								var index = 0;
+								var adTimer;
+								$(".cb_num li").mouseover(function(){
+										index  =   $(".cb_num li").index(this);
+										showImg(index);
+								}).eq(0).mouseover();
+								$('.cb_adbox').hover(function(){
+											clearInterval(adTimer);
+										},function(){
+											 adTimer = setInterval(function(){
+											    showImg(index)
+												index++;
+												if(index==len){index=0;}
+											  } , 5000);
+								}).trigger("mouseleave");
+							
+								function showImg(index){
+								    var adHeight = $(".cb_adbox").height();
+									$(".cb_slider").stop(true,false).animate({top : -adHeight*index},0);
+									$(".cb_num li").removeClass("on").eq(index).addClass("on");
+								}
+							</script>						
+						</div>
+
+						
 				<?php if (!$tflag) {?>
 						<div class="top">
 							<span class="title_1 title_icon_0"><?php echo $ktit;?></span>
