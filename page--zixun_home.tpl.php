@@ -41,10 +41,28 @@ drupal_add_css ( (path_to_theme () . '/css/zs.css'), 'theme', 'all' );
 <?php
 $hdpid = 0;
 $hdpmc = "保险问答";
-$brgz = '1|4|5|8';//保险问答
+
+/**
+ * 幻灯片显示数组即banner的显示定义
+ * 根据不同url，幻灯片的显示顺序可能不同，由变量$imgsort决定，即如果没有定义$imgsort则默认按数组$imgArr的顺序显示
+ * 图片的格式都必须是jpg
+ * imgsrc 是图片的名称，将与$pathPrefix一起组成完整的路径
+ * href 是用户点击图片的跳转地址将与常量 CMCURL  一起组完整的路径
+ * alt 是用户在图片上停留时的提示
+ * van_zhang 2015/11/02
+ */
+$pathPrefix = '/sites/default/themes/cigna_cmc/images/'; //图片路径前缀
+$imgArr = array(array('imgsrc'=>'zx_banner9.jpg','href'=>'shop/shaoerxian.html','alt'=>'少儿险'),
+	            array('imgsrc'=>'zx_banner5.jpg','href'=>'shop/zhongjixian.html','alt'=>'重疾险'),
+	            array('imgsrc'=>'zx_banner8.jpg','href'=>'shop/lekangwuyou.html','alt'=>'乐康无忧'),
+	            array('imgsrc'=>'zx_banner4.jpg','href'=>'shop/huodong/yiwaixian.html','alt'=>'信运无忧')	);
+
+
+//$brgz = '1|4|5|8';//保险问答
+$imgsort = '0,1,2,3';  //默认的显示顺序
 $link = 'baoxianzhishi/';
 if (stripos(request_path(), 'baoxianzhishi') !== false) {
-	$brgz = '9|5|8|4';//9458;
+	//$brgz = '9|5|8|4';//9458;
 	$hdpid = 1;
 	$hdpmc = "保险知识";
 	$zx_type = 100;
@@ -109,7 +127,7 @@ if (stripos(request_path(), 'baoxianzhishi') !== false) {
 	);
 } 
 if (stripos(request_path(), 'baoxiananli') !== false) {
-	$brgz = '9|5|8|4';//9458;
+	//$brgz = '9|5|8|4';//9458;
 	$hdpid = 2;
 	$hdpmc = "保险案例";
 	$zx_type = 110;
@@ -176,7 +194,7 @@ if (stripos(request_path(), 'baoxiananli') !== false) {
 // new 保险问答 faq
 $is_faq = false;
 if (stripos(request_path(), 'faq') !== false) {
-	$brgz = '';//'1|4|5|8';
+	//$brgz = '';//'1|4|5|8';
 	$hdpid = 4;
 	$hdpmc = "保险问答";
 	$zx_type = 120;
@@ -455,77 +473,51 @@ function linkTab(obj){
 		print $zixun_left;
 		?>
 			<div id="ZixunColumn">
-			<?php if($brgz!=''){?>
-				<script type="text/javascript" >
-					$(function(){
-					     var len  = $(".cb_num > li").length;
-						 var index = 0;
-						 var adTimer;
-						 $(".cb_num li").mouseover(function(){
+			<?php if($brgz!=''){?>				
+				<div class="cb_adbox" >
+					<ul class="cb_slider" >
+					<?php
+						$imgsortArr = explode(',',$imgsort); $len = count($imgsortArr);
+						for($i=0;$i<$len;$i++){
+					<?php } ?>				  							
+						<li>
+							<a name="<?php echo $imgArr[$i]['imgsrc']; ?>" class="gaq" href="<?php echo CMCURL . $imgArr[$i]['href'];?>" target="_blank">
+								<img src="<?php echo $pathPrefix . $imgArr[$i]['imgsrc']; ?>" alt="<?php echo $imgArr[$i]['alt']; ?>"/>
+							</a>
+						</li>
+						<?php }?>
+					</ul>
+					<ul class="cb_num" ><?php for($j = 0; $j <= $len;$j++){ ?><li> <?php echo $j;?></li> <?php }?> </ul>
+				</div>
+				<script type="text/javascript">	
+					//可能是跟踪代码需要？？
+					$('.gaq').click(function(){ var banner = $(this).attr('name'); _gaq.push(['_trackEvent', '<?php echo $hdpmc;?>', 'click', banner]); });
+
+					//图片切换		
+					var len  = <?php echo $len; ?>;
+					var index = 0;
+					var adTimer;
+					$(".cb_num li").mouseover(function(){
 							index  =   $(".cb_num li").index(this);
 							showImg(index);
-						 }).eq(0).mouseover();
-						 $('.cb_adbox').hover(function(){
-								 clearInterval(adTimer);
-							 },function(){
+					}).eq(0).mouseover();
+					$('.cb_adbox').hover(function(){
+								clearInterval(adTimer);
+							},function(){
 								 adTimer = setInterval(function(){
 								    showImg(index)
 									index++;
 									if(index==len){index=0;}
 								  } , 5000);
-						 }).trigger("mouseleave");
-					})
+					}).trigger("mouseleave");
+				
 					function showImg(index){
-					        var adHeight = $(".cb_adbox").height();
-							$(".cb_slider").stop(true,false).animate({top : -adHeight*index},0);
-							$(".cb_num li").removeClass("on")
-								.eq(index).addClass("on");
+					    var adHeight = $(".cb_adbox").height();
+						$(".cb_slider").stop(true,false).animate({top : -adHeight*index},0);
+						$(".cb_num li").removeClass("on").eq(index).addClass("on");
 					}
 				</script>
-				<div class="cb_adbox" >
-					<?php
-						$hdpimgs = 4;//幻灯片图片数量;
-						$imgpfx = "zx_banner";//图片名称前缀，图片的格式都必须是jpg
-						//以下是图片的链接url，链接url的数量要和幻灯片图片的数量一致
-						$hdpurl1 = CMCURL . "shop/chengzhangzhinuo.html";
-						$hdpurl2 = CMCURL . "shop/changqingshou.html";
-						$hdpurl3 = CMCURL . "shop/lirenyounuo.html";
-						$hdpurl4 = CMCURL . "shop/huodong/yiwaixian.html";
-						$hdpurl5 = CMCURL . "shop/zhongjixian.html";
-						$hdpurl6 = CMCURL . "shop/zhouquanbao.html";
-						$hdpurl7 = "http://member.cigna-cmc.com/es/cigna-cmc-esales/DomesticAction.do";
-						$hdpurl8 = CMCURL . "shop/lekangwuyou.html";
-						$hdpurl9 = CMCURL . "shop/shaoerxian.html";
-						$hdpurl10 = CMCURL . "campaign/ipmi/zftongyong/index.php";//"shop/huanqiuzhizun.html";
-						$hdpurl11 = CMCURL . "shop/lexiangruijian.html";
-						$hdpurl12 = CMCURL . "shop/zhixiangruijian.html";
-						$alt1 = "成长之诺";
-						$alt2 = "长青寿险";
-						$alt3 = "丽人优诺";
-						$alt4 = "信运无忧";
-						$alt5 = "重疾险";
-						$alt6 = "周全保";
-						$alt7 = "境内旅游";
-						$alt8 = "乐康无忧";
-						$alt9 = "少儿险";
-						$alt10 = "寰球至尊";
-						$alt11 = "乐享睿健";
-						$alt12 = "智享睿健";
-						$brgz = strval($brgz);
-						$splvals = explode('|', $brgz);
-						$splval = '';
-					?>
-					  <ul class="cb_slider" >
-							<?php for ($hdi = 1; $hdi <= $hdpimgs;$hdi++) {$splval = $splvals[$hdi - 1];?>
-							<li><a onclick="_gaq.push(['_trackEvent', '<?php echo $hdpmc;?>', 'click', 'banner<?php echo $hdi;?>']);" href="<?php echo ${"hdpurl" . $splval};?>" target="_blank" otype="<?php echo $hdpmc;?>" otitle="<?php echo ${"alt" . $splval};?>" oarea="banner"><img src="/sites/default/themes/cigna_cmc/images/<?php echo $imgpfx;?><?php echo $splval;?>.jpg" alt="<?php echo ${"alt" . $splval};?>"/></a></li>
-							<?php }?>
-						  </ul>
-					  <ul class="cb_num" >
-					  	<?php for ($hdj = 1; $hdj <= $hdpimgs;$hdj++) {?>
-						<li><?php echo $hdj;?></li>
-						<?php }?>
-					  </ul>
-				</div>
+
 				<?php } if($is_faq){?>
 				<div class="block_1 zslist" style="margin-top:0px;">
 				<div class="top">
