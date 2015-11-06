@@ -118,14 +118,6 @@ var count=$("#select_id  option").length;
         }  
     }
 
-
-//定义并调用一个函数来确定当前脚本运行时是否为严格模式
-<script>
-    "use strict";
-    var strict = (function(){ return !this;}());
-    alert(strict);
-</script>
-
 //javascript中定义类的步骤
 1.先定义一个构造函数，并设置初始化新对象的实例属性。
 2.给构造函数的prototype对象定义实例的方法
@@ -269,9 +261,22 @@ var count=$("#select_id  option").length;
     a.add('45','30','aaa','ccc');
     alert(a.remove('aaa','45','ccc'));
     alert(a.size());
+    
+//基础知识
+isNaN()    如果参数是NaN或者是一个非数字值（比如字符串和对象），则返回true.
+isFinite() 参数不是NaN Infinity 或 -Infinity的时候返回true
 
 
 /*--------------------可选函数----------------------------*/
+
+//定义并调用一个函数来确定当前脚本运行时是否为严格模式
+<script>
+    "use strict";
+    var strict = (function(){ return !this;}());
+    alert(strict);
+</script>
+
+
 function counter(n){
 	n = n || 0;
 	//if(!(isFinite(n) && n > 0 && n == Math.round(n))) return null;
