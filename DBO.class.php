@@ -183,7 +183,7 @@ abstract class DBO
     */
   public function rows()
   {
-	$strQuery = "SELECT COUNT(*) AS total FROM " . $this->where . $this->strTableName;
+	$strQuery = "SELECT COUNT(*) AS total FROM " . $this->strTableName . $this->where; //var_dump($strQuery);
 	unset($stmt);
 	$stmt = $this->oDBLink->prepare($strQuery);
     $blQuery = $stmt->execute();
