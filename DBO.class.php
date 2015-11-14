@@ -41,7 +41,7 @@ abstract class DBO
     foreach($this->definedRelations() as $key => $val)
     {
 	  //必须遵循命名的规则
-      if(!property_exists($this,$val)){ exit("属性的映射名有误(子类的属性名与映射集的$val不一致)!"); }
+      if(!property_exists($this,$val)){ exit("属性的映射名有误(子类的属性名与映射集的 $val 不一致)!"); }
       $this->arRelations[$val] = $key;   //属性到字段的映射集
     }
 	$this->sPrimaryKey = $this->definedPrimaryKey(); //保存主键名	
