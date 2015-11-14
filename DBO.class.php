@@ -29,118 +29,87 @@ abstract class DBO
    * $where 可以是一个数组，但必须是关联数组
    * $where 可以是一个数字，则必须主键为数字,否则查询或更新失败
    * $where 可以是一个字符串，主要是因为数组不能完成如大于、小于、等于及一些模糊查询而设定
-   * $where 可以是字符串 '$$‘ 表示全表更新或者查询全表数据
+   * $where 可以是字符串 '$$‘ 表示全表更新
    * @param array $arr 必须为关联数组 否则设置无效。且必须是order:排序依据 limit:查询限制
    * @param $oDBLink  数据库连接对象如果不提供则使用DBC::PDO()
    */  
   public function __construct($where=null,array $arr=null,PDO $oDBLink=null)
   {
     $this->oDBLink = isset($oDBLink) ? $oDBLink : DBC::PDO();//数据库连接对象
-    $this->strTableName = $this->definedTableName();//表名
-	
+    $this->strTableName = $this->definedTableName();//表名	
     //定义映射集
     foreach($this->definedRelations() as $key => $val)
     {
-      if(empty($val) || is_numeric($val) || !property_exists($this,$val)) //必须遵循命名的规则
-      {
-        $strErrorMessage = "表字段到属性的映射名有误（子类的属性名和 $val 不一致或者命名不规范）!";
-		if(defined('ISLOG') && ISLOG){ LOG::logger()->write($strErrorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR); }
-        exit;
-      }
+	  //必须遵循命名的规则
+      if(!property_exists($this,$val)){ exit("属性的映射名有误(子类的属性名与映射集的$val不一致)!"); }
       $this->arRelations[$val] = $key;   //属性到字段的映射集
     }
-	//var_dump($this->arRelations);exit;
 	$this->sPrimaryKey = $this->definedPrimaryKey(); //保存主键名	
-	$this->where = $this->conditions($where); //where 条件子句
+	$this->where = $this->condition($where); //where 条件子句
 	//order by子句
 	$this->order = isset($arr['order']) && !empty($arr['order']) ? ' ORDER BY ' . strtr($arr['order'],$this->arRelations) : '';
 	//limit 子句
 	$this->limit = isset($arr['limit']) && !empty($arr['limit']) ? ' LIMIT ' . $arr['limit'] : '';
-  }
-  
+  }  
   /**
     * where 条件
+    * 注意：不支持复合主键，如果$where是一个整数，通常主键是一个单一的主键且为名id
     */
-  private function conditions($where)
+  private function condition($where)
   {
-	//查询或更新条件设置
-    if(!empty($where)) 
-    { 
-      if(ctype_digit($where)) //where 条件提供的是一个纯数字则视为主键id
-      {
-        return ' WHERE ' . $this->sPrimaryKey . ' = ' . $where;
-      }elseif(is_string($where))
-      {
-		//如果$where == '$$'则为全表更新否则为条件查询或更新
-        return ($where == '$$') ? $where : ' WHERE ' . strtr($where,$this->arRelations);
-	  //提供的是一个数组，这里取消了以前对数组类型必须为2时的关联数组的判断而直接判断是否是一个数组以提高程序执行效果 
-      }elseif(is_array($where)) 
-      {
-        $str = '';
-        foreach($where as $key=>$value) //无论value是数字还是字符串统一当作字符串处理  仅适用于MySQL数据库
-        { 
-          $k = $this->arRelations[$key];  //字段名
-          if(property_exists($this,$key))
-		  {
-			$str .= (is_string($value)) ?  $k . ' = ' . "'" . $value  . "'" . ' AND ' : $k . ' = ' . $value . ' AND ' ;
-		  }						
-        }
-		//删除最后一个 ' AND ';
-        return ' WHERE ' . substr($str,0,strlen($str)-5);
-	  //除纯数字 合法的字符串和关联数组之外 视where条件异常处理
-      }elseif(defined('ISLOG') && ISLOG)
+	//查询或更新条件设置 如果为空返回null
+	if(empty($where)){ return ''; };
+    
+	if(ctype_digit($where)) //where 条件提供的是一个纯数字则视为主键id
+	{
+	  return ' WHERE ' . $this->sPrimaryKey . ' = ' . $where;
+	}elseif(is_string($where))
+	{
+	  //如果$where == '$$'则为全表更新否则为条件查询或更新
+	  return ($where == '$$') ? $where : ' WHERE ' . strtr($where,$this->arRelations);
+	//提供的是一个数组，这里取消了以前对数组类型必须为2时的关联数组的判断而直接判断是否是一个数组以提高程序执行效果 
+	}elseif(is_array($where)) 
+	{
+	  $_arr = array();		
+	  foreach($where as $key=>$val)  //确保键是一个存在的属性名称
 	  {
-        $strErrorMessage = 'supplied an invalid parameter!Must be associative array';
-		LOG::logger()->write($strErrorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
-        exit;
-      }
-    }
-	return '';
-  }
-  
+		if(!property_exists($this,$key)){  exit('不合法的查询条件,检查键[' . $key . ']'); }
+		$_arr[] = (is_string($val)) ? $this->arRelations[$key] . "='" . $val . "'" : $this->arRelations[$key] . '=' . $val;		  
+	  }
+	  return ' WHERE ' . implode(' AND ',$_arr);
+	//除纯数字 合法的字符串和关联数组之外 视where条件异常处理
+	}else{ exit('检查查询条件,不是一个合法的查询数据类型[字符串？关联数组？整数主键值？]!'); }  
+  }  
   /**
      *读取对象值
      */
   public function get(array $arFields)
   {
 	$arThisSelect = $this->selectsArr;
-	$arr = array();
-	for($i=0,$l=count($arFields);$i<$l;$i++)
-	{
-	  if(property_exists($this,$arFields[$i])) //检查是否是一个定义了的属性,如果不是则抛弃它
-	  {
-		$arr[$arFields[$i]] = '' ; //合法选择集		
-	  //如果不存在此属性则写入错误日志，但程序不退出因为可以查询其它的合法字段的值
-	  }elseif(defined('ISLOG') && ISLOG)   
-      {       
-        $errorMessage = "supplied an invalid value ($arFields[$i])! please check your input.";
-		LOG::logger()->write($errorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
-      }
-	}
-	$this->selectsArr = array_keys($arr);
-	$diffArr = array_values(array_diff($arFields,$arThisSelect)); //var_dump($diffArr); //得出数组的差集并重新索引 
+	$arr = array(); $len = count($arFields);
+	//检查是否是一个定义了的属性,如果不是则抛弃它
+	for($i=0;$i<$len;$i++){  if(property_exists($this,$arFields[$i])){ $arr[] = $arFields[$i]; } }
+	$this->selectsArr = $arr;
+	$diffArr = array_diff($arFields,$arThisSelect); //var_dump($diffArr); //得出数组的差集并重新索引 
 	if(!empty($diffArr)){ $this->blIsQueried = false; } 
     //如果没有执行过查询则执行一次查询 并将$blIsQueried 置为真
-    if(!$this->blIsQueried){ $this->load($this->selectsArr); $this->blIsQueried = true; } 
+    if(!$this->blIsQueried){ $this->load(); $this->blIsQueried = true; } 
     //检查字段映射集合并赋值
     $arAssoc = array();
-	for($i=0,$len=count($arFields);$i<$len;$i++){  $arAssoc[$arFields[$i]] = $this->$arFields[$i];	}
+	for($i=0;$i<$len;$i++){  $arAssoc[$arFields[$i]] = $this->$arFields[$i]; }
     return $arAssoc;
-  }
-  
+  }  
   /**
    * 按条件执行一次表查询
    */	
-  private function load(array $ar)
+  private function load()
   {
     //得到投影的字段 如果$this->selectSets为空时 则仅有主键参与投影，不作*查询
-	$arr = empty($ar) ? array($this->sPrimaryKey) : $ar;
+	$arr = empty($this->selectsArr) ? array($this->sPrimaryKey) : $this->selectsArr;
+	//置换属性名为表字段名称并将属性定义为一个数组
 	$fieldsAr = array();
-	for($i=0,$l=count($arr);$i<$l;$i++)
-	{
-	  $fieldsAr[] = $this->arRelations[$arr[$i]];
-	  $this->$arr[$i] = array();
-	}
+	for($i=0,$l=count($arr);$i<$l;$i++){ $fieldsAr[] = $this->arRelations[$arr[$i]];  $this->$arr[$i] = array(); }
+	//得到查询的SQL
     $sFields = implode(',',$fieldsAr);
     $where = ($this->where != '$$') ? $this->where : '';
     $sSQL =  'SELECT ' . $sFields . ' FROM ' . $this->strTableName . $where . $this->order . $this->limit; //var_dump($sSQL);//exit;
@@ -150,34 +119,23 @@ abstract class DBO
     $blSelected = $stmt->execute();
     if($blSelected) //执行成功
     { 
-      $arSelectSet = $stmt->fetchAll(PDO::FETCH_ASSOC); //保存投影操作的结果集 全部
-      $arDefinedRelations = $this->definedRelations(); //字段名到属性名的映射集
+      $results = $stmt->fetchAll(PDO::FETCH_ASSOC); //保存投影操作的结果集 全部
+      $_relations = $this->definedRelations(); //字段名到属性名的映射集
       $this->iTotal = $stmt->rowcount();  //保存投影操作的记录总数		
       //为属性赋值 （数组）
-      if($this->iTotal > 0)
-      {
-        for($i=0;$i<$this->iTotal;$i++){ foreach($arSelectSet[$i] as $key=>$val){ array_push($this->$arDefinedRelations[$key],$val);} }
-      }
-	//执行失败
-    }elseif(defined('ISLOG') && ISLOG)
-    {
-      $strErrorMessage = '';
-      foreach($stmt->errorInfo() as $key=>$val){  $strErrorMessage .= $val . ':'; }
-      $strErrorMessage = rtrim($strErrorMessage,':');
-	  LOG::logger()->write($strErrorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
-    }
-  }
-    
+      for($i=0;$i<$this->iTotal;$i++){ foreach($results[$i] as $key=>$val){ array_push($this->$_relations[$key],$val);} }
+	  
+    }else{ exit('执行查询时失败,字段:' . $sFields . '表名: ' . '查询条件及其它: ' . $where . $this->order . $this->limit); }
+  }    
   /**
    *获取投影结果的总数
    */
   public function iTotal()
   {
 	//如果没有执行过查询则执行一次数据库查询 并将$blIsQueried 置为真
-    if(!$this->blIsQueried){ $this->load(array($this->sPrimaryKey));  $this->blIsQueried = true; }
+    if(!$this->blIsQueried){ $this->load();  $this->blIsQueried = true; }
     return $this->iTotal;
-  }
-  
+  }  
   /**
     *获取表记录数
     */
@@ -189,8 +147,7 @@ abstract class DBO
     $blQuery = $stmt->execute();
     $rowsAr = $stmt->fetch(PDO::FETCH_ASSOC);
 	return $rowsAr['total'];
-  }
-    
+  }    
   /**
    *获取插入操作的最后id
    */
@@ -205,66 +162,55 @@ abstract class DBO
   public function set(array $settings)
   {
 	$arr = array();//保存修改集的内容
-	if(ARR::type($settings) == 1) //是一个索引数组 此时是一次插入多条记录操作
+	if($this->typed($settings) == 1) //是一个索引数组 此时是一次插入多条记录操作
 	{
 	  for($i=0,$l=count($settings);$i<$l;$i++)
 	  {
 		$arr[$i] = array();
-		foreach($settings[$i] as $k=>$v)//检查是否存在此属性的定义
-		{
-		  if(property_exists($this,$k)) 
-		  {
-			$arr[$i][$k] = $v; 
-		  }elseif(defined('ISLOG') && ISLOG) //写日志
-		  {        
-			$errorMessage = "supplied an invalid key ($k)! please check your input.";
-			LOG::logger()->write($errorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
-			return false; //中断检查直接返回设置失败
-		  }
-		}		
+		//检查是否存在此属性的定义
+		foreach($settings[$i] as $k=>$v){  if(!property_exists($this,$k)){ return false;}  $arr[$i][$k] = $v; }		
 	  }
 	  //这种情况下只能执行插入操作 如果在初始时where为空时，视为插入操作，因为本类并不支持条件插入
 	  if(empty($this->where)){ return $this->inserted($arr); }else{ return false; }
 	}
 	
 	//是一个关联数组 此时可以是插入一条新记录或更新一条已存在的记录
-	if(ARR::type($settings) == 2)  
+	if($this->typed($settings) == 2)  
 	{
 	  foreach($settings as $k=>$v)//检查是否存在此属性的定义
 	  {
-		if(property_exists($this,$k)) 
-		{
-		  $arr[0][$k] = $v; 
-		}elseif(defined('ISLOG') && ISLOG) //写日志
-		{        
-		  $errorMessage = "supplied an invalid key ($k)! please check your input.";
-		  LOG::logger()->write($errorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
-		  return false; //中断检查直接返回设置失败
-		}
+		if(!property_exists($this,$k)){ return false;}
+		$arr[0][$k] = $v; 
 	  }
 	  //这种情况下可能是插入一条记录也可能是更新一条记录 如果在初始时where为空时，视为插入操作，因为本类并不支持条件插入
-	  if(empty($this->where)){	  return $this->inserted($arr); }else{ return $this->updated($arr); }
+	  if(empty($this->where)){ return $this->inserted($arr); }else{ return $this->updated($arr); }
 	}
-	//其它情况不能正确处理，返回假
-	return false;
-  }
-  
+	return false;//其它情况不能正确处理，返回假
+  } 
+  /**
+     *得到数组类型 索引数组 混合数组 关联数组 函数名称由getArrayType 改成 type
+     *@param array $arr
+     *@return -1 不是一个数组 0空数组 1索引数组 2 关联数组 3 混合数组
+   */
+  private function typed($arr)
+  {
+	if(!is_array($arr)){ return -1;} //如果不是一个数组 返回-1
+	if(empty($arr)) { return 0;} //空数组无意义
+	$t = count($arr);
+	$intersect = array_intersect_key($arr,range(0,$t-1)); //求两个数组的交集
+	if(count($intersect) == $t) {  return 1;  }elseif(empty($intersect)) {  return 2; }else { return 3; }
+  }  
   /**
     *插入操作
     */
   private function inserted(array $ar)
   { 
-	$keyAr = array();
-	$values = array();
-	$strBindParam = '';
+	$keyAr = array(); $values = array(); $strBindParam = '';
+	//组成SQL语句并绑定参数
 	for($i=0,$len=count($ar);$i<$len;$i++)
 	{
 	  $tmpAr = $ar[$i];	  $values[$i] = array();
-	  foreach($tmpAr as $k=>$v)
-	  {
-		$keyAr[$this->arRelations[$k]] = '';
-		$values[$i][':' . $k . '_' . $i] = $v;
-	  }
+	  foreach($tmpAr as $k=>$v){ $keyAr[$this->arRelations[$k]] = '';  $values[$i][':' . $k . '_' . $i] = $v; }
 	}
 	for($j=0,$l=count($values);$j<$l;$j++){  $strBindParam .= '(' . implode(',',array_keys($values[$j])) . '),'; }
 	$strBindParam = rtrim($strBindParam,',');
@@ -272,27 +218,17 @@ abstract class DBO
 	unset($stmt);
 	$stmt = $this->oDBLink->prepare($strQuery); //结束SQL 准备语句 
 	//参数和值绑定
-	for($k=0,$length=count($values);$k<$length;$k++)
-	{
-	  foreach($values[$k] as $x=>$y){ $stmt->bindValue($x,$y); }
-	}	
-	$blInserted = $stmt->execute();
-	if($blInserted)
+	for($k=0,$length=count($values);$k<$length;$k++){  foreach($values[$k] as $x=>$y){ $stmt->bindValue($x,$y); } }	
+	if($stmt->execute())
 	{
 	  //插入操作成功完成 最后插入的主键通常是id 此语法用在pgsql中，但不影响mysql的使用
 	  $this->lastInsertedId = $this->oDBLink->lastInsertId($this->strTableName . '_id_seq') + (count($ar) - 1);
 	  //如果用户在插入操作之前执行过get操作 必须更新投影结果集
-	  $this->blIsQueried = false; 
-	}elseif(defined('ISLOG') && ISLOG)
-	{
-	  $strErrorMessage = '';
-	  foreach($stmt->errorInfo() as $key=>$val){  $strErrorMessage .= $val . ':'; }
-	  $strErrorMessage = rtrim($strErrorMessage,':');
-	  LOG::logger()->write($strErrorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
-	}			
-	return $blInserted;
-  }
-  
+	  $this->blIsQueried = false;
+	  return true;
+	
+	}else{	return false; }		
+  }  
   /**
     *更新操作
     */
@@ -303,38 +239,20 @@ abstract class DBO
 	foreach($ar as $key => $value){ $strQuery .=  $this->arRelations[$key] . '=:' . $key . ','; }
 	$strQuery = rtrim($strQuery,','); 
 	unset($stmt);
-	if($this->where == '$$') //全表更新
-	{
-	  unset($stmt);
-	  $stmt = $this->oDBLink->prepare($strQuery);
-	  foreach($ar as $k => $v){ $stmt->bindValue(":" . $k,$v);	}
-	  $updated = $stmt->execute();
-	}else //条件更新
-	{
-	  unset($stmt);
-	  $strQuery = $strQuery . $this->where; //var_dump($strQuery);exit;				
-	  $stmt = $this->oDBLink->prepare($strQuery);
-	  //绑定修改值域
-	  foreach($ar as $k => $v){ $stmt->bindValue(":" . $k,$v);	}
-	  $updated = $stmt->execute();
-	}			
+	$strQuery .= $this->where == '$$' ? '' : $this->where;
+	$stmt = $this->oDBLink->prepare($strQuery);
+	//绑定修改值域
+	foreach($ar as $k => $v){ $stmt->bindValue(":" . $k,$v);	}
+	$updated = $stmt->execute();
 	if($updated)
 	{
 	  //更新相关属性的值和投影操作的结果集 如果有的话
 	  $this->blIsQueried = false; //重置查询为假
 	  //eval('$this->' . $k . ' = "'. $v . '";'); 注意这里一定不要有多余的空格 否则属性值就不正确
 	  foreach($arr[0] as $k => $v)	{ if(property_exists($this,$k)) { eval('$this->' . $k . ' = "'. $v . '";'); } }
-	  
-	}elseif(defined('ISLOG') && ISLOG)
-	{
-	  $strErrorMessage = '';
-	  foreach($stmt->errorInfo() as $key=>$val){  $strErrorMessage .= $val . ':'; }
-	  $strErrorMessage = rtrim($strErrorMessage,':');
-	  LOG::logger()->write($strErrorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
 	}
 	return $updated;
-  } 
-  
+  }  
   /**
    *删除记录
    */
@@ -344,16 +262,7 @@ abstract class DBO
 	unset($stmt);
     $stmt = $this->oDBLink->prepare($strSQL);
     $blDelete = $stmt->execute();
-	if($blDelete)
-	{
-	  $this->blIsQueried = false;
-	}elseif(defined('ISLOG') && ISLOG)
-    {
-      $strErrorMessage = '';
-      foreach($stmt->errorInfo() as $key=>$val){  $strErrorMessage .= $val . ':'; }
-      $strErrorMessage = rtrim($strErrorMessage,':');
-	  LOG::logger()->write($strErrorMessage,__FILE__ . '=>function:' . __FUNCTION__,LOG::ERROR);
-    }
+	if($blDelete){ $this->blIsQueried = false; }
     return $blDelete;
   }
 }
