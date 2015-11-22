@@ -83,15 +83,6 @@ imaginary[ɪ'mædʒɪnɛri] adj. 虚构的，假想的；想像的；虚数的
 mutable['mjutəbl] adj. 易变的，不定的；性情不定的
 introspection['ɪntrə'spɛkʃən] n. 内省；反省
 
-
-
-
-
-
-
-
-
-
 stick with 坚持；继续做；保持联系
 derived from  来源于
 be promoted to 被提升为
@@ -119,4 +110,82 @@ Love makes all hard hearts gentle.  爱情把一切冷酷的心变得温柔。
 而欲主要是指人的生存和享受的需要，属于生理活动的范畴。
 
 谦卑不是看轻自己，而是不仅为自己着想。
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta charset="utf-8" />
+        <link type="text/css" rel="stylesheet" href="/bases/css/reset.css" />
+        <style>
+            #left
+            {
+                width:18%;height:462px;
+                background-color:#292d30;
+                float:left;
+            }
+            #top,#viewer{ width:82%;}
+            #top
+            {
+                height:62px;
+                float:right;
+                background-color:#eff3f3;
+            }
+            #viewer
+            {
+                height:400px;
+                float:right;
+                background-color:#d9dcde; #eff3f3;
+            }
+            #foot
+            {
+                clear:both;
+                width:100%;height:60px;
+                background-color:#eff3f3;
+            }
+            
+            #tb{width:82%;margin:40px auto;}
+            #tb table{width:100%;}
+            #tb thead{border-top:1px solid blue;}
+            #tb thead tr td,#tb tbody tr td{border-left:1px solid blue;border-bottom: 1px solid blue;text-align: center;}            
+            #tb thead{height:32px;line-height:32px;font-weight: bold;background-color:#eff3f3;}
+            #tb tbody tr{height:24px;}
+            #tb td.no-border{border-left:none;}
+            #tb tfoot tr td{height: 40px;text-align: center;line-height: 40px;background-color:#eff3f3;}
+        </style>
+    </head>
+    <body>
+        <div>
+            <div id="left"></div>
+            <div id="top"></div>
+            <iframe id="viewer" name="viewer"></iframe>
+        </div>
+        <div id="foot">adadad</div>
+        
+        <div  id="tb">
+            <div id="oper">aaaa</div>
+            <table id="table">
+                <thead>
+                    <tr><td class="no-border">1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>                
+                </thead>
+                <tbody>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+                </tbody>
+                <tfoot><tr><td colspan="5">pages</td></tr></tfoot>
+            </table>
+        </div>
+    </body>
+</html>
+
+
+
+
 
