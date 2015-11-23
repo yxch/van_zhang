@@ -330,6 +330,116 @@ a{cursor:pointer;}
 
 
 
+登录
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title>登录</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="bases/css/reset.css" />
+    <script type="text/javascript" src="bases/js/jquery.min.js"></script>
+    <style>
+        body{ font-family: "微软雅黑",sans-serif; font-size:12px;background-color:#D9DCDE;}
+        #head{width:100%;height:60px;background-color:#EFF3F3;}
+        
+        #main{width:100%;min-height:812px;}
+        #main #left{width:56%;height:812px;float:left;`}
+        #main #right{width:44%;height:812px;float:right;}
+        
+        #right #login
+        {
+            width:70%;height:460px;
+            margin:120px auto;
+            box-shadow: 1px 1px 10px #000000;
+            background: #EFF3F3;
+        }
+       
+        #right #login #item a
+        {
+            display:inline-block;
+            height:40px;
+            line-height: 40px;
+            font-size:16px;text-align: center;
+            background-color:#EFF3F3;
+        }
+        #right #login #item a.used{ background-color:#fffbf0; }
+        #right #login #in-huodong,#right #login #in-master,#right #login #in-custom
+        {
+            display: none;
+            width:100%;height:60px;line-height: 60px;
+            margin-top:-1px;text-align: center;
+            background-color:#fffbf0
+            z-index:-1
+        }
+        #right #login #in-huodong select,#right #login #in-master select,#right #login #in-custom select
+        {
+            width:40%;height:24px;
+        }
+        #right #login #in-huodong label,#right #login #in-master label,#right #login #in-custom label
+        {
+            font-size:14px;
+        }
+        #right #login #in-huodong{display:block;background-color:#fffbf0}
+    </style>    
+</head>
+<body>
+    <div id="head"></div>
+    <div id="main">
+        <div id="left"></div>
+        <div id="right">
+            <div id="login">
+                <div id="item">
+                    <a class="used" style="width:33%" id="huodong">活动专题</a>
+                    <a style="width:32%" id="master">控　制　台</a>
+                    <a style="width:33%" id="custom">定　　制</a>
+                </div>
+                <div  id="in-huodong">
+                    <label>选择组类型:</label>
+                   <select>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                   </select>
+                </div>
+                <div id="in-master">
+                    <label>选择组类型:</label>
+                    <select>
+                        <option>控制台</option>
+                    </select>
+                </div>
+                <div id="in-custom">
+                    <label>选择组类型:</label>
+                    <select>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                   </select>
+                </div> 
+            </div>
+        </div>
+    </div>
+    <div id="foot"></div>     
+</body>
+<script>
+    $('#item a').click(function(){        
+        $(this).addClass('used');
+        $(this).siblings().removeClass('used');
+        
+    });
+</script>
+</html>
+
+
+
+
+
 
 
 
