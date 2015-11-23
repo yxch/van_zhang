@@ -142,21 +142,19 @@ Love makes all hard hearts gentle.  爱情把一切冷酷的心变得温柔。
                 <?php } ?>
             </div>
             
-            <div id="right">
-                <div id="top">
-                    <div id="centered">
-                        <a id="dashboard"></a>
-                        <a id="refresh"></a>
-                        <a id="grid"></a>
-                        <span id="search"><input type="text" id="seacher" /><label id="ico-search"></label></span>
-                        <a id="lock">锁屏</a>
-                        <a id="logout">注销</a>
-                        <span id="group"><?php echo $page['group']; ?></span>
-                        <a id="manager"></a>
-                    </div>
+            <div id="top">
+                <div id="centered">
+                    <a id="dashboard"></a>
+                    <a id="refresh"></a>
+                    <a id="grid"></a>
+                    <span id="search"><input type="text" id="seacher" /><label id="ico-search"></label></span>
+                    <a id="lock">锁屏</a>
+                    <a id="logout">注销</a>
+                    <span id="group"><?php echo $page['group']; ?></span>
+                    <a id="manager"></a>
                 </div>
-               <iframe id="viewer" name="viewer" src="/points/usr/servant/universal.php"></iframe>
             </div>
+           <iframe id="viewer" name="viewer" src="/points/usr/servant/universal.php"></iframe>
         </div>
         
         <div id="foot">
@@ -168,32 +166,27 @@ Love makes all hard hearts gentle.  爱情把一切冷酷的心变得温柔。
 </html>
 
 
-
 /**本需求通用样式*/
-body
-{
-	font-family: "微软雅黑",sans-serif;
-	font-size:12px;
-}
+body{ font-family: "微软雅黑",sans-serif; font-size:12px; }
 a{cursor:pointer;}
-#outset{ margin-top:4px;}
-#left,#right{ height:100%;min-height:836px; }
-
+#outset
+{
+    min-height:862px;
+    margin-top:4px;    
+    box-shadow: 1px 0px 20px #292D30;
+}
 /**左侧面板*/
 #left
 {	
-	width:20%;min-width: 252px;
+	width:20%;min-height:862px;
 	background-color:#292D30;
-	box-shadow: 1px 0px 20px #292D30;
 	float:left;
 }
-
 #logo
 {
 	width:100%;height:100px;
 	background-color:#23272B;
 	text-align: center;
-	/*padding-left:20px;*/
 }
 #logo #icom
 {
@@ -269,19 +262,12 @@ a{cursor:pointer;}
 	background-color:green;
 	float:right;
 }
-
-/**右侧面板 */
-#right
-{
-	width:80%;float:right;
-	box-shadow: 1px 1px 20px #292D30;
-	background-color:#D9DCDE;
-}
-/**右侧面板最上面功能区域*/
+/**左侧显示样式*/
+#top,#viewer{ width:80%; float:right; }
+/**右侧最上面功能区域*/
 #top
 {
-	position: relative;
-	width:100%;height:62px;
+	height:62px;position: relative;
 	background-color:#EFF3F3;
 	box-shadow: 1px 1px 3px #292D30;
 }
@@ -326,12 +312,12 @@ a{cursor:pointer;}
 
 #viewer
 {
-	width:100%;height:100%;min-height: 770px;
+    float:right;min-height: 800px;
 	border:none;
+    background-color:#D9DCDE;
 }
-
 /**底部 样式 */
-#foot{	width:100%;height:50px; }
+#foot{ clear:both;width:100%;height:50px; }
 #foot span
 { 
 	display:inline-block;
@@ -339,10 +325,7 @@ a{cursor:pointer;}
 	margin-left:20%;
 }
 #linked{ margin-left:350px; }
-#linked a:link{color:rgb(168,168,168);}
-#linked a:visited{color:rgb(168,168,168);}
-#linked a:hover{color:rgb(168,168,168);}
-#copyright{color:rgb(168,168,168);}
+#linked a:link,#linked a:visited,#linked a:hover,#copyright{color:#A8A8A8;}
 
 
 
