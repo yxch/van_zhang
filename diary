@@ -112,78 +112,248 @@ Love makes all hard hearts gentle.  爱情把一切冷酷的心变得温柔。
 谦卑不是看轻自己，而是不仅为自己着想。
 
 
+
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
-        <meta charset="utf-8" />
-        <link type="text/css" rel="stylesheet" href="/bases/css/reset.css" />
-        <style>
-            #left
-            {
-                width:18%;height:462px;
-                background-color:#292d30;
-                float:left;
-            }
-            #top,#viewer{ width:82%;}
-            #top
-            {
-                height:62px;
-                float:right;
-                background-color:#eff3f3;
-            }
-            #viewer
-            {
-                height:400px;
-                float:right;
-                background-color:#d9dcde; #eff3f3;
-            }
-            #foot
-            {
-                clear:both;
-                width:100%;height:60px;
-                background-color:#eff3f3;
-            }
-            
-            #tb{width:82%;margin:40px auto;}
-            #tb table{width:100%;}
-            #tb thead{border-top:1px solid blue;}
-            #tb thead tr td,#tb tbody tr td{border-left:1px solid blue;border-bottom: 1px solid blue;text-align: center;}            
-            #tb thead{height:32px;line-height:32px;font-weight: bold;background-color:#eff3f3;}
-            #tb tbody tr{height:24px;}
-            #tb td.no-border{border-left:none;}
-            #tb tfoot tr td{height: 40px;text-align: center;line-height: 40px;background-color:#eff3f3;}
-        </style>
+       <?php points::head($page['head']);?>
+       <script type="text/javascript" src="/points/project/repository/js/project.js"></script>
     </head>
+    
     <body>
-        <div>
-            <div id="left"></div>
-            <div id="top"></div>
-            <iframe id="viewer" name="viewer"></iframe>
+        <div id="outset">
+            <div id="left">
+                <div id="logo">
+                    <span id="icom"></span><span id="name">招商信诺</span><span id="ico"></span>
+                    <label>招商信诺人寿保险有限公司 2015</label>
+                </div>
+                <div id="portraits">
+                    <span id="portrait"><img alt="招商信诺" src="/points/project/repository/images/test.portrait.jpg" /></span>
+                    <span id="info">
+                        <p><?php echo $page['username'];?></p>
+                        <p><?php echo $page['status'];?></p>
+                        <label>更改我的设置:</label><p id="fright"><img alt="设置" src="/points/project/repository/images/002_02.ico" /></p>
+                    </span>
+                </div>
+                <?php foreach($page['item'] as $k=>$arr){?>
+                <div class="items">
+                    <a id="<?php echo $arr['id']; ?>" ref="<?php echo $arr['path']; ?>"><?php echo $arr['title']; ?></a><label></label>
+                </div>
+                <?php } ?>
+            </div>
+            
+            <div id="right">
+                <div id="top">
+                    <div id="centered">
+                        <a id="dashboard"></a>
+                        <a id="refresh"></a>
+                        <a id="grid"></a>
+                        <span id="search"><input type="text" id="seacher" /><label id="ico-search"></label></span>
+                        <a id="lock">锁屏</a>
+                        <a id="logout">注销</a>
+                        <span id="group"><?php echo $page['group']; ?></span>
+                        <a id="manager"></a>
+                    </div>
+                </div>
+               <iframe id="viewer" name="viewer" src="/points/usr/servant/universal.php"></iframe>
+            </div>
         </div>
-        <div id="foot">adadad</div>
         
-        <div  id="tb">
-            <div id="oper">aaaa</div>
-            <table id="table">
-                <thead>
-                    <tr><td class="no-border">1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>                
-                </thead>
-                <tbody>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                    <tr><td class="no-border">2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
-                </tbody>
-                <tfoot><tr><td colspan="5">pages</td></tr></tfoot>
-            </table>
+        <div id="foot">
+            <span id="linked"><a href="http://www.cignacmb.com">招商信诺首页</a></span>
+            <span id="copyright">Copyright © 2015 招商信诺人寿保险有限公司. All Rights Reserved. 粤ICP备11053445号-2</span>
         </div>
+       
     </body>
 </html>
+
+
+
+/**本需求通用样式*/
+body
+{
+	font-family: "微软雅黑",sans-serif;
+	font-size:12px;
+}
+a{cursor:pointer;}
+#outset{ margin-top:4px;}
+#left,#right{ height:100%;min-height:836px; }
+
+/**左侧面板*/
+#left
+{	
+	width:20%;min-width: 252px;
+	background-color:#292D30;
+	box-shadow: 1px 0px 20px #292D30;
+	float:left;
+}
+
+#logo
+{
+	width:100%;height:100px;
+	background-color:#23272B;
+	text-align: center;
+	/*padding-left:20px;*/
+}
+#logo #icom
+{
+	display: inline-block;
+	width:42px;height:50px;
+	background: url("../images/logo.gif") no-repeat;
+	margin-left:40px;
+	float:left;
+}
+#logo #name
+{
+	display: inline-block;
+	width:100px;height:50px;line-height:50px;
+	color:#EFF3F3;
+	font-size:24px;
+	float:left;
+}
+#logo #ico
+{
+	display:inline-block;
+	width:42px;height:50px;
+	background:url("../images/logo.gif") no-repeat;
+	background-position: -180px 0px;
+	float:left;
+}
+#logo label
+{
+	display: inline-block;
+	width:auto;height:20px;
+	line-height: 20px;
+	color:#939393;
+	border-top:1px inset #EFF3F3;
+}
+
+#portraits
+{
+	width:100%;height:156px;
+	margin-top:10px;
+	background-color:#23272B;
+	color:#EFF3F3;
+}
+#portraits span
+{
+	display:inline-block;
+	margin-top:33px;margin-left:14px;
+	float:left;
+}
+#portraits #portrait{width:72px;height:72px;border-radius:36px;}
+#portraits #portrait img{width:100%;height:100%;border-radius:36px;}
+#portraits #info{ width:130px;height:130px; }
+#portraits #info p{line-height:26px; font-weight:bold;margin-right:4px;font-size:16px;}
+#portraits #info #fright{width:16px;height:16px;float:right;}
+#portraits #info #fright img{width:100%;height:100%;cursor: pointer;}
+
+#left .items
+{
+	margin-top:10px;
+	background-color:#23272B;
+	width:100%;height:50px;
+}
+
+#left .items a
+{
+	display:inline-block;
+	width:90%;line-height:50px;
+	color:#EFF3F3;
+	text-align:right;
+}
+#left .items label
+{
+	display:inline-block;
+	width:2%;height:50px;
+	background-color:green;
+	float:right;
+}
+
+/**右侧面板 */
+#right
+{
+	width:80%;float:right;
+	box-shadow: 1px 1px 20px #292D30;
+	background-color:#D9DCDE;
+}
+/**右侧面板最上面功能区域*/
+#top
+{
+	position: relative;
+	width:100%;height:62px;
+	background-color:#EFF3F3;
+	box-shadow: 1px 1px 3px #292D30;
+}
+#top #centered
+{
+	position: absolute;
+	width:98%;height:24px;line-height:24px;
+	margin:19px auto;
+}
+#top a,#top span{ display:inline-block;	height:24px;}
+#top #dashboard,#top #refresh,#top #grid{ width:24px; margin-left:30px;}
+#top #dashboard{background-image:url("../images/top_03.jpg");}
+#top #refresh{background-image:url("../images/top_05.jpg");}
+#top #grid{background-image:url("../images/top_07.jpg");}
+#top #search
+{
+	position: relative;
+	margin-left:30px;width:160px;
+	border:1px solid grey;
+}
+#top #search input
+{
+	position: absolute;
+	width:85%;height:100%;
+	background-color:#D9DCDE;
+	border:none;
+}
+#top #search #ico-search
+{
+	display:inline-block;
+	position: absolute;
+	right:0;top:0;
+	width:24px;height:24px;
+	background-image:url("../images/top_12.png");
+}
+
+#top #group,#top #lock{margin-left:30px;width:24px;}
+#top #lock{	margin-left:30%;width:24px;vertical-align: top;}
+#top #logout{margin-left:30px;width:24px;height:24px;vertical-align: top;}
+#top #group {width:120px;vertical-align: top;font-weight: bold;font-size:14px;color:#D9DCDE;}
+#top #manager{width:24px;height:24px;margin-left:30px;background-image:url("../images/top_03.png");}
+
+#viewer
+{
+	width:100%;height:100%;min-height: 770px;
+	border:none;
+}
+
+/**底部 样式 */
+#foot{	width:100%;height:50px; }
+#foot span
+{ 
+	display:inline-block;
+	height:40px;line-height:40px;
+	margin-left:20%;
+}
+#linked{ margin-left:350px; }
+#linked a:link{color:rgb(168,168,168);}
+#linked a:visited{color:rgb(168,168,168);}
+#linked a:hover{color:rgb(168,168,168);}
+#copyright{color:rgb(168,168,168);}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
