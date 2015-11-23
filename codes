@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+    <head>
+       <?php points::head($page['head']);?>
+       <script type="text/javascript" src="/points/project/repository/js/project.js"></script>
+    </head>
+    
+    <body>
+        <div id="outset">
+            <div id="left">
+                <div id="logo">
+                    <span id="icom"></span><span id="name">招商信诺</span><span id="ico"></span>
+                    <label>招商信诺人寿保险有限公司 2015</label>
+                </div>
+                <div id="portraits">
+                    <span id="portrait"><img alt="招商信诺" src="/points/project/repository/images/test.portrait.jpg" /></span>
+                    <span id="info">
+                        <p><?php echo $page['username'];?></p>
+                        <p><?php echo $page['status'];?></p>
+                        <label>更改我的设置:</label><p id="fright"><img alt="设置" src="/points/project/repository/images/002_02.ico" /></p>
+                    </span>
+                </div>
+                <?php foreach($page['item'] as $k=>$arr){?>
+                <div class="items">
+                    <a id="<?php echo $arr['id']; ?>" ref="<?php echo $arr['path']; ?>"><?php echo $arr['title']; ?></a><label></label>
+                </div>
+                <?php } ?>
+            </div>
+            
+            <div id="top">
+                <div id="centered">
+                    <a id="dashboard"></a>
+                    <a id="refresh"></a>
+                    <a id="grid"></a>
+                    <span id="search"><input type="text" id="seacher" /><label id="ico-search"></label></span>
+                    <a id="lock">锁屏</a>
+                    <a id="logout">注销</a>
+                    <span id="group"><?php echo $page['group']; ?></span>
+                    <a id="manager"></a>
+                </div>
+            </div>
+           <iframe id="viewer" name="viewer" src="/points/usr/servant/universal.php"></iframe>
+        </div>
+        
+        <div id="foot">
+            <span id="linked"><a href="http://www.cignacmb.com">招商信诺首页</a></span>
+            <span id="copyright">Copyright © 2015 招商信诺人寿保险有限公司. All Rights Reserved. 粤ICP备11053445号-2</span>
+        </div>
+       
+    </body>
+</html>
+
+
+/**本需求通用样式*/
+body{ font-family: "微软雅黑",sans-serif; font-size:12px; }
+a{cursor:pointer;}
+#outset
+{
+    min-height:862px;
+    margin-top:4px;    
+    box-shadow: 1px 0px 20px #292D30;
+}
+/**左侧面板*/
+#left
+{	
+	width:20%;min-height:862px;
+	background-color:#292D30;
+	float:left;
+}
+#logo
+{
+	width:100%;height:100px;
+	background-color:#23272B;
+	text-align: center;
+}
+#logo #icom
+{
+	display: inline-block;
+	width:42px;height:50px;
+	background: url("../images/logo.gif") no-repeat;
+	margin-left:40px;
+	float:left;
+}
+#logo #name
+{
+	display: inline-block;
+	width:100px;height:50px;line-height:50px;
+	color:#EFF3F3;
+	font-size:24px;
+	float:left;
+}
+#logo #ico
+{
+	display:inline-block;
+	width:42px;height:50px;
+	background:url("../images/logo.gif") no-repeat;
+	background-position: -180px 0px;
+	float:left;
+}
+#logo label
+{
+	display: inline-block;
+	width:auto;height:20px;
+	line-height: 20px;
+	color:#939393;
+	border-top:1px inset #EFF3F3;
+}
+
+#portraits
+{
+	width:100%;height:156px;
+	margin-top:10px;
+	background-color:#23272B;
+	color:#EFF3F3;
+}
+#portraits span
+{
+	display:inline-block;
+	margin-top:33px;margin-left:14px;
+	float:left;
+}
+#portraits #portrait{width:72px;height:72px;border-radius:36px;}
+#portraits #portrait img{width:100%;height:100%;border-radius:36px;}
+#portraits #info{ width:130px;height:130px; }
+#portraits #info p{line-height:26px; font-weight:bold;margin-right:4px;font-size:16px;}
+#portraits #info #fright{width:16px;height:16px;float:right;}
+#portraits #info #fright img{width:100%;height:100%;cursor: pointer;}
+
+#left .items
+{
+	margin-top:10px;
+	background-color:#23272B;
+	width:100%;height:50px;
+}
+
+#left .items a
+{
+	display:inline-block;
+	width:90%;line-height:50px;
+	color:#EFF3F3;
+	text-align:right;
+}
+#left .items label
+{
+	display:inline-block;
+	width:2%;height:50px;
+	background-color:green;
+	float:right;
+}
+/**左侧显示样式*/
+#top,#viewer{ width:80%; float:right; }
+/**右侧最上面功能区域*/
+#top
+{
+	height:62px;position: relative;
+	background-color:#EFF3F3;
+	box-shadow: 1px 1px 3px #292D30;
+}
+#top #centered
+{
+	position: absolute;
+	width:98%;height:24px;line-height:24px;
+	margin:19px auto;
+}
+#top a,#top span{ display:inline-block;	height:24px;}
+#top #dashboard,#top #refresh,#top #grid{ width:24px; margin-left:30px;}
+#top #dashboard{background-image:url("../images/top_03.jpg");}
+#top #refresh{background-image:url("../images/top_05.jpg");}
+#top #grid{background-image:url("../images/top_07.jpg");}
+#top #search
+{
+	position: relative;
+	margin-left:30px;width:160px;
+	border:1px solid grey;
+}
+#top #search input
+{
+	position: absolute;
+	width:85%;height:100%;
+	background-color:#D9DCDE;
+	border:none;
+}
+#top #search #ico-search
+{
+	display:inline-block;
+	position: absolute;
+	right:0;top:0;
+	width:24px;height:24px;
+	background-image:url("../images/top_12.png");
+}
+
+#top #group,#top #lock{margin-left:30px;width:24px;}
+#top #lock{	margin-left:30%;width:24px;vertical-align: top;}
+#top #logout{margin-left:30px;width:24px;height:24px;vertical-align: top;}
+#top #group {width:120px;vertical-align: top;font-weight: bold;font-size:14px;color:#D9DCDE;}
+#top #manager{width:24px;height:24px;margin-left:30px;background-image:url("../images/top_03.png");}
+
+#viewer
+{
+    float:right;min-height: 800px;
+	border:none;
+    background-color:#D9DCDE;
+}
+/**底部 样式 */
+#foot{ clear:both;width:100%;height:50px; }
+#foot span
+{ 
+	display:inline-block;
+	height:40px;line-height:40px;
+	margin-left:20%;
+}
+#linked{ margin-left:350px; }
+#linked a:link,#linked a:visited,#linked a:hover,#copyright{color:#A8A8A8;}
+
+
+
+
+登录
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title>登录</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="bases/css/reset.css" />
+    <script type="text/javascript" src="bases/js/jquery.min.js"></script>
+    <style>
+        body{ font-family: "微软雅黑",sans-serif; font-size:12px;background-color:#D9DCDE;}
+        #head{width:100%;height:60px;background-color:#EFF3F3;}
+        
+        #main{width:100%;min-height:812px;}
+        #main #left{width:56%;height:812px;float:left;`}
+        #main #right{width:44%;height:812px;float:right;}
+        
+        #right #login
+        {
+            width:70%;height:460px;
+            margin:120px auto;
+            box-shadow: 1px 1px 10px #000000;
+            background: #EFF3F3;
+        }
+       
+        #right #login #item a
+        {
+            display:inline-block;
+            height:40px;
+            line-height: 40px;
+            font-size:16px;text-align: center;
+            background-color:#EFF3F3;
+        }
+        #right #login #item a.used{ background-color:#fffbf0; }
+        #right #login #in-huodong,#right #login #in-master,#right #login #in-custom
+        {
+            display: none;
+            width:100%;height:60px;line-height: 60px;
+            margin-top:-1px;text-align: center;
+            background-color:#fffbf0
+            z-index:-1
+        }
+        #right #login #in-huodong select,#right #login #in-master select,#right #login #in-custom select
+        {
+            width:40%;height:24px;
+        }
+        #right #login #in-huodong label,#right #login #in-master label,#right #login #in-custom label
+        {
+            font-size:14px;
+        }
+        #right #login #in-huodong{display:block;background-color:#fffbf0}
+    </style>    
+</head>
+<body>
+    <div id="head"></div>
+    <div id="main">
+        <div id="left"></div>
+        <div id="right">
+            <div id="login">
+                <div id="item">
+                    <a class="used" style="width:33%" id="huodong">活动专题</a>
+                    <a style="width:32%" id="master">控　制　台</a>
+                    <a style="width:33%" id="custom">定　　制</a>
+                </div>
+                <div  id="in-huodong">
+                    <label>选择组类型:</label>
+                   <select>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                   </select>
+                </div>
+                <div id="in-master">
+                    <label>选择组类型:</label>
+                    <select>
+                        <option>控制台</option>
+                    </select>
+                </div>
+                <div id="in-custom">
+                    <label>选择组类型:</label>
+                    <select>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                        <option>1111</option>
+                   </select>
+                </div> 
+            </div>
+        </div>
+    </div>
+    <div id="foot"></div>     
+</body>
+<script>
+    $('#item a').click(function(){        
+        $(this).addClass('used');
+        $(this).siblings().removeClass('used');
+        
+    });
+</script>
+</html>
