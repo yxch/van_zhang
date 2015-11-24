@@ -1,1 +1,35 @@
 
+<!DOCTYPE html>
+<html>
+    <head>
+       <!--<?php points::head($page['head']);?>-->
+       <link rel="stylesheet" href="bases/css/reset.css" />
+       <script type="text/javascript" src="bases/js/jquery.min.js"></script>
+       <style>
+        table { width:90%;margin:60px auto;}
+        table thead{height:48px;font-weight: bold;color:#808080;}
+        
+       </style>
+    </head>
+    
+    <body>
+        
+        <table>
+            <thead>
+                <tr><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td></tr>
+            </thead>
+            <tbody>
+                <tr><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td></tr>
+                <tr><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td></tr>
+                <tr><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td></tr>
+                <tr><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td></tr>
+                <tr><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td><td>AAAA</td></tr>
+            </tbody>
+        </table>
+       
+    </body>
+    <script>
+        var tr = $('table tbody').find('tr').eq(0);
+        tr.before('<tr class="modifying"><td><input /></td><td><input /></td><td><input /></td><td><input /></td><td><input /></td></tr>');
+    </script>
+</html>
