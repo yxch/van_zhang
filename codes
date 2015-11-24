@@ -33,3 +33,18 @@
         tr.before('<tr class="modifying"><td><input /></td><td><input /></td><td><input /></td><td><input /></td><td><input /></td></tr>');
     </script>
 </html>
+
+
+下载PHPExcel后保存到自己的类文件目录中，然后使用以下代码可以打开Excel 2007（xlsx）格式的文件：
+
+require_once '/libs/PHPExcel-1.8.0/Classes/PHPExcel.php';     //修改为自己的目录
+echo '<p>TEST PHPExcel 1.8.0: read xlsx file</p>';
+$objReader = PHPExcel_IOFactory::createReaderForFile($filename);
+$objPHPExcel = $objReader->load($filename);
+$objPHPExcel->setActiveSheetIndex(1);
+$date = $objPHPExcel->getActiveSheet()->getCell('A16')->getValue();
+　　
+
+
+
+
