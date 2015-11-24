@@ -43,6 +43,62 @@ $objReader = PHPExcel_IOFactory::createReaderForFile($filename);
 $objPHPExcel = $objReader->load($filename);
 $objPHPExcel->setActiveSheetIndex(1);
 $date = $objPHPExcel->getActiveSheet()->getCell('A16')->getValue();
+
+
+
+
+<?php
+    require_once('include/common.inc.php');
+    require_once(ROOTPATH . 'include/phpExcel/PHPExcel/IOFactory.php');
+    
+    $filePath = './file/xls/110713.xls'; 
+    
+    $fileType = PHPExcel_IOFactory::identify($filePath); //文件名自动判断文件类型
+    $objReader = PHPExcel_IOFactory::createReader($fileType);
+    $objPHPExcel = $objReader->load($filePath);
+    
+    $currentSheet = $objPHPExcel->getSheet(0); //第一个工作簿
+    $allRow = $currentSheet->getHighestRow(); //行数
+    $output = array();
+    $preType = '';
+    
+    $qh = $currentSheet->getCell('A4')->getValue();
+    //按照文件格式从第7行开始循环读取数据
+    for($currentRow = 7;$currentRow<=$allRow;$currentRow++){ 
+        //判断每一行的B列是否为有效的序号，如果为空或者小于之前的序号则结束
+        $xh = (int)$currentSheet->getCell('B'.$currentRow)->getValue();
+        if(empty($xh))break;
+        
+        $tmpType = (string)$currentSheet->getCell('C'.$currentRow)->getValue(); //赛事类型
+        if(!empty($tmpType))$preType = $tmpType;
+        $output[$xh]['type'] = $preType;
+        $output[$xh]['master'] = $currentSheet->getCell('F'.$currentRow)->getValue(); //主队
+        $output[$xh]['guest'] = $currentSheet->getCell('H'.$currentRow)->getValue(); //客队    
+    }
+    
+    //从当前行开始往下循环，取出第一个不为空的行
+    for( ; ; $currentRow++){
+        $xh = (int)$currentSheet->getCell('B'.$currentRow)->getValue();
+        if(!empty($xh))break;
+    }
+    
+    for( ; $currentRow <= $allRow; $currentRow++){
+        $xh = (int)$currentSheet->getCell('B'.$currentRow)->getValue();
+        if(empty($xh))break;
+        
+        $output[$xh]['rq'] = $currentSheet->getCell('I'.$currentRow)->getValue();
+    }
+    header("content-type:text/html; charset=utf-8");
+    
+    echo '期号：' . $qh . "\n\n";
+    if(!empty($output)){
+        printf("%-5s\t%-15s\t%-40s\t%-40s\t%-5s\n", '序号', '赛事类型', '主队', '客队', '让球值');
+        foreach($output as $key => $row){
+            $format = "%-5d\t%-15s\t%-40s\t%-40s\t%-5s\n";
+            printf($format, $key, $row['type'], $row['master'], $row['guest'], $row['rq']);
+        }
+    }
+?>
 　　
 
 
