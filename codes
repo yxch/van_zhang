@@ -1,1 +1,4 @@
-
+document.getElementById('months').onchange = function()
+        {
+            var month = this.value; alert(month);
+        }
