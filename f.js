@@ -117,6 +117,14 @@ var count=$("#select_id  option").length;
             break;  
         }  
     }
+ 
+ //JavaScript权威指南摘要
+ 
+    
+    
+    
+    
+    
 
 //javascript中定义类的步骤
 1.先定义一个构造函数，并设置初始化新对象的实例属性。
