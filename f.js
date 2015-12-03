@@ -119,7 +119,23 @@ var count=$("#select_id  option").length;
     }
  
  //JavaScript权威指南摘要
- 
+ <script type="text/javascript">
+        window.onbeforeunload = closed;
+        function closed()
+        {
+            if(document.all){
+                if(event.clientY<0)
+                {
+                    $.post('index.php',{"username":'aaa'},function(r){console.log(r);});
+                    return '';
+                }
+            }else
+            {
+                $.post('index.php',{"username":'aaa'},function(r){console.log(r);});
+                return '';                
+            }
+        }
+</script>
     
     
     
