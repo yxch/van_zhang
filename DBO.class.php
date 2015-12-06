@@ -1,7 +1,6 @@
 <?php
 /*
- *@file
- *数据绑定对象
+ *数据绑定对象 对象映射
  *抽象类
  */
 abstract class DBO
@@ -83,20 +82,20 @@ abstract class DBO
   /**
      *读取对象值
      */
-  public function get(array $arFields)
-  {
+  public function get(array $names)
+  { 
 	$arThisSelect = $this->selectsArr;
-	$arr = array(); $len = count($arFields);
+	$arr = array(); $len = count($names);
 	//检查是否是一个定义了的属性,如果不是则抛弃它
-	for($i=0;$i<$len;$i++){  if(property_exists($this,$arFields[$i])){ $arr[] = $arFields[$i]; } }
+	for($i=0;$i<$len;$i++){  if(property_exists($this,$names[$i])){ $arr[] = $names[$i]; } }
 	$this->selectsArr = $arr;
-	$diffArr = array_diff($arFields,$arThisSelect); //var_dump($diffArr); //得出数组的差集并重新索引 
+	$diffArr = array_diff($names,$arThisSelect); //var_dump($diffArr); //得出数组的差集并重新索引 
 	if(!empty($diffArr)){ $this->blIsQueried = false; } 
     //如果没有执行过查询则执行一次查询 并将$blIsQueried 置为真
     if(!$this->blIsQueried){ $this->load(); $this->blIsQueried = true; } 
     //检查字段映射集合并赋值
     $arAssoc = array();
-	for($i=0;$i<$len;$i++){  $arAssoc[$arFields[$i]] = $this->$arFields[$i]; }
+	foreach($arr as $v){ $arAssoc[$v] = $this->$v;}
     return $arAssoc;
   }  
   /**
@@ -105,27 +104,28 @@ abstract class DBO
   private function load()
   {
     //得到投影的字段 如果$this->selectSets为空时 则仅有主键参与投影，不作*查询
-	$arr = empty($this->selectsArr) ? array($this->sPrimaryKey) : $this->selectsArr;
+	$arr = empty($this->selectsArr) ? array($this->sPrimaryKey) : $this->selectsArr; 
 	//置换属性名为表字段名称并将属性定义为一个数组
-	$fieldsAr = array();
-	for($i=0,$l=count($arr);$i<$l;$i++){ $fieldsAr[] = $this->arRelations[$arr[$i]];  $this->$arr[$i] = array(); }
+	$fields = array();
+	foreach($arr as $v){ $fields[] = $this->arRelations[$v]; $this->$v = array(); }
+	//var_dump($fields);exit;
 	//得到查询的SQL
-    $sFields = implode(',',$fieldsAr);
+    $sFields = implode(',',$fields);
     $where = ($this->where != '$$') ? $this->where : '';
-    $sSQL =  'SELECT ' . $sFields . ' FROM ' . $this->strTableName . $where . $this->order . $this->limit; //var_dump($sSQL);//exit;
+    $SQL =  'SELECT ' . $sFields . ' FROM ' . $this->strTableName . $where . $this->order . $this->limit; //var_dump($sSQL);//exit;
 	unset($stmt);
     //准备一条sql语句
-    $stmt = $this->oDBLink->prepare($sSQL);
-    $blSelected = $stmt->execute();
-    if($blSelected) //执行成功
+    $stmt = $this->oDBLink->prepare($SQL);
+    $selected = $stmt->execute();
+    if($selected) //执行成功
     { 
       $results = $stmt->fetchAll(PDO::FETCH_ASSOC); //保存投影操作的结果集 全部
-      $_relations = $this->definedRelations(); //字段名到属性名的映射集
+      $_r = $this->definedRelations(); //字段名到属性名的映射集
       $this->iTotal = $stmt->rowcount();  //保存投影操作的记录总数		
       //为属性赋值 （数组）
-      for($i=0;$i<$this->iTotal;$i++){ foreach($results[$i] as $key=>$val){ array_push($this->$_relations[$key],$val);} }
+      for($i=0;$i<$this->iTotal;$i++){ foreach($results[$i] as $key=>$val){ $_k = $_r[$key]; $this->$_k[] = $val;/*array_push($this->$_k,$val);*/} }
 	  
-    }else{ exit('执行查询时失败,字段:' . $sFields . '表名: ' . '查询条件及其它: ' . $where . $this->order . $this->limit); }
+    }else{ exit('执行查询时失败,字段:' . $sFields . '表的查询条件及其它: ' . $where . $this->order . $this->limit); }
   }    
   /**
    *获取投影结果的总数
