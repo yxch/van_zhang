@@ -1,33 +1,10 @@
-16,	memcache-3.0.8.tar.gz					
-用phpize编译共享PECL扩展库
-tar -zxvf memcache-3.0.8.tar.gz
-cd memcache-3.0.8
-/web/php/bin/phpize
-./configure \
---enable-memcache \
---with-php-config=/web/php/bin/php-config \
---with-zlib-dir
-make && make install
-如果成功安装会有提示信息，要注意它的路径名称，比如:
-提示为：/usr/local/php/lib/php/extensions/no-debug-zts-20121212/
-
-修改php.ini
-在php的配置文件的最后[end]前面加上这两行
-extension_dir="/usr/local/php/lib/php/extensions/no-debug-zts-20121212/"
-extension=memcache.so
-可以查看/websrv/php/lib/php/extentsions的相关文件名不一定是20090626
-需要重启apache服务
-
-17,	memcached-1.4.17.tar.gz
-tar xzvf memcache-1.4.17.tar.gz
-cd memcache-1.4.17
-./configure \
---prefix=/web/memcache \		
-make && make install
-检查相应目录结构，验证安装是否成功。
-
-启动memcached并分配32m内存（32m为使用内数，可按自身情况修改）
-/web/memcache/bin/memcached -d -m 32 -l 127.0.0.1 -p 11211 -u root
-加入启动项
-vi /etc/rc.d/rc.local
-/web/memcache/bin/memcached -d -m 32 -l 127.0.0.1 -p 11211 -u root
+CREATE TABLE `my_groups` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `aliase` varchar(64) DEFAULT NULL COMMENT '组的中文显示名',
+  `tye` char(1) NOT NULL DEFAULT '1' COMMENT '1:用户数据2:控制台3:定制',
+  `auth` char(10) NOT NULL DEFAULT '10000000' COMMENT '组的默认权限',
+  `dir` varchar(254) DEFAULT NULL COMMENT '组的默认目录',
+  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '组的默认状态',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '组的创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4
