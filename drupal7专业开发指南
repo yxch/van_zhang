@@ -1,4 +1,0 @@
-
-创建一个模块的步骤：
-1.创建目录结构，通常:/sites/all/modules/custom 或者 /sites/all/modules/moduleName
-2.创建文件/sites/all/modules/custom/annotate/annotate.info或者/sites/all/modules/annotate/annotate.info(以下同不再重复)
