@@ -8,3 +8,18 @@ CREATE TABLE `my_groups` (
   `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '组的创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4
+
+<body>
+    <div id="outset">
+      <div id="child">点我试试</div>    
+    </div>
+    <script>
+      $('#outset').click(function(){
+          alert(2);
+      });
+      $('#child').click(function(event){
+         event.stopPropagation();
+           alert(1);
+       });
+    </script>        
+</body>
