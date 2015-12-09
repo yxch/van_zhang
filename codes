@@ -217,6 +217,146 @@ wx.ready(function(){
 
 
 
+<?php
+$noncestr = mt_rand ( 1000, 9999 );
+$timestamp = time ();
+$jsapi_ticket = GE::getJsApiTicket ( APPID,DOMAINNAME,false);
+$currentUrl = 'http://' . DOMAINNAME . $_SERVER ["REQUEST_URI"];
+
+$signArr = 'jsapi_ticket='.$jsapi_ticket.'&noncestr='.$noncestr.'&timestamp='.$timestamp.'&url='.$currentUrl;
+$signature = sha1 ( $signArr );
+?>
+<script>
+	var pid = $('#pid').val();
+	var url = $('#domain').val()  + '/cmbwx/';
+	
+	// 微信分享的数据
+	var wxData = {
+	    "appId": "", // 服务号可以填写appId
+	    "imgUrl" : url + 'images/index.jpg',
+	    "link" : url + 'index.php',
+	    "desc" : '秒变百万壕,领100万航空保障',
+	    "title" : "秒变百万壕,领100万航空保障"
+	};
+
+</script>
+
+<?php if(MOLD){?>
+	<script type="text/javascript" src="./WeixinApi/WeixinApi.js"></script>
+	<script type="text/javascript" src="./js/start.js"></script>
+<?php }else{?>
+	<script type="text/javascript" src="./WeixinApi/jweixin-1.0.0.js"></script>
+	<script type="text/javascript" src="./js/startnew.js"></script>
+<?php }?>
+
+
+;weixin configuration file
+
+[cigna]
+
+env='uat'
+log=''
+
+;url = 'http://58.61.30.111:14002/WeiXinOauthService?wsdl'
+;url = 'http://weixin.cmbchina.com:14005/WeiXinOauthService?wsdl'
+url = 'http://218.17.246.186:14005/WeiXinOauthService?wsdl'
+;oauth_url = 'http://58.61.30.111/PCS2012/OAuthHandler.aspx?req=mer'
+oauth_url = 'http://weixin.cmbchina.com/PCS2012/OAuthHandler.aspx?req=mer'
+key = 'hdf345sd23u78jgk58'
+mid = 'cigna'
+
+;推送模板需要设置的参数
+template_id = 'Tmplcigna'
+template_url = 'http://weixin.qq.com/download'
+template_topcolor = '#FF0000'
+
+;获取用户信息的参数
+base_authType = 'snsapi_base'
+userInfo_authType = 'snsapi_userinfo'
+sub = 'y'
+bind = 'y'
+cb_url_prex='http://test.cignacmb.com'
+
+;代理设置
+proxy_host = '10.140.131.22'
+proxy_port = '82'
+
+;承保接口
+approvalUrl = 'http://10.140.130.41:8080/online/services/cmbWeixinPolicyCoverService?wsdl'
+;approvalUrl = 'http://10.141.139.157:8080/online/services/cmbWeixinPolicyCoverService?wsdl'
+;承保签名串
+ws_signa_key='A4FDAF841B91E37B34FC2A2C072DFFD40BD940E54F2B64B5698A9C9F0FA37476'
+;保单登记推送消息ID
+approval_register='CwvwLIa8tFGYlMXOar3ZcYEwwFSAHdJwQADlgQ382G4'
+;承保时，因重复承保错误
+approval_failed='u8_EAhouMsYhOjh9jMrp-0Q0XRtI6tlpr7bzdc1ENsQ'
+;保单生效推送消息ID
+approval_success='IgB6v37D2KIMO1mVEEHDSjnDB4Pogyd3wC5zaZ0wSok'
+;分配首次保额后，消息推送跳转的URL
+approval_firsr_reg_url='http://test.cignacmb.com/cmbwx/index.php'
+;满100万后，推送消息跳转的URL
+approval_mane_url='http://test.cignacmb.com/cmbwx/index.php'
+;承保成功后推送消息的保单查询地址
+approval_success_url='http://m.cignacmb.com'
+;关注跳转链接
+;focus_url='http://mp.weixin.qq.com/s?__biz=MjM5ODgwNjUxNQ==&mid=203210430&idx=1&sn=07524fab564c15488878ece5f33881e7&scene=1&from=groupmessage&isappinstalled=0#rd'
+focus_url='http://mp.weixin.qq.com/s?__biz=MjM5MDU4Njg5Mw==&mid=373680153&idx=1&sn=8a3d4895cba81ae891cecf46e29d76de#rd'
+
+
+
+;weixin configuration file
+
+[cigna]
+
+env='uat'
+log=''
+
+;url = 'http://58.61.30.111:14002/WeiXinOauthService?wsdl'
+url = 'http://weixin.cmbchina.com:14005/WeiXinOauthService?wsdl'
+;oauth_url = 'http://58.61.30.111/PCS2012/OAuthHandler.aspx?req=mer'
+oauth_url = 'http://forum.cmbchina.com/PCS2012/OAuthHandler.aspx?req=mer'
+key = 'hdf345sd23u78jgk58'
+mid = 'cigna'
+
+;推送模板需要设置的参数
+template_id = 'Tmplcigna'
+template_url = 'http://weixin.qq.com/download'
+template_topcolor = '#FF0000'
+
+;获取用户信息的参数
+base_authType = 'snsapi_base'
+userInfo_authType = 'snsapi_userinfo'
+sub = 'y'
+bind = 'y'
+cb_url_prex='http://test.cignacmb.com'
+
+;代理设置
+proxy_host = '10.140.198.31'
+proxy_port = '82'
+
+;承保接口
+approvalUrl = 'http://10.140.3.94/online/services/cmbWeixinPolicyCoverService?wsdl'
+;承保签名串
+ws_signa_key='A4FDAF841B91E37B34FC2A2C072DFFD40BD940E54F2B64B5698A9C9F0FA37476'
+;保单登记推送消息ID
+approval_register='CwvwLIa8tFGYlMXOar3ZcYEwwFSAHdJwQADlgQ382G4'
+;保单生效推送消息ID
+approval_success='RR2hyjcxm9KNrZKbj444Ex-W9i6DkIpayKMVeWDorAA'
+;承保时，因重复承保错误
+approval_failed='u8_EAhouMsYhOjh9jMrp-0Q0XRtI6tlpr7bzdc1ENsQ'
+;分配首次保额后，消息推送跳转的URL
+approval_firsr_reg_url='http://m.cignacmb.com/cmbwx/index.php'
+;满100万后，推送消息跳转的URL
+approval_mane_url='http://m.cignacmb.com/cmbwx/index.php'
+;承保成功后推送消息的保单查询地址
+approval_success_url='http://m.cignacmb.com'
+;关注跳转链接
+focus_url='http://mp.weixin.qq.com/s?__biz=MjM5MDU4Njg5Mw==&mid=373680153&idx=1&sn=8a3d4895cba81ae891cecf46e29d76de#rd'
+
+
+
+
+
 
 
 
