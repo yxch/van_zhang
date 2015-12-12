@@ -19,6 +19,236 @@ CREATE TABLE `tb_points_category` (
 ============================================SQL============================================
 
 
+==============================shell.css============================================
+/**本需求通用样式*/
+body{ font-family: "微软雅黑",sans-serif; font-size:12px; }
+a{cursor:pointer;}
+#outset
+{
+    min-height:520px;
+    margin-top:4px;    
+    box-shadow: 1px 0px 20px #292D30;
+}
+/**左侧面板*/
+#left
+{	
+	width:20%;min-height:520px;
+	background-color:#292D30;
+	float:left;
+}
+#logo
+{
+	width:100%;height:100px;
+	background-color:#23272B;
+	text-align: center;
+}
+#logo #icom
+{
+	display: inline-block;
+	width:42px;height:50px;
+	background: url("../images/logo.gif") no-repeat;
+	margin-left:40px;
+	float:left;
+}
+#logo #name
+{
+	display: inline-block;
+	width:100px;height:50px;line-height:50px;
+	color:#EFF3F3;
+	font-size:24px;
+	float:left;
+}
+#logo #ico
+{
+	display:inline-block;
+	width:42px;height:50px;
+	background:url("../images/logo.gif") no-repeat;
+	background-position: -180px 0px;
+	float:left;
+}
+#logo label
+{
+	display: inline-block;
+	width:auto;height:20px;
+	line-height: 20px;
+	color:#939393;
+	border-top:1px inset #EFF3F3;
+}
+
+#portraits
+{
+	width:100%;height:156px;
+	margin-top:10px;
+	background-color:#23272B;
+	color:#EFF3F3;
+}
+#portraits span
+{
+	display:inline-block;
+	margin-top:33px;margin-left:14px;
+	float:left;
+}
+#portraits #portrait{width:72px;height:72px;border-radius:36px;}
+#portraits #portrait img{width:100%;height:100%;border-radius:36px;}
+#portraits #info{ width:130px;height:130px; }
+#portraits #info p{line-height:26px; font-weight:bold;margin-right:4px;font-size:16px;}
+#portraits #info p#status{font-weight:normal;font-size:10px;color:#FFBB1C;} 
+#portraits #info #fright{width:16px;height:16px;float:right;}
+#portraits #info #fright img{width:100%;height:100%;cursor: pointer;}
+
+#left .items
+{
+	margin-top:10px;
+	background-color:#23272B;
+	width:100%;height:50px;
+}
+
+#left .items a
+{
+	display:inline-block;
+	width:90%;line-height:50px;
+	color:#EFF3F3;
+	text-align:right;
+}
+#left .items label
+{
+	display:inline-block;
+	width:2%;height:50px;
+	background-color:green;
+	float:right;
+}
+/**左侧显示样式*/
+#top,#viewer{ width:80%; float:right; }
+/**右侧最上面功能区域*/
+#top
+{
+	height:62px;position: relative;
+	background-color:#EFF3F3;
+	box-shadow: 1px 1px 3px #292D30;
+}
+#top #centered
+{
+	position: absolute;
+	width:98%;height:24px;line-height:24px;
+	margin:19px auto;
+}
+#top a,#top span{ display:inline-block;	height:24px;}
+#top #dashboard,#top #refresh,#top #grid{ width:24px; margin-left:30px;}
+#top #dashboard{background-image:url("../images/top_03.jpg");}
+#top #refresh{background-image:url("../images/top_05.jpg");}
+#top #grid{background-image:url("../images/top_07.jpg");}
+#top #search
+{
+	position: relative;
+	margin-left:30px;width:160px;
+	border:1px solid grey;
+}
+#top #search input
+{
+	position: absolute;
+	width:85%;height:100%;
+	background-color:#D9DCDE;
+	border:none;
+}
+#top #search #ico-search
+{
+	display:inline-block;
+	position: absolute;
+	right:0;top:0;
+	width:24px;height:24px;
+	background-image:url("../images/top_12.png");
+}
+#top #screen
+{
+    float:right;
+}
+#top #userinfo
+{
+    display:none;
+    height:62px;
+    margin-top:-19px;margin-left:4%;
+    float:right;
+}
+#top #screen #lock,#top #screen #logout{width:32px;text-align: center;text-decoration: none;}
+#top #screen #applied{font-weight: bold;font-size:14px;color:#D9DCDE;}
+
+#top #userinfo #user-portrait{ display: inline-block;width:48px;height:48px;border-radius:24px;margin-top:7px;}
+#top #userinfo #user-portrait img{width:100%;height:100%;border-radius:24px;}
+#top #userinfo #user-status
+{
+    display: inline-block;
+    height:100%;line-height: 62px;
+    margin-left:6px;
+    color:#ffbb1c;font-weight: bold;
+    float:right;
+}
+
+#viewer
+{
+    float:right;min-height:458px;
+	border:none;
+    background-color:#D9DCDE;
+}
+==============================shell.css============================================
+
+
+
+==============================shell.js============================================
+
+$(document).ready(function(){
+    
+    //重置节点的高度
+    resize();
+    
+    $('.items a').click(function(){
+        document.getElementById('viewer').src =  $(this).attr('ref');       
+    });
+    
+    //刷新按钮
+    $('#refresh').click(function(){
+        var src = $('#viewer').attr('src');
+        src = src.split('?')[0];
+        document.getElementById('viewer').src = src + '?ver=' + Math.random();    
+    });
+    
+    //切换窗口
+    $('#grid').click(function(){
+        if ($(this).hasClass('full'))
+        {
+            $(this).removeClass('full');
+            $('#left').show();
+            $('#top').css('width','80%');
+            $('#userinfo').hide();
+            $('#viewer').css('width','80%');
+        }else
+        {
+            $(this).addClass('full');
+            $('#left').hide();
+            $('#top').css('width','100%');
+            $('#userinfo').show();
+            $('#viewer').css('width','100%');
+        }
+    });
+    
+    //心变窗口时重置节点的高度
+    $(window).resize(function(){ resize(); });
+    
+    function resize()
+    {
+        var _H = $(window).height(); //alert(_H);
+        $('#outset').css('height',(_H - 50 - 4) + 'px');
+        $('#left').css('height',(_H - 50 - 4) + 'px');
+        $('#viewer').css('height',(_H - 50 - 62 - 4) + 'px');
+    }
+
+});
+
+
+==============================shell.js============================================
+
+
+
+
 ==============================category.php============================================
 
 <?php
@@ -398,7 +628,7 @@ class category extends DBO
                     <h2>为此类别指定访问用户及相关权限</h2>
                     <div id="users">有待增加内容</div>
                     <div id="authority">有待增加内容</div>
-                    <div class="apply"><a id="save-user">为此类别应用用户权限</a></div>
+                    <div class="apply"><a id="save-user">保存用户权限</a></div>
                </div>
             </div>
         </div>
