@@ -1,0 +1,456 @@
+
+==============================category.php============================================
+
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/usr/master/master.inc.php';
+    
+    /**
+     *类别管理
+     */
+    
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+       <?php points::head('',false); ?>
+       <link rel="stylesheet" href="css/master.css" />
+       <link rel="stylesheet" href="/project/css/grids.css" />
+       <script src="/project/js/f.js"></script>
+       <script src="js/category.js"></script>
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1>类别管理器</h1><span id="err">这里将显示操作提示</span></div>
+            <table id="grids">
+                <thead>
+                    <tr>
+                        <td>编号</td>
+                        <td>MD5值</td>
+                        <td>类别显示名</td>
+                        <td>所在区域的ID</td>
+                        <td>管理的URL部分</td>
+                        <td>访问的URL</td>
+                        <td>隶属于</td>
+                        <td>状态</td>
+                        <td>创建时间</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="loading"><td colspan="9">loading data！please wait......</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="9"><span id="oper">&nbsp</span><span id="fpage">&nbsp</span></td></tr>
+                </tfoot>
+            </table>
+        </div>
+    </body>
+</html>
+==============================category.php============================================
+
+==============================category.oper.css=======================================
+#categories,#variable,#filter,#user
+{
+    border:1px solid #998514;
+    margin-bottom: 10px;
+}
+#categories h2,#variable h2,#filter h2,#user h2
+{
+    font-style:italic;font-weight: 100;
+    color:#998516;
+    margin-top:2px;margin-bottom: 2px;
+    width:13%;
+    text-align: left;
+    float:right;
+}
+
+#categories div, #variable div,#filter div,#user div
+{
+    clear:both;
+    width:96%;margin:auto;
+    line-height: 32px;
+    border-bottom: 1px solid #A0C9D6;
+    margin-bottom: 10px;
+    padding-bottom: 16px;
+}
+#categories div .desc, #variable div .desc,#filter div .desc,#user div .desc
+{
+    -webkit-text-size-adjust: none;
+    font-size:10px;color:#808080;
+}
+
+#categories .apply, #variable .apply,#filter .apply,#user .apply{  border-bottom: none;width:100%;height:32px;}
+#categories .apply a, #variable .apply a,#filter .apply a,#user .apply a
+{
+    display:inline-block;
+    width:8%;height:32px;line-height: 32px;
+    position: absolute;
+    right:5%;
+    background-color:#73E4FE; /**替换此背景色*/
+    text-align: center;
+    font-weight:bold;
+    border-radius: 6px;
+}
+
+#categories input,#variable input,#filter input,#user input,
+#categories select,#variable select,#filter select,#user select
+{
+    background-color:transparent;
+    border-top:none;border-left:none;border-right:1px solid transparent;
+    border-bottom:1px solid #808080;
+    border-radius: 2px;
+    height:22px;
+    text-align: center;
+    font-weight: 200;
+    color:red; /**请用合适的颜色值替换此颜色值*/
+}
+#categories select,#variable select,#filter select,#user select
+{
+    border-radius:0;
+    border:1px solid #808080;
+}
+
+#categories #dv-url input{ width:40%;margin-right:20%;}
+#categories #dv-title input{ width:36.5%;margin-right:5%;}
+#categories #dv-region select{ width:16%;margin-right:5%;}
+#categories #dv-region input{ width:34.8%;}
+
+#variable div input{width:16%;margin-right:5%;}
+#variable #ver input{ width:auto;height:22px;line-height: 22px;vertical-align:bottom;}
+#variable #ver label{display: inline-block;width:6%;height:22px;line-height: 22px;}
+
+
+#announce
+{
+    width:98%;
+    margin: auto;
+    
+}
+
+==============================category.oper.css=======================================
+
+
+
+==============================category.js==============================
+$(document).ready(function(){
+    posts.page = 1;//默认显示第一页
+    f.grid('ask/category.ajx.php');
+    
+    $('#grids tfoot tr td').delegate('#edit','click',function(){ 
+        var tr = $('#grids tbody .checked');
+        var err = document.getElementById('err');
+        if (tr.length == 0) { err.innerHTML = '没有条目选中'; return; }
+        if (tr.length > 1) { err.innerHTML = '一次只能编辑一个条目'; return; }
+        err.innerHTML = '';
+        var id = tr.find(':first-child').text();
+        window.location.href="category.oper.php?cid=" + id;    
+    });
+
+    $('#grids tfoot tr td').delegate('#add','click',function(){
+        window.location.href="category.oper.php";
+    });
+
+
+});
+
+==============================category.js==============================
+
+==============================category.oper.js==============================
+
+$(document).ready(function(){
+
+    $('#save-category').click(function(event){
+        event.stopPropagation();    
+        alert();
+    
+    });
+});
+
+==============================category.oper.js==============================
+
+
+==============================category.ajx.php==============================
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/usr/master/master.inc.php';
+    $_SESSION['authority'] = '1111000110';
+    
+    //返回的数据
+    $set = array('status'=>0,'page'=>$_POST['page'],'pageTotal'=>0,'tbody'=>'','operations'=>'','fpage'=>'');
+    
+    //校验一下$page 必须为一个整数
+    if(!ctype_digit($set['page'])){ exit; /**异常的参数传入*/ }
+    
+    //获取符合条件的总数并处理分页
+    $category = new category();
+    $pageSize = 20; //分页大小
+    $set['pageTotal'] = ceil($category->rows() / $pageSize);
+    $limit = $pageSize . ' OFFSET ' . ($set['page'] - 1) * $pageSize;
+    
+    //获取数据
+    $category = new category(NULL,array('order'=>'createTime DESC','limit'=>$limit));
+    $categories  = $category->get(array('id','MD5','title','regionId','managingURL','accessedURL','type','status','createTime'));
+    
+    //准备显示的内容
+    $tbody = '';
+    for($i=0;$i<$category->iTotal();$i++)
+    {
+        $tbody .= '<tr><td>' . $categories['id'][$i] . '<label class="selected"></label></td>';
+        $tbody .= '<td>' . $categories['MD5'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['title'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['regionId'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['managingURL'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['accessedURL'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['type'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['status'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['createTime'][$i] . '</td></tr>';   
+    }
+    if($category->iTotal() > 0) //有可用数据提供显示
+    {
+        $set['status'] = 1;
+        $set['tbody'] = $tbody;
+        $set['operations'] = points::authorized($_SESSION['authority'],array('apply','import','export'));
+        $fpage = points::fpage($set['pageTotal'],$set['page'],$pageSize);
+        $set['fpage'] = empty($fpage) ? '&nbsp' : $fpage;
+    }else
+    {
+        
+    }
+    
+    points::jan($set);
+?>
+
+==============================category.ajx.php==============================
+
+
+==============================category.class.php==============================
+
+<?php
+class category extends DBO
+{
+    protected $id;
+    protected $MD5;
+    protected $title;
+    protected $regionId;
+    protected $managingURL;
+    protected $accessedURL;
+    protected $type;
+    protected $status;
+    protected $modifiedTime;
+    protected $createTime;
+    
+    protected function definedTableName(){ return 'tb_points_category'; }
+    protected function definedPrimaryKey(){ return 'id'; }
+    protected function definedRelations()
+    {
+        return array('id'=>'id',
+                     'md5'=>'MD5',
+                     'title'=>'title',
+                     'rid'=>'regionId',
+                     'murl'=>'managingURL',
+                     'aurl'=>'accessedURL',
+                     'tye'=>'type',
+                     'yes'=>'status',
+                     'mtime'=>'modifiedTime',
+                     'ctime'=>'createTime'     );
+    }
+    
+}
+
+?>
+
+==============================category.class.php==============================
+
+
+==============================category.oper.php==============================
+
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/usr/master/master.inc.php';
+    
+    $categoryId = isset($_GET['cid']) ? $_GET['cid'] : '';
+    if($categoryId && !ctype_digit($categoryId)){exit('Exception access violation');}
+    if($categoryId) //如果用户编辑类别
+    {
+        $title = "编辑类别[ID:<label id=\"id\">$categoryId</label>]";
+        $category = new category(array('id'=>$categoryId));
+        $categories = $category->get(array('regionId','title','managingURL','accessedURL','type')); //var_dump($categories);exit;
+        $murl = $categories['managingURL'][0];
+        $name = $categories['title'][0];
+        $aurl = $categories['accessedURL'][0];
+        $pos = $categories['type'][0];
+        $rid = $categories['regionId'][0];
+        
+    }else //否则用户新增类别
+    {
+        $title = "增加类别";
+        $murl = '';
+        $name = '';
+        $aurl = '';
+        $pos = '';
+        $rid = '';
+    }
+    //区域
+    $region = new regions(array('status'=>1));
+    $regions = $region->get(array('id','name','region','directory','status')); //echo '<pre>'; var_dump($regions);exit;
+    //处理成id=>'用户数据-招商信诺'形式
+    $arr = array();
+    $regionRelations = points::regions(); 
+    for($i=0;$i<$region->iTotal();$i++){ $arr[$regions['id'][$i]] = $regionRelations[$regions['region'][$i]] . '=>' . $regions['name'][$i];}
+
+?>
+<!DCOTYPE html>
+<html>
+    <head>
+       <?php points::head('',false); ?>
+       <link rel="stylesheet" href="css/master.css" />
+       <link rel="stylesheet" href="css/category.oper.css" />
+       <script src="js/category.oper.js"></script>
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1><?php echo $title; ?></h1><span id="err">在这里显示操作提示</span></div>
+            <div id="category">
+                <div id="categories">
+                    <h2>为此类别指定管理URL的一些参数</h2>
+                    <div id="dv-url">                        
+                        <p id="m-url">
+                            <label>管理路径：</label><input type="text" id="murl" value="<?php echo $murl; ?>" />
+                            <label>隶属于：</label>
+                            <select id="pos">
+                                <option value="1" <?php echo $pos == 1 ? 'selected' : ''; ?>>PC端</option>
+                                <option value="2" <?php echo $pos == 2 ? 'selected' : ''; ?>>移动端</option>
+                                <option value="3" <?php echo $pos == 3 ? 'selected' : ''; ?>>通用</option>
+                            </select>
+                        </p>
+                        <p class="desc">输入要管理的路径部分。如果URL为：http://www.test.org/aaaa/bbbb/ccc/index.html,只需要输入/aaaa/bbbb/ccc/index.html即可.请确保输入部分没有空白且符合url规范。</p>
+                    </div>
+                    <div id="dv-title">
+                        <label>类别的中文显示名：</label><input type="text" id="title" value="<?php echo $name; ?>" />
+                        <span class="desc">为此类别确定一个描述性中文显示名，这有助于与其它类别明确地区分开。</span>
+                    </div>
+                    <div id="dv-region">
+                        <p>
+                            <label>类别的显示区域：</label>
+                            <select id="regions">
+                                <?php foreach($arr as $k=>$v){ ?>
+                                    <option value="<?php echo $k; ?>" <?php echo $rid == $k ? 'selected' : ''; ?>><?php echo $v; ?></option>
+                                <?php } ?>
+                            </select>
+                            
+                            <label>指定该类别的状态：</label>
+                            <select id="status">
+                                <option value="1">使用</option>
+                                <option value="0">废弃</option>
+                            </select>
+                        </p>
+                        <p><label>指定该类别的访问路径：</label><input type="text" id="aurl" value="<?php echo $aurl; ?>" /></p>
+                        <p class="desc">区域的目录与类别的访问路径组合成访问URL，即为此类别指定模块文件。如果管理URL与组合的访问URL相同，并且隶属于的值相等，则系统将此类别判定为系统类别。某些变量将不能初始化。</p>
+                    </div>
+                    <div class="apply"><a id="save-category">保存此类别</a></div>
+               </div>
+               <div id="variable">
+                    <h2>为此类别初始化一些变量</h2>
+                    <div id="time">
+                        <label>开始时间：</label><input type="text" id="stime" value="" />
+                        <label>结束时间：</label><input type="text" id="etime" value="" />
+                        <p class="desc">如果初始化了时间变量，则此类别可以根据用户输入的时间值来确定某些活动有效时间范围。</p>
+                    </div>
+                    <div id="ver">
+                        <label>变量版本<input type="checkbox" id="vver" value="1" /></label>
+                        <span class="desc">如果初始化了此变量，则此类别的变量在每次修改时增加1，可以根据变量的版本来判断变量是否有更新。</span>
+                    </div>
+                    <div>
+                        <label>活动未开始时的页面URL：</label><input type="url" id="surl" value="" />
+                        <label>活动结束后的页面URL：</label><input type="url" id="eurl" value="" />
+                        <p class="desc">如果初始化了这两个变量，则用户可以指定未活动开始或结束后的页面显示方式。</p>
+                    </div>
+                    <div>
+                        <label>用户数据分页大小:</label><input type="text" id="psize" value="20" />
+                        <span class="desc">如果初始化了此变量，则用户可以指定自定义的分页大小值。</span>
+                    </div>
+                    <div class="apply"><a id="save-var">初始化变量</a></div>
+               </div>
+               <div id="filter">
+                    <h2>为此类别初始化一个用户数据过滤器</h2>
+                    <div id="fields">有待增加内容</div>
+                    <div id="sql">有待增加内容</div>
+                    <div class="apply" id="save-filter"><a>保存此过滤器</a></div>
+               </div>
+               <div id="user">
+                    <h2>为此类别指定访问用户及相关权限</h2>
+                    <div id="users">有待增加内容</div>
+                    <div id="authority">有待增加内容</div>
+                    <div class="apply"><a id="save-user">为此类别应用用户权限</a></div>
+               </div>
+            </div>
+        </div>
+        <div id="announce">增加对类别管理的描述内容</div>
+    </body>
+</html>
+==============================category.oper.php==============================
+
+
+==============================master.css==============================
+
+body{font-family: '微软雅黑',Arial;font-size:12px;}
+#outset{width:98%;height:auto;margin:0 auto;}
+
+#topic
+{
+    width:100%;height:32px;line-height: 32px;
+    vertical-align: middle;
+    margin:20px auto;
+}
+#topic h1
+{
+    display: inline-block;
+    font-size:16px;
+    float:left;
+}
+#topic span
+{
+    color:#DD5B25;
+    font-style:italic;
+    float:right;
+    margin-right:15%;
+}
+
+==============================master.css==============================
+
+
+==============================grids.css==============================
+#grids{width:100%;text-align: center;}
+#grids thead{font-weight: bold;font-size:14px;}
+#grids thead tr{height:36px;line-height:36px;background-color:#B9D1EA;}
+#grids tbody tr{height:28px;line-height: 28px;}
+#grids thead tr,#grids tbody tr{border-top:1px solid #B9D1EA;border-bottom:1px solid #B9D1EA;}
+#grids tbody tr:hover{background-color:#B9DCE1;cursor: pointer;}
+#grids tbody tr td:first-child .selected
+{
+    display: inline-block;
+    width:10px;height: 10px;
+    margin-left:20%;
+}
+#grids tbody tr#loading
+{
+    height:68px;line-height: 68px;
+    color:#DD5B25;
+    font-size:16px;
+    font-style:italic;
+}
+#grids thead tr td,#grids tbody tr td{border-left:1px solid #B9D1EA;}
+#grids thead tr td:first-child,#grids tbody tr td:first-child{border-left:none;}
+#grids tfoot tr{height:32px;line-height: 32px;}
+#grids tfoot tr{border-top:1px solid #B9D1EA;border-bottom:1px solid #B9D1EA; }
+#grids tfoot tr td #oper,#grids tfoot tr td #fpage{display:inline-block;}
+#grids tfoot tr td #oper{width:40%;background-color:#B9D1DF;}
+#grids tfoot tr td #fpage{width:60%;background-color:#B9D1EA;}
+#grids tfoot tr #fpage a
+{
+    display:inline-block;
+    width:24px;height:24px;line-height: 24px;
+    text-align: center;
+    margin-left:4px;margin-right:4px;
+}
+#grids tfoot tr #fpage  .page{ width:12px;}
+
+==============================grids.css==============================
+
