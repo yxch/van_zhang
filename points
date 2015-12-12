@@ -1,4 +1,24 @@
 
+删除了regions.css
+
+注意修改各文件的路径。
+
+============================================SQL============================================
+CREATE TABLE `tb_points_category` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `md5` char(32) DEFAULT NULL COMMENT '路径MD5值',
+  `title` varchar(64) DEFAULT NULL COMMENT '类别中文标题',
+  `rid` int(11) DEFAULT NULL COMMENT '区域id',
+  `murl` varchar(254) DEFAULT NULL COMMENT '管理路径',
+  `aurl` varchar(254) DEFAULT NULL COMMENT '访问路径',
+  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+============================================SQL============================================
+
+
 ==============================category.php============================================
 
 <?php
