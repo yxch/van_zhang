@@ -361,15 +361,22 @@ $(document).ready(function(){
     border:1px solid #808080;
 }
 
+#categories .error,#variable .error,#filter .error,#user .error
+{
+    color:#DD5B25;
+    font-style:italic;
+    float:right;
+    margin-right:15%;
+}
+
 #categories #dv-url input{ width:40%;margin-right:20%;}
 #categories #dv-title input{ width:36.5%;margin-right:5%;}
 #categories #dv-region select{ width:16%;margin-right:5%;}
 #categories #dv-region input{ width:34.8%;}
 
-#variable div input{width:16%;margin-right:5%;}
-#variable #ver input{ width:auto;height:22px;line-height: 22px;vertical-align:bottom;}
-#variable #ver label{display: inline-block;width:6%;height:22px;line-height: 22px;}
-
+#variable input{width:10%;}
+#variable #time #stime{margin-right:8%;}
+#variable #dv-aurl input{width:30%;}
 
 #announce
 {
@@ -439,7 +446,7 @@ $(document).ready(function(){
     
     //获取数据
     $category = new category(NULL,array('order'=>'createTime DESC','limit'=>$limit));
-    $categories  = $category->get(array('id','MD5','title','regionId','managingURL','accessedURL','type','status','createTime'));
+    $categories  = $category->get(array('id','MD5','title','regionId','managingURL','accessedURL','position','status','createTime'));
     
     //准备显示的内容
     $tbody = '';
@@ -451,7 +458,7 @@ $(document).ready(function(){
         $tbody .= '<td>' . $categories['regionId'][$i] . '</td>';
         $tbody .= '<td>' . $categories['managingURL'][$i] . '</td>';
         $tbody .= '<td>' . $categories['accessedURL'][$i] . '</td>';
-        $tbody .= '<td>' . $categories['type'][$i] . '</td>';
+        $tbody .= '<td>' . $categories['position'][$i] . '</td>';
         $tbody .= '<td>' . $categories['status'][$i] . '</td>';
         $tbody .= '<td>' . $categories['createTime'][$i] . '</td></tr>';   
     }
@@ -523,12 +530,15 @@ class category extends DBO
     {
         $title = "编辑类别[ID:<label id=\"id\">$categoryId</label>]";
         $category = new category(array('id'=>$categoryId));
-        $categories = $category->get(array('regionId','title','managingURL','accessedURL','type')); //var_dump($categories);exit;
+        $categories = $category->get(array('regionId','title','managingURL','accessedURL','position')); //var_dump($categories);exit;
         $murl = $categories['managingURL'][0];
         $name = $categories['title'][0];
         $aurl = $categories['accessedURL'][0];
-        $pos = $categories['type'][0];
+        $pos = $categories['position'][0];
         $rid = $categories['regionId'][0];
+        
+        $vver = ''; /** 从变量表中取值替换 mock here */
+        $psize = '';
         
     }else //否则用户新增类别
     {
@@ -538,6 +548,8 @@ class category extends DBO
         $aurl = '';
         $pos = '';
         $rid = '';
+        $vver = '';
+        $psize = '';
     }
     //区域
     $region = new regions(array('status'=>1));
@@ -558,7 +570,7 @@ class category extends DBO
     </head>
     <body>
         <div id="outset">
-            <div id="topic"><h1><?php echo $title; ?></h1><span id="err">在这里显示操作提示</span></div>
+            <div id="topic"><h1><?php echo $title; ?></h1><span id="err"></span></div>
             <div id="category">
                 <div id="categories">
                     <h2>为此类别指定管理URL的一些参数</h2>
@@ -567,12 +579,11 @@ class category extends DBO
                             <label>管理路径：</label><input type="text" id="murl" value="<?php echo $murl; ?>" />
                             <label>隶属于：</label>
                             <select id="pos">
-                                <option value="1" <?php echo $pos == 1 ? 'selected' : ''; ?>>PC端</option>
-                                <option value="2" <?php echo $pos == 2 ? 'selected' : ''; ?>>移动端</option>
-                                <option value="3" <?php echo $pos == 3 ? 'selected' : ''; ?>>通用</option>
+                                <option value="1" <?php echo $pos == 1 ? 'selected' : ''; ?>>前端页面显示</option>
+                                <option value="2" <?php echo $pos == 2 ? 'selected' : ''; ?>>后端管理页面</option>
                             </select>
                         </p>
-                        <p class="desc">输入要管理的路径部分。如果URL为：http://www.test.org/aaaa/bbbb/ccc/index.html,只需要输入/aaaa/bbbb/ccc/index.html即可.请确保输入部分没有空白且符合url规范。</p>
+                        <p class="desc">输入要管理的URL。如：http://www.test.org/aaaa/bbbb/ccc/.请确保输入没有空白且符合url规范。可以为不同的目录下的文件管理不同的类别内容。如果管理URL属于后端管理页面，某些变量不能被初始化。比如开始时间.</p>
                     </div>
                     <div id="dv-title">
                         <label>类别的中文显示名：</label><input type="text" id="title" value="<?php echo $name; ?>" />
@@ -593,44 +604,46 @@ class category extends DBO
                                 <option value="0">废弃</option>
                             </select>
                         </p>
-                        <p><label>指定该类别的访问路径：</label><input type="text" id="aurl" value="<?php echo $aurl; ?>" /></p>
-                        <p class="desc">区域的目录与类别的访问路径组合成访问URL，即为此类别指定模块文件。如果管理URL与组合的访问URL相同，并且隶属于的值相等，则系统将此类别判定为系统类别。某些变量将不能初始化。</p>
+                        <p>
+                            <label>指定该类别的访问路径：</label><input type="text" id="aurl" value="<?php echo $aurl; ?>" />
+                            <span class="desc">区域的目录与类别的访问路径组合成访问URL，即为此类别指定模块文件。</span>
+                        </p>
                     </div>
-                    <div class="apply"><a id="save-category">保存此类别</a></div>
+                    <div class="apply"><span class="error" id="category-err">在这里显示操作提示</span><a id="save-category">保存此类别</a></div>
                </div>
                <div id="variable">
                     <h2>为此类别初始化一些变量</h2>
                     <div id="time">
                         <label>开始时间：</label><input type="text" id="stime" value="" />
                         <label>结束时间：</label><input type="text" id="etime" value="" />
-                        <p class="desc">如果初始化了时间变量，则此类别可以根据用户输入的时间值来确定某些活动有效时间范围。</p>
+                        <span class="desc">如果初始化了时间变量，则此类别可以根据用户输入的时间值来确定某些活动有效时间范围。</span>
                     </div>
                     <div id="ver">
-                        <label>变量版本<input type="checkbox" id="vver" value="1" /></label>
-                        <span class="desc">如果初始化了此变量，则此类别的变量在每次修改时增加1，可以根据变量的版本来判断变量是否有更新。</span>
+                        <label>变量版本：<input type="text" id="vver" value="<?php echo $vver; ?>" /></label>
+                        <span class="desc">此变量的值为纯数字字符串，比如：20151213171001。如果初始化了此变量，用户在修改此变量后，系统自动保存上一次的版本号。可以根据这两个值来定义系统的一些功能。</span>
                     </div>
-                    <div>
+                    <div id="dv-aurl">
                         <label>活动未开始时的页面URL：</label><input type="url" id="surl" value="" />
                         <label>活动结束后的页面URL：</label><input type="url" id="eurl" value="" />
-                        <p class="desc">如果初始化了这两个变量，则用户可以指定未活动开始或结束后的页面显示方式。</p>
+                        <p class="desc">如果初始化了这两个变量，则用户可以指定活动未开始或活动结束后的URL。请指定完整的URL，如:http://m.cignacmb.com/campaign/cgb201501/zaodo.html</p>
                     </div>
                     <div>
-                        <label>用户数据分页大小:</label><input type="text" id="psize" value="20" />
-                        <span class="desc">如果初始化了此变量，则用户可以指定自定义的分页大小值。</span>
+                        <label>用户数据分页大小:</label><input type="text" id="psize" value="<?php echo $psize; ?>" />
+                        <span class="desc">如果初始化了此变量，则用户可以指定自定义的分页大小。</span>
                     </div>
-                    <div class="apply"><a id="save-var">初始化变量</a></div>
+                    <div class="apply"><span class="error" id="variable-err">在这里显示操作提示</span><a id="save-var">初始化变量</a></div>
                </div>
                <div id="filter">
                     <h2>为此类别初始化一个用户数据过滤器</h2>
                     <div id="fields">有待增加内容</div>
                     <div id="sql">有待增加内容</div>
-                    <div class="apply" id="save-filter"><a>保存此过滤器</a></div>
+                    <div class="apply" id="save-filter"><span class="error" id="filter-err">在这里显示操作提示</span><a>保存此过滤器</a></div>
                </div>
                <div id="user">
                     <h2>为此类别指定访问用户及相关权限</h2>
                     <div id="users">有待增加内容</div>
                     <div id="authority">有待增加内容</div>
-                    <div class="apply"><a id="save-user">保存用户权限</a></div>
+                    <div class="apply"><span class="error" id="authority-err">在这里显示操作提示</span><a id="save-user">保存用户权限</a></div>
                </div>
             </div>
         </div>
