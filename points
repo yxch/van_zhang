@@ -34,6 +34,111 @@ CREATE TABLE `tb_points_variables` (
 
 ============================================SQL============================================
 
+
+============================================f.js============================================
+var posts = {};
+var cached = {}; //缓存
+var pageTotal = 0; //页总数
+
+var f = {};
+
+f.grid = function(url)
+{
+    $.post(url,posts,function(r){   //alert(r);return;
+        var j = $.parseJSON(r);
+        var status = parseInt(j.status);
+        var empty = '加载数据失败或者没有可用数据,请稍候重试！';
+        if (status == 1)
+        {
+            setTimeout(function(){
+                posts.page = j.page;
+                pageTotal = j.pageTotal;
+                $('tbody').html(j.tbody);
+                $('#oper').html(j.operations);
+                $('#fpage').html(j.fpage);
+            },200);
+        }
+        
+        if (status == 2)
+        {
+            setTimeout(function(){
+                $('#grids tbody #loading td').html(empty);
+                $('#oper').html(j.operations);
+                $('#fpage').html('&nbsp');
+            },200);
+            setTimeout(function(){$('#grids tbody #loading td').html(empty);},6000);
+        }
+    });
+}
+
+//遮罩层
+function overlay(j)
+{    
+    var _w = $(window).width(), _h = $(window).height();
+    var opacity = j && j.opacity ? j.opacity : 0.3;
+    $('#overlay').css({width:_w,height:_h,opacity:opacity});
+    return $('#overlay');
+}
+
+$(document).ready(function(){
+    
+    $('#grids tbody').delegate('tr','click',_trClick);
+    function _trClick()
+    {
+        var obj = $(this).children('td:first-child');      
+        if ($(this).hasClass('checked'))
+        {
+            $(this).removeClass('checked');
+            obj.children('label').css('background','');
+        }else
+        {
+            $(this).addClass('checked');
+            obj.children('label').css('background','url(../../project/images/selected.png) no-repeat');
+        }
+    }
+    
+    $('#grid',window.top.document).click(function(){ overlay(); });
+    $(window).resize(function(){ overlay(); });
+    
+    //首页单击事件
+    $('#grids tfoot tr td').delegate('.first','click',function(){
+        var total = parseInt(pageTotal);
+        var page = parseInt(posts.page);
+        if (page != 1) { posts.page = 1; f.grid('ask/regions.ajx.php'); }
+    });
+    
+    //下一页
+    $('#grids tfoot tr td').delegate('.next','click',function(){
+        var total = parseInt(pageTotal);
+        var page = parseInt(posts.page);
+        var i = page + 1; 
+        if (i <= total){ posts.page = i; f.grid('ask/regions.ajx.php');}
+    });
+    
+    //单击每一页
+    $('#grids tfoot tr td').delegate('.page','click',function(){
+        posts.page = $(this).attr('id').split('-')[1];
+        f.grid('ask/regions.ajx.php');
+    });
+    
+    //单击上一页
+    $('#grids tfoot tr td').delegate('.last','click',function(){
+        var total = parseInt(pageTotal);
+        var page = parseInt(posts.page);
+        var i = page - 1; 
+        if (i >= 1){ posts.page = i; f.grid('ask/regions.ajx.php');}
+    });
+    
+    //最后一页
+    $('#grids tfoot tr td').delegate('.end','click',function(){
+        var total = parseInt(pageTotal);
+        var page = parseInt(posts.page);
+        if (page < total) { posts.page = total; f.grid('ask/regions.ajx.php'); }
+    });
+
+});
+============================================f.js============================================
+
 ==============================master.css==============================
 
 body{font-family: '微软雅黑',Arial;font-size:12px;}
@@ -247,6 +352,287 @@ $(document).ready(function(){
 ?>
 ======================================vars.ajx.php===================================
 
+======================================regions.class.php===================================
+<?php
+class regions extends DBO
+{
+    protected $id;
+    protected $name;
+    protected $region;
+    protected $authority;
+    protected $directory;
+    protected $status;
+	protected $modifiedTime;
+    protected $createTime;
+    
+    protected function definedTableName(){ return 'tb_points_regions'; }
+    protected function definedPrimaryKey(){ return 'id'; }
+    protected function definedRelations()
+    {
+        return array('id'=>'id',
+                     'name'=>'name',
+                     'region'=>'region',
+                     'auth'=>'authority',
+                     'dir'=>'directory',
+                     'yes'=>'status',
+					 'mtime'=>'modifiedTime',
+                     'ctime'=>'createTime'         );
+    }
+}
+?>
+======================================regions.class.php===================================
+
+======================================regions.php===================================
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+       <?php points::head('',false); ?>
+        <link rel="stylesheet" href="/points/project/css/grids.css" />
+        <link rel="stylesheet" href="css/master.css" />
+        <link rel="stylesheet" href="css/category.css" />
+        <script src="/points/project/js/f.js"></script>
+        <script src="js/regions.js"></script>
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1>区域选项管理</h1><span id="err"></span></div>
+            <table id="grids">
+                <thead>
+                    <tr>
+                        <td>编号</td>
+                        <td>区域</td>
+                        <td>区域选项名称</td>
+                        <td>默认权限</td>
+                        <td>区域目录</td>
+                        <td>状态[启用|停用]</td>
+                        <td>创建时间</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="loading"><td colspan="7">loading data！please wait......</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="7"><span id="oper">&nbsp</span><span id="fpage">&nbsp</span></td></tr>
+                </tfoot>
+            </table>
+        </div>
+        <div id="pop">
+            <div id="authorities">
+                <p>
+                    <label><input type="checkbox" name="power" />编辑</label>
+                    <label><input type="checkbox" name="power" />删除</label>
+                </p>
+                <p>
+                    <label><input type="checkbox" name="power" />增加</label>
+                    <label><input type="checkbox" name="power" />权限扩展1</label>
+                </p>
+                <p>
+                    <label><input type="checkbox" name="power" />权限扩展2</label>
+                    <label><input type="checkbox" name="power" />权限扩展3</label>
+                </p>
+                <p>
+                    <label><input type="checkbox" name="power" />导入</label>
+                    <label><input type="checkbox" name="power" />导出</label>
+                </p>
+                <p id="dv-ensure"><a id="ensure">确定</a></p> 
+            </div>
+        </div>
+        <div id="overlay"></div>
+    </body>
+</html>
+======================================regions.php===================================
+
+======================================regions.js===================================
+
+$(document).ready(function(){
+    
+    posts.page = 1;
+    f.grid('ask/regions.ajx.php'); //默认显示第一页
+    
+    popResize();
+    $(window).resize(function(){  popResize();  overlay(); });
+    
+    var err = document.getElementById('err');
+    var td = $('#grids tfoot tr td');
+    //编辑操作
+    td.delegate('#edit','click',function(){
+        var checks = $('#grids .checked');        
+        var adding = $('#grids .adding');
+        if(adding.length >= 1){ err.innerHTML = '正在增加新条目，无法同时编辑其它条目.'; return false; }
+        if(checks.length == 0){ err.innerHTML = '没有条目选中'; return false; }
+        if(checks.length > 1){ err.innerHTML = '一次只能编辑一个条目'; return false; }
+        err.innerHTML = '';
+        //取消tr的单击事件
+        $('#grids tbody').undelegate('tr','click');
+        $('#grids tfoot tr td').undelegate('#edit','click');
+        $('#grids .checked td').each(function(i,obj){
+            var td = $(obj);
+            var v = td.text();
+            if (td.hasClass('editable'))
+            {
+                var attr = td.attr('region');
+                if (attr == 'region')
+                {
+                    var r = {"用户数据":1,"控制台":2,"定制":3};
+                    td.html('<select id="regions" class="transparent"><option value="1">用户数据</option><option value="2">控制台</option><option value="3">定制</option></seclect>');
+                    $('#regions').val(r[v]);                   
+                }
+                if (attr == 'name') { td.html('<input id="name" class="transparent" value="' + v + '" />');  }
+                if (attr == 'authority')
+                {
+                    td.html('<input id="authority" class="transparent" value="' + v + '" />');
+                    $('#authority').focus(function(){
+                        overlay().show();
+                        $('#pop').show();                        
+                    });
+                }
+                if (attr == 'directory') { td.html('<input id="directory" class="transparent" value="' + v + '" />');  }
+                if (attr == 'status')
+                {
+                    var j = {"停用":0,"启用":1};
+                    td.html('<select id="status" class="transparent"><option value="1">启用</option><option value="0">停用</option></seclect>');
+                    $('#status').val(j[v]);
+                }
+            }
+        });
+    });
+    
+    //设定#auth的大小函数
+    function popResize()
+    {
+        var w = $(window).width(), h = $(window).height();
+        var _w = $('#pop').width(),_h = $('#pop').height();        
+        var left = Math.ceil((w - _w) / 2) + 'px',top = Math.ceil((h - _h) / 2) + 'px';        
+        $('#pop').css({marginLeft:left,marginTop:top});
+    }
+    
+    //弹窗确定事件
+    $('#ensure').click(function(){
+        var power = document.getElementsByName('power');
+        var powers = [];
+        for(var i=0,len=power.length;i<len;i++){ powers.push(power[i].checked ? 1 : 0); }
+        //赋值
+        $('#authority').val('1' + powers.join('') + '0');
+        //清空
+        for(var i=0,len=power.length;i<len;i++){ if(power[i].checked){power[i].checked = false;} }
+        
+        //关闭弹窗和遮罩层
+        $('#pop').hide();
+        overlay().hide();
+    });
+    
+    //应用操作
+    td.delegate('#applied','click',function(){
+        //应用编辑
+        var checked = $('#grids tbody .checked');
+        var addings = $('#grids tbody .adding');
+        var applied = {};
+        //修改
+        var modified = false;
+        if (checked.length == 0 && addings.length == 0){ err.innerHTML = '编辑或者新增操作请求'; return; }
+        if (checked.length == 1 && addings.length == 0){ var tds = $('#grids tbody .checked td'); modified = true; }
+        //新增
+        if(addings.length == 1){ var tds = $('#grids tbody .adding td'); }
+        
+        //获取值
+        tds.each(function(i,obj){
+            var td = $(obj);
+            var attr = td.attr('region');
+            if(attr == 'id' && modified){ applied.id = td.text();}
+            if(attr == 'region'){ applied.region = $('#regions').val();}
+            if(attr == 'name'){ applied.name = $('#name').val();}
+            if(attr == 'authority'){ applied.authority = $('#authority').val();}
+            if(attr == 'directory'){ applied.directory = $('#directory').val();}
+            if(attr == 'status'){ applied.status = $('#status').val();}                
+        });
+        
+        //验证值
+        
+        //提交改变
+        $.post('ask/regions.save.ajx.php',applied,function(r){ //console.log(r);
+            var j = $.parseJSON(r);
+            if (j.status == 1)
+            {
+                window.location.href = window.location.href; //刷新子窗体
+                
+            }else{ err.innerHTML = j.err;}
+            
+        });    
+    });
+    
+    //删除操作
+    td.delegate('#delete','click',function(){
+        var checked = $('#grids tbody .checked');
+        var ids = [];
+        if (checked.length > 0)
+        {
+            //获取值
+            $('#grids tbody .checked td').each(function(i,obj){
+                var td = $(obj);
+                var attr = td.attr('region');
+                if(attr == 'id'){  ids.push(td.text());}
+            });
+        }
+        $.post('ask/regions.delete.ajx.php',{id:ids.join('|')},function(r){ console.log(r);
+            var j = $.parseJSON(r);
+            if (j.status == 1)
+            {
+                window.location.href = window.location.href; //刷新子窗体
+                
+            }else{ err.innerHTML = j.message;}
+        });
+    });
+    
+    //增加操作
+    td.delegate('#add','click',function(){
+        $('#loading').hide();
+        var checks = $('#grids .checked');
+        if (checks.length > 0) { err.innerHTML = '正在编辑条目,不能同时增加新条目！'; return false;}
+        var adding = $('#grids tbody .adding');
+        if (adding.length == 0)
+        {
+            err.innerHTML = '';
+            var tr = '<tr class="adding"><td region="id"></td><td region="region"><select id="regions" class="transparent"><option value="1">用户数据</option><option value="2">控制台</option><option value="3">定制</option></seclect></td><td region="name"><input id="name" class="transparent" value="" /></td><td region="authority"><input id="authority" class="transparent" value="" /></td><td region="directory"><input id="directory" class="transparent" value="" /></td><td region="status"><select id="status" class="transparent"><option value="1">启用</option><option value="0">停用</option></seclect></td><td></td></tr>'
+            $('#grids tbody tr:first-child').before(tr);
+            $('#authority').focus(function(){
+                overlay().show();
+                $('#pop').show();                        
+            });
+            
+        }else{ err.innerHTML = '一次仅能增加一个条目,请先应用后再增加'; }        
+    });
+    
+    //导入操作
+    td.delegate('#import','click',function(){
+        alert('import');
+    });
+    
+    //导出操作
+    td.delegate('#export','click',function(){
+        alert('export');
+    });
+    
+    //搜索功能
+    $('#searcher',window.top.document).keyup(function(e){
+        var v = $(this).val();
+        if(e.which == 13)
+        {
+            posts.searcher = v;
+            f.grid('ask/regions.ajx.php');
+        }
+    });
+    $('#ico-search',window.top.document).click(function(){
+        var v = $(this).parent().find('#searcher').val();
+        posts.searcher = v;
+        f.grid('ask/regions.ajx.php');
+    });
+}); 
+
+======================================regions.js===================================
+
 
 ======================================regions.ajx.php===================================
 <?php
@@ -301,7 +687,82 @@ $(document).ready(function(){
 
 ======================================regions.ajx.php===================================
 
+======================================regions.delete.ajx.php===================================
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+    
+    if(empty($_POST['id'])){ echo points::jen(0,'没有条目选中，异常的请求！'); exit; }
+    
+    $arr = explode('|',$_POST['id']);
+    $len = count($arr);
+    //校验用户输入
+    for($i=0;$i<$len;$i++){  if(!ctype_digit($arr[$i])){ echo points::jen(0,'包含了异常的请求！'); exit; }   }
+    
+    //删除条目
+    $where = ' id IN(' . implode(',',$arr) . ')';
+    $region = new regions($where);
+    if($region->delete())
+    {
+        echo points::jen(1,'删除了共 ' . $len . ' 个条目');exit;
+        
+    }else{ echo points::jen(0,'删除失败');exit; }
+?>
+======================================regions.delete.ajx.php===================================
 
 
+======================================regions.save.ajx.php===================================
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+    
+    $set = array('status'=>0,'err'=>'');
+    
+    $updates = array('name'=>trim($_POST['name']),
+                    'region'=>$_POST['region'],
+                    'authority'=>$_POST['authority'],
+                    'directory'=>trim($_POST['directory']),
+                    'status'=>$_POST['status']           );
+    //检验
+    if(empty($updates['name'])){ $set['err'] = '没有提供区域选项名称'; points::jan($set); }
+    if(!in_array($updates['region'],array('1','2','3'))){ $set['err'] = '提供的区域代号不正确'; points::jan($set);}
+    if(!ctype_digit($updates['authority']) || strlen($updates['authority']) != 10)
+    {
+        $set['err'] = '提供的权限值不正确'; points::jan($set);
+    }
+    if(empty($updates['directory']) || $updates['directory'][0] != '/' || $updates['directory'][strlen($updates['directory']) - 1] != '/')
+    {
+        $set['err'] = '提供的目录结构不正确'; points::jan($set);
+    }
+    if(!in_array($updates['status'],array('1','0')) ){ $set['err'] = '提供的状态值不正确'; points::jan($set);}
+    
+    //写入内容
+    if(isset($_POST['id'])) //修改条目
+    {
+        if(!ctype_digit($_POST['id'])){ $set['err'] = '不正确的ID值'; points::jan($set); }
+        
+        $id = $_POST['id'];
+        
+        $region = new regions(array('id'=>$id));
+        if($region->iTotal() > 0)
+        {
+            $updates['modifiedTime'] = date('Y-m-d H:i:s');  
+            if($region->set($updates))
+            {
+                $set['status'] = 1; points::jan($set);
+                
+            }else{ $set['err'] = '修改失败'; points::jan($set); }
+            
+        }else{ $set['err'] = '未找到的内容'; points::jan($set); }
+        
+    }else //新增条目
+    {
+        $region = new regions();
+        if($region->set($updates))
+        {
+            $set['status'] = 1; points::jan($set);
+            
+        }else{ $set['err'] = '提交失败,请重试！'; points::jan($set); }
+    }
+?>
+======================================regions.save.ajx.php===================================
 
 
