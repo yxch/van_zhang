@@ -248,6 +248,58 @@ $(document).ready(function(){
 ======================================vars.ajx.php===================================
 
 
+======================================regions.ajx.php===================================
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+    $_SESSION['authority'] = '1111000110';
+    
+    //返回的数据
+    $set = array('status'=>0,'page'=>$_POST['page'],'pageTotal'=>0,'tbody'=>'','operations'=>'','fpage'=>'');
+    
+    //校验一下$page 必须为一个整数
+    if(!ctype_digit($set['page'])){ exit; /**异常的参数传入*/ }
+    
+    //获取符合条件的总数并处理分页
+    $region = new regions();
+    $pageSize = 20; //分页大小
+    $set['pageTotal'] = ceil($region->rows() / $pageSize);
+    $limit = $pageSize . ' OFFSET ' . ($set['page'] - 1) * $pageSize;
+    
+    //映射集 数据可视化处理
+    $regionSets = array('1'=>'用户数据','2'=>'控制台','3'=>'定制');
+    $statusSets = array('停用','启用');
+    
+    //获取数据
+    $region = new regions(NULL,array('order'=>'createTime DESC','limit'=>$limit));
+    $regions  = $region->get(array('id','region','name','authority','directory','status','createTime'));
+    
+    //准备显示的内容
+    $tbody = '';
+    for($i=0;$i<$region->iTotal();$i++)
+    {
+        $tbody .= '<tr><td region="id">' . $regions['id'][$i] . '<label class="selected"></label></td>';
+        $tbody .= '<td region="region" class="editable">' . $regionSets[$regions['region'][$i]] . '</td>';
+        $tbody .= '<td region="name" class="editable">' . $regions['name'][$i] . '</td>';
+        $tbody .= '<td region="authority" class="editable">' . $regions['authority'][$i] . '</td>';
+        $tbody .= '<td region="directory" class="editable">' . $regions['directory'][$i] . '</td>';
+        $tbody .= '<td region="status" class="editable">' . $statusSets[$regions['status'][$i]] . '</td>';
+        $tbody .= '<td>' . $regions['createTime'][$i] . '</td></tr>';   
+    }
+    $set['operations'] = points::authorized($_SESSION['authority'],array('import','export'));
+    $set['fpage'] = '&nbsp';
+    if($region->iTotal() > 0) //有可用数据提供显示
+    {
+        $set['status'] = 1;
+        $set['tbody'] = $tbody;        
+        $fpage = points::fpage($set['pageTotal'],$set['page'],$pageSize);
+        if(!empty($fpage)){ $set['fpage'] = $fpage;}
+        
+    }else{ $set['status'] = 2;}
+    points::jan($set);
+
+?>
+
+======================================regions.ajx.php===================================
 
 
 
