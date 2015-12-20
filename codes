@@ -144,9 +144,8 @@ $('#fadd').click(function(){
     $v = strtolower($v);        
     $arr = array();
     if(strtr($v,array('../'=>'','./'=>'','/*'=>'','--'=>'')) !== $v){$arr[] = '../ 或者 ./ 或者 /* 或者 -- ';}
-    if(strpos($v,';') !== false && strpos($v,'--') !== false){ $arr[] = '; 和 --不能同时存在'; }
-    if(stripos($v,'and') !== false && strpos($v,'=') !== false){$arr[] = '大小写的 and 不能和=同时存在';} //此处有待改善
-    
+    if(strpos($v,';') !== false && strpos($v,'--') !== false){ $arr[] = '; 和 -- 不能同时存在'; }
+    if(stripos($v,'and') !== false && strpos($v,'=') !== false){$arr[] = '大小写的 and 不能和=同时存在';} //此处有待改善    
     //join in,left join,right join, union 
     $explodes = explode(' ',$v);       
     for($i=0,$len = count($explodes);$i<$len;$i++){ if($explodes[$i] == ' ' || $explodes[$i] == ''){unset($explodes[$i]); } }
@@ -155,25 +154,25 @@ $('#fadd').click(function(){
     $joins = array('outer','right','left','inner','cross');
     for($j=0,$length=count($joins);$j<$length;$j++)
     {
-        $pos = array_search($joins[$j],$explodes);
-        if($pos !== false && $explodes[$pos + 1] == 'join'){ $arr[] = "{$joins[$j]} join";}
+      $pos = array_search($joins[$j],$explodes);
+      if($pos !== false && $explodes[$pos + 1] == 'join'){ $arr[] = "{$joins[$j]} join";}
     }        
     //insert into
     $pos = array_search('insert',$explodes);
-    if((array_search(';insert',$explodes) !== false && $explodes[$pos + 1] == 'into') ||($pos !== false && $explodes[$pos + 1] == 'into' && $explodes[$pos - 1] == ';'))
-    {
-        $arr[] = 'insert into 或者 ;insert into';
-    }        
+    $isTrue = (array_search(';insert',$explodes) !== false && $explodes[$pos + 1] == 'into') ||
+              ($pos !== false && $explodes[$pos + 1] == 'into' && $explodes[$pos - 1] == ';');
+    if($isTrue){ $arr[] = 'insert into 或者 ;insert into'; }
+    //union关键字
     $pos = array_search('union',$explodes);
     if($pos !== false && $explodes[$pos + 1] == 'select'){ $arr[] = 'union select'; }
     $pos = array_search('union',$explodes);
-    if($pos !== false && $explodes[$pos + 1] == 'all'){ $arr[] = 'union all'; }        
+    if($pos !== false && $explodes[$pos + 1] == 'all'){ $arr[] = 'union all'; }    
     //在值中出现 ;update 或者 ; update 等等时视为注入风险
     $_arr = array('update','delete','declare','exec','load_file','outfile');
     for($i=0,$l=count($_arr);$i<$l;$i++)
     {
-        $pos = array_search($_arr[$i],$explodes);
-        if(array_search(';'. $_arr[$i],$explodes) !== false || ($pos !== false && $explodes[$pos - 1] == ';')){ $arr[] = ";{$_arr[$i]} 或者 ; {$_arr[$i]}"; } 
+      $pos = array_search($_arr[$i],$explodes);
+      if(array_search(';'. $_arr[$i],$explodes) !== false || ($pos !== false && $explodes[$pos - 1] == ';')){ $arr[] = ";{$_arr[$i]} 或者 ; {$_arr[$i]}"; } 
     }
     return empty($arr) ? false : $arr;
   }
