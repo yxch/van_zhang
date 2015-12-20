@@ -1,218 +1,184 @@
 
+user.oper.php
 
-============================================SQL============================================
-CREATE TABLE `tb_points_category` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `md5` char(32) DEFAULT NULL COMMENT '路径MD5值',
-  `title` varchar(64) DEFAULT NULL COMMENT '类别中文标题',
-  `rid` int(11) DEFAULT NULL COMMENT '区域id',
-  `murl` varchar(254) DEFAULT NULL COMMENT '管理路径',
-  `aurl` varchar(254) DEFAULT NULL COMMENT '访问路径',
-  `pos` char(1) DEFAULT '1' COMMENT '隶属于1:前端页面显示2:后台管理页面',
-  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '状态',
-  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
-  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4
-
-CREATE TABLE `tb_points_variables` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) DEFAULT NULL COMMENT '变量名',
-  `val` varchar(254) DEFAULT NULL COMMENT '变量值',
-  `pos` char(32) DEFAULT NULL COMMENT '变量应用在',
-  `url` varchar(254) DEFAULT NULL COMMENT '应用路径',
-  `note` varchar(254) DEFAULT NULL COMMENT '变量的描述',
-  `txt` text COMMENT '变量文本',
-  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '是否废弃',
-  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
-  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`,`ctime`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4
-
-============================================SQL============================================
-
-
-============================================f.js============================================
-var posts = {};
-var cached = {}; //缓存
-var pageTotal = 0; //页总数
-
-var f = {};
-
-f.grid = function(url)
-{
-    $.post(url,posts,function(r){   //alert(r);return;
-        var j = $.parseJSON(r);
-        var status = parseInt(j.status);
-        var empty = '加载数据失败或者没有可用数据,请稍候重试！';
-        if (status == 1)
-        {
-            setTimeout(function(){
-                posts.page = j.page;
-                pageTotal = j.pageTotal;
-                $('tbody').html(j.tbody);
-                $('#oper').html(j.operations);
-                $('#fpage').html(j.fpage);
-            },200);
-        }
-        
-        if (status == 2)
-        {
-            setTimeout(function(){
-                $('#grids tbody #loading td').html(empty);
-                $('#oper').html(j.operations);
-                $('#fpage').html('&nbsp');
-            },200);
-            setTimeout(function(){$('#grids tbody #loading td').html(empty);},6000);
-        }
-    });
-}
-
-//遮罩层
-function overlay(j)
-{    
-    var _w = $(window).width(), _h = $(window).height();
-    var opacity = j && j.opacity ? j.opacity : 0.3;
-    $('#overlay').css({width:_w,height:_h,opacity:opacity});
-    return $('#overlay');
-}
-
-$(document).ready(function(){
-    
-    $('#grids tbody').delegate('tr','click',_trClick);
-    function _trClick()
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/usr/master/master.inc.php';
+    $uid = isset($_GET['uid']) ? $_GET['uid'] : '';
+    if(!empty($uid) && !ctype_digit($uid)){ exit('Exception access violation'); }
+    if($uid)
     {
-        var obj = $(this).children('td:first-child');      
-        if ($(this).hasClass('checked'))
-        {
-            $(this).removeClass('checked');
-            obj.children('label').css('background','');
-        }else
-        {
-            $(this).addClass('checked');
-            obj.children('label').css('background','url(../../project/images/selected.png) no-repeat');
-        }
+        $title = "编辑类别[ID:<label id=\"id\">$uid</label>]";
+        
+    }else
+    {
+         $title = "增加用户";
     }
-    
-    $('#grid',window.top.document).click(function(){ overlay(); });
-    $(window).resize(function(){ overlay(); });
-    
-    //首页单击事件
-    $('#grids tfoot tr td').delegate('.first','click',function(){
-        var total = parseInt(pageTotal);
-        var page = parseInt(posts.page);
-        if (page != 1) { posts.page = 1; f.grid('ask/regions.ajx.php'); }
-    });
-    
-    //下一页
-    $('#grids tfoot tr td').delegate('.next','click',function(){
-        var total = parseInt(pageTotal);
-        var page = parseInt(posts.page);
-        var i = page + 1; 
-        if (i <= total){ posts.page = i; f.grid('ask/regions.ajx.php');}
-    });
-    
-    //单击每一页
-    $('#grids tfoot tr td').delegate('.page','click',function(){
-        posts.page = $(this).attr('id').split('-')[1];
-        f.grid('ask/regions.ajx.php');
-    });
-    
-    //单击上一页
-    $('#grids tfoot tr td').delegate('.last','click',function(){
-        var total = parseInt(pageTotal);
-        var page = parseInt(posts.page);
-        var i = page - 1; 
-        if (i >= 1){ posts.page = i; f.grid('ask/regions.ajx.php');}
-    });
-    
-    //最后一页
-    $('#grids tfoot tr td').delegate('.end','click',function(){
-        var total = parseInt(pageTotal);
-        var page = parseInt(posts.page);
-        if (page < total) { posts.page = total; f.grid('ask/regions.ajx.php'); }
-    });
-
-});
-============================================f.js============================================
-
-==============================master.css==============================
-
-body{font-family: '微软雅黑',Arial;font-size:12px;}
-#outset{width:98%;height:auto;margin:0 auto;}
-
-#topic
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+       <?php points::head('',false); ?>
+       <link rel="stylesheet" href="css/master.css" />
+       <link rel="stylesheet" href="css/user.css" />
+       <!--<script src="js/category.oper.js"></script>-->
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1><?php echo $title; ?></h1><span id="err"></span></div>
+            <div id="user">
+                <div id="name">
+                    <p class="top"><label  class="title">指定用户名和显示名</label></p>
+                    <label>用户名称：</label><input type="text" id="username" value="" />
+                    <label>用户别名：</label><input type="text" id="aliase" value="" />
+                    <p class="desc">用户别名即用户显示名,通常建议填写此项来有效识别用户。建议中文字符。</p>
+                </div>
+                <div id ="passwords">
+                    <p><label  class="title">设定用户密码</label></p>
+                    <label>用户密码：</label><input type="password" id="password" value="" />
+                    <label>确认密码：</label><input type="password" id="pwd" value="" />
+                    <p class="desc">用户密码应满足要求:至少包含字符@ # $ % ^ & * ! ~中的一个或多个，至少包含一个或多个大写字母和小写字母，至少包含一个或多个数字且长度在6个字符或以上。</p>
+                </div>
+                <div>
+                    <p><label  class="title">指定用户应用范围即区域</label></p>
+                    <ul id="regions">
+                        <li>
+                             <label><input type="checkbox" name="" value="" />区域一</label>
+                             <label><input type="checkbox" name="" value="" />区域二</label>
+                             <label><input type="checkbox" name="" value="" />区域三</label>
+                             <label><a>更多>></a></label>
+                        </li>
+                       <li>
+                            <label><input type="checkbox" name="" value="" />区域四</label>
+                            <label><input type="checkbox" name="" value="" />区域五</label>
+                            <label><input type="checkbox" name="" value="" />区域六</label>
+                            <label><a>更多>></a></label>
+                       </li>
+                    </ul>
+                    <p class="desc">一个用户可以在多个区域上登录</p>
+                </div>
+                <div id="info">
+                    <p><label  class="title">设定用户的一些其它信息</label></p>
+                    <label>用户邮箱：</label><input type="email" id="email" value="" />
+                </div>
+                <div>
+                    <p><label  class="title">为用户指定一个或多个访问类别</label></p>
+                    <ul id="categories">                        
+                        <li>
+                            <label><input type="checkbox" name="" value="" />类别一</label>
+                            <label><input type="checkbox" name="" value="" />类别二</label>
+                            <label><input type="checkbox" name="" value="" />类别三</label>
+                            <label><a>更多>></a></label>
+                        </li>
+                        <li>
+                            <label><input type="checkbox" name="" value="" />类别四</label>
+                            <label><input type="checkbox" name="" value="" />类别五</label>
+                            <label><input type="checkbox" name="" value="" />类别六</label>
+                            <label><a>更多>></a></label>
+                        </li>
+                    </ul>
+                </div>
+                <div id="authority">
+                    <p><label class="title">为用户设定访问类别权限</label></p>
+                    <ul id="authorities">
+                        <li>
+                            <label><input type="checkbox" name="power" />编辑</label>
+                            <label><input type="checkbox" name="power" />删除</label>
+                            <label><input type="checkbox" name="power" />增加</label>
+                        </li>
+                        <li>
+                            <label><input type="checkbox" name="power" />权限扩展1</label>
+                            <label><input type="checkbox" name="power" />权限扩展2</label>
+                            <label><input type="checkbox" name="power" />权限扩展3</label>
+                        </li>
+                        <li>
+                            <label><input type="checkbox" name="power" />导入</label>
+                            <label><input type="checkbox" name="power" />导出</label>
+                        </li>
+                        
+                    </ul>
+                    <p id="options">
+                        <label><input type="radio" name="" />使用区域的权限设置</label>
+                        <label><input type="radio" name="" />使用区域权限与此权限的最小权限</label>
+                        <label><input type="radio" name="" />使用区域权限与此权限的最大权限</label>
+                    </p>
+                </div>
+                <div id="apply"><a id="applied">应用</a></div>
+            </div>
+            <div id="announce">这里写一些内容来说新增或编辑用户时的注意事项</div>
+        </div>        
+    </body>
+ </html>   
+ 
+ 
+ 
+ 
+ #user
 {
-    width:100%;height:32px;line-height: 32px;
-    vertical-align: middle;
-    margin:20px auto;
+    border:1px solid #998514;
+    margin-bottom: 10px;
 }
-#topic h1
+
+#user div
+{
+    width:96%;
+    margin:auto;
+    line-height: 32px;
+    border-bottom: 1px solid #A0C9D6;
+    padding-bottom:10px;
+}
+#user div p{position: relative;height:24px;}
+#user div p .title
 {
     display: inline-block;
-    font-size:16px;
-    float:left;
+    position: absolute;
+    width:15%;
+    font-style: italic;
+    color:#998516;
+    text-align: left;
+    right:4%;top:6px;
+    line-height: 12px;
 }
-#topic span
+#user div .top{margin-top:6px;}
+#user input
 {
-    color:#DD5B25;
-    font-style:italic;
-    float:right;
-    margin-right:15%;
+    background-color:transparent;
+    border-top:none;border-left:none;
+    border-right:1px solid transparent;
+    border-bottom:1px solid #808080;
 }
+#user #name input,#user #passwords input,#user #info input{width:20%;margin-right:5%;text-align: center;}
 
-==============================master.css==============================
+#user div .desc{ color:#808080; }
 
-
-==============================grids.css==============================
-#grids{width:100%;text-align: center;}
-#grids thead{font-weight: bold;font-size:14px;}
-#grids thead tr{height:36px;line-height:36px;background-color:#B9D1EA;}
-#grids tbody tr{height:28px;line-height: 28px;}
-#grids thead tr,#grids tbody tr{border-top:1px solid #B9D1EA;border-bottom:1px solid #B9D1EA;}
-#grids tbody tr:hover{background-color:#B9DCE1;cursor: pointer;}
-#grids tbody tr td:first-child .selected
+#user div ul li label
 {
     display: inline-block;
-    width:10px;height: 10px;
-    margin-left:20%;
+    width:20%;
 }
-#grids tbody tr#loading
-{
-    height:68px;line-height: 68px;
-    color:#DD5B25;
-    font-size:16px;
-    font-style:italic;
-}
-#grids thead tr td,#grids tbody tr td{border-left:1px solid #B9D1EA;}
-#grids thead tr td:first-child,#grids tbody tr td:first-child{border-left:none;}
-#grids tfoot tr{height:32px;line-height: 32px;}
-#grids tfoot tr{border-top:1px solid #B9D1EA;border-bottom:1px solid #B9D1EA; }
-#grids tfoot tr td #oper,#grids tfoot tr td #fpage{display:inline-block;}
-#grids tfoot tr td #oper{width:40%;background-color:#B9D1DF;}
-#grids tfoot tr td #fpage{width:60%;background-color:#B9D1EA;}
-#grids tfoot tr #fpage a
+#user div ul li label input{margin-right:6px;vertical-align:middle;}
+
+#user div #authorities li label{width:13%;}
+
+#user #authority #options label{margin-right:5%;}
+#user #authority p label input{margin-right:6px;vertical-align: middle;}
+
+#user #apply{ position: relative;border-bottom: none;width:100%;height:40px;}
+#user #apply #applied
 {
     display:inline-block;
-    width:24px;height:24px;line-height: 24px;
+    width:8%;height:32px;line-height: 32px;
+    position: absolute;
+    right:5%; top:6px;
+    background-color:#73E4FE; /**替换此背景色*/
     text-align: center;
-    margin-left:4px;margin-right:4px;
+    font-weight:bold;
+    border-radius: 6px;
 }
-#grids tfoot tr #fpage  .page{ width:12px;}
 
-==============================grids.css==============================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#announce
+{
+    width:98%;
+    margin: auto;
+}
+ 
+ 
