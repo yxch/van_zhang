@@ -7,6 +7,10 @@ color: #686868 深灰色
 color: #EEEEEE 淡灰色
 color: #
 
+1.需要对user表增加一个字段 作用范围 1:前端页面 2：后台页面  3：通用
+
+2.需要对变量增加一个字段 变量的显示方式 tye  text radio checkbox button textarea select
+
 
 修改category.oper.php
 
