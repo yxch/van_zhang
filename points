@@ -465,4 +465,197 @@ class filter extends DBO
 ?>
 ===========================================category.oper.filter.ajx.php=======================================
 
+================================================weixin.ajx.php============================================
+<?php
+	date_default_timezone_set('Asia/Urumqi');  //设置时区
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/include_form/bases/DBC.class.php';
+    $back = array('appid'=>'','nonceStr'=>'','timestamp'=>'','signature'=>'');
+	
+    /**
+     *参数 
+     * $back['appid']  公众号
+     * $account 账号
+     * $ticketurl 请求ticket的url 中控服务的响应地址
+     */
+	
+	$back['appid'] = 'wx9de7849179fa4533';
+    $account = 'gh_5c67caf6c386';
+    $ticketurl = 'http://10.140.5.166:8080/wxweb/getJsApiTicket.xhtml?accountId=' . $account;	
+
+	//生产环境
+    if(stripos($_SERVER['HTTP_HOST'],'cigna') !== false && $_SERVER['HTTP_HOST'] != 'test.cignacmb.com')
+    {
+        $back['appid'] = 'wx8d188615510c9093';
+		$account = 'gh_6c17146316ec';
+		$ticketurl = 'http://10.140.5.133/wxweb/getJsApiTicket.xhtml?accountId=' . $account;
+    }
+    
+    //获取ticket 是否已经缓存了ticket
+	$pdo = DBC::pdo('default','default'); //改变数据库连接 表tb_weixin_ticket在数据库drupal_mobile而不是drupal_activity中.
+	$db = DBC::execute("SELECT * FROM tb_weixin_ticket where accountID='{$account}'");
+		
+	if(count($db) > 0) //已经缓存了ticket及过期时间
+	{
+		//如果ticket已经过期
+		if($db[0]['expire_time'] < time())
+		{
+			$curls = myCURL($ticketurl);
+			$jsapiTicket = $curls['ticket'];
+			$expire = $curls['expire'];
+			$SQL = "update tb_weixin_ticket set ticket='{$jsapiTicket}',expire_time='{$expire}' where accountID='{$account}'";
+			$pdo->exec($SQL);
+		}else //ticket没有过期
+		{
+			$jsapiTicket = $db[0]['ticket'];
+			$expire = $db[0]['expire_time'];
+		}
+		
+	}else //没有缓存此账户的ticket和expire_time信息，则缓存它
+	{
+		$curls = myCURL($ticketurl);
+		$jsapiTicket = $curls['ticket'];
+		$expire = $curls['expire'];
+		$SQL = "insert into tb_weixin_ticket(accountID,ticket,expire_time) values('{$account}','{$jsapiTicket}','{$expire}')";
+		$pdo->exec($SQL);
+	}
+	
+	//获取签名
+	$timestamp = $expire; 
+	$url = $_SERVER['HTTP_REFERER'];
+	
+	//产生8个长度的随机字符串
+	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	$nonceStr = '';
+	$charsLen = strlen($chars);
+	for ($i=0;$i<8;$i++){ $nonceStr .= $chars[mt_rand(0,$charsLen-1)];	}
+
+    //$nonceStr = mt_rand(10000,99999);  
+    $string = "jsapi_ticket=$jsapiTicket&noncestr=$nonceStr&timestamp=$timestamp&url=$url";
+    $signature = sha1($string);
+  
+    //得到签名及填充返回的数组
+	$back['timestamp'] = $timestamp;
+    $back['nonceStr'] = (string)$nonceStr;
+    $back['signature'] = $signature;
+    
+    /**
+     * 远程资源请求 中控服务器的响应地址
+     * @param $url 请求的远程url
+     * @return 返回请求的资源
+     */
+    function myCURL($ticketUrl)
+    {	
+      $curl = curl_init();
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($curl, CURLOPT_TIMEOUT, 500);
+      curl_setopt($curl, CURLOPT_URL, $ticketUrl);
+      $res = curl_exec($curl);
+      curl_close($curl);
+	  
+	  $explodes = explode('#',$res);
+	  $arr = array();
+	  $arr['ticket'] = $explodes[0];
+	  $arr['expire'] = strtotime($explodes[1]) + 3600;	  
+      return $arr;
+    }
+	
+	//响应请求
+    echo json_encode($back); exit;
+?>
+================================================weixin.ajx.php============================================
+
+================================================weixinshare_1.js============================================
+/*
+ *微信分享
+ *date 2015/12/04
+ *van_zhang
+ */
+
+//fs对象根据用户需求而定
+var fs ={   //分享标题
+            "title":'天啦！你敢信？免费白给1000元',
+            //分享的描述
+            "desc":'节后连续大涨，赚钱速度快人一步，猛戳我，抢！',
+            //分享的链接
+            "link":'http://'+ window.location.host + '/campaign/201510_toulian_1/',
+            //分享的图标文件
+            "imgUrl":'http://'+ window.location.host + '/campaign/201510_toulian_1/images/wx_200X200.jpg',
+            //分享类型,music、video或link，不填默认为link
+            "type": '',
+            //如果type是music或video，则要提供数据链接，默认为空
+            dataUrl: '',
+        };
+
+//获取微信配置 
+$.ajax({ 
+	type: "post",
+	url: "/include_form/bases/weixin.ajx.php", 
+	cache:false,
+	async:false,
+	dataType: "JSON",   
+	success: function(j){
+		wx.config({
+			debug:		false, 
+			appId:		j.appid,				// 必填，公众号的唯一标识
+			timestamp:	j.timestamp,			// 必填，生成签名的时间戳
+			nonceStr:	j.nonceStr,			    // 必填，生成签名的随机串
+			signature:	j.signature,			// 必填，签名，见附录1
+			// 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+			jsApiList:	['onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','onMenuShareWeibo','hideMenuItems','showMenuItems','hideAllNonBaseMenuItem','showAllNonBaseMenuItem','translateVoice','startRecord','stopRecord']		        
+		});
+	}
+});
+
+wx.ready(function(){    
+    //分享给朋友
+    wx.onMenuShareAppMessage({
+        title: fs.title, desc: fs.desc, link: fs.link, imgUrl:fs.imgUrl, type:fs.type, dataUrl:fs.dataUrl,
+        //用户确认分享后执行的回调函数
+        success: function(){ alert('分享成功'); },
+        //用户取消分享后执行的回调函数
+        cancel: function(){ alert('取消成功'); }
+    });
+    
+    //分享到朋友圈
+    wx.onMenuShareTimeline({
+        title: fs.title,link: fs.link, imgUrl:fs.imgUrl,		 
+        //用户确认分享后执行的回调函数
+        success: function(){ },
+        //用户取消分享后执行的回调函数
+        cancel: function(){ }
+    });
+    
+    //分享到QQ
+    wx.onMenuShareQQ({
+        title: fs.title,  desc: fs.desc, link:fs.link, imgUrl:fs.imgUrl,
+        // 用户确认分享后执行的回调函数
+        success: function(){},
+        // 用户取消分享后执行的回调函数
+        cancel: function(){}
+    });
+    
+    //分享到腾讯微博
+    wx.onMenuShareWeibo({
+        title: fs.title,  desc: fs.desc, link:fs.link, imgUrl:fs.imgUrl,
+        // 用户确认分享后执行的回调函数
+        success: function(){},
+        // 用户取消分享后执行的回调函数
+        cancel: function(){}
+    });
+    
+    //分享到QQ空间
+    wx.onMenuShareQZone({
+        title: fs.title,  desc: fs.desc, link:fs.link, imgUrl:fs.imgUrl,
+        // 用户确认分享后执行的回调函数
+        success: function(){},
+        // 用户取消分享后执行的回调函数
+        cancel: function(){}
+    });
+
+});
+
+
+
+================================================weixinshare_1.js============================================
+
 
