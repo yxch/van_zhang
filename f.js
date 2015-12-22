@@ -1,8 +1,5 @@
 2015-09-18 9:42
 
-
- 
- //JavaScript权威指南摘要
  <script type="text/javascript">
         window.onbeforeunload = closed;
         function closed()
@@ -20,11 +17,97 @@
             }
         }
 </script>
+
+===============================验证IDC==================================================
+
+//检验身份证
+    function isIdCard(idnumber)
+    {
+        var isRight = 0;
+        if (idnumber == "" || idnumber == "undefined")
+        {
+            isRight = 1;
+        }else
+        { 
+            var flag=true;
+            var iSum=0 ;
+            var aCity={11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外"};
+            if(!/^\d{17}(\d|x)$/i.test(idnumber)) flag=false; 
+            idnumber=idnumber.replace(/x$/i,"a"); 
+            if(aCity[parseInt(idnumber.substr(0,2),10)]==null) flag=false; 
+            var sBirthday=idnumber.substr(6,4)+"-"+Number(idnumber.substr(10,2))+"-"+Number(idnumber.substr(12,2)); 
+            var d=new Date(sBirthday.replace(/-/g,"/")) ;
+            if(sBirthday!=(d.getFullYear()+"-"+ (d.getMonth()+1) + "-" + d.getDate()))flag=false; 
+            for(var i = 17;i>=0;i --) iSum += (Math.pow(2,i) % 11) * parseInt(idnumber.charAt(17 - i),11) ;
+            if(iSum%11!=1) flag=false; 
+            if(!flag){
+                isRight = 2;
+            }
+        }
+        return isRight;
+    }
+
+===============================验证IDC==================================================
+
+ 
+ ===============================时间对象==================================================  
     
+    /**
+    * 时间对象的格式化;
+    */
     
+    Date.prototype.format = function(format){
+     /*
+      * eg:format="YYYY-MM-dd hh:mm:ss";
+      */
+        var o = {
+            "M+": this.getMonth()+1,  //month
+            "d+": this.getDate(),     //day
+            "h+": this.getHours(),    //hour
+            "m+": this.getMinutes(),  //minute
+            "s+": this.getSeconds(), //second
+            "q+": Math.floor((this.getMonth()+3)/3),  //quarter
+            "S" : this.getMilliseconds() //millisecond
+        };
+        if(/(y+)/.test(format)){ format = format.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length)); }
+        for(var k in o)
+        {
+            if(new RegExp("("+ k +")").test(format)){  format = format.replace(RegExp.$1, RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));}
+        }
+        return format;
+    }
     
+    /* 
+    * 获得时间差,时间格式为 年-月-日 小时:分钟:秒 或者 年/月/日 小时：分钟：秒 
+    * 其中，年月日为全格式，例如 ： 2010-10-12 01:00:00 
+    * 返回精度为：秒，分，小时，天
+    */
+    function GetDateDiff(startTime, endTime, diffType)
+    {
+        //将xxxx-xx-xx的时间格式，转换为 xxxx/xx/xx的格式 
+        startTime = startTime.replace(/\-/g, "/");
+        endTime = endTime.replace(/\-/g, "/");
+        //将计算间隔类性字符转换为小写
+        diffType = diffType.toLowerCase();
+        var sTime = new Date(startTime);      //开始时间
+        var eTime = new Date(endTime);  //结束时间
+        //作为除数的数字
+        var divNum = 1;
+        switch (diffType) {
+            case "second":
+                divNum = 1000;           break;
+            case "minute":
+                divNum = 1000 * 60;      break;
+            case "hour":
+                divNum = 1000 * 3600;    break;
+            case "day":
+                divNum = 1000 * 3600 * 24;  break;
+            default: break;    
+        }
+        return parseInt((eTime.getTime() - sTime.getTime()) / parseInt(divNum));
+    }
     
-    
+  ===============================时间对象==================================================     
 
 //javascript中定义类的步骤
 1.先定义一个构造函数，并设置初始化新对象的实例属性。
