@@ -296,9 +296,11 @@ $(document).ready(function(){
     
     //保存过滤器
     $('#save-filter').click(function(){
+        if($('#murl').val().empty()){ $('#filter-err').text('必须指定管理URL');return false; }
         var filter = {};
+        filter.murl = $('#murl').val();
         filter.title = $.trim($('#filter-title').val());
-        if(filter.title.empty()){ $('#filter-err').text('标题不能空.');return;}
+        if(filter.title.empty()){ $('#filter-err').text('标题不能空.');return false;}
         //过滤器的字段内容 字段名
         var tr = $('#fields .clone');
         var trArr = [];
@@ -336,10 +338,13 @@ $(document).ready(function(){
         filter.searcher = $.trim($('#fsearch').val());
         filter.SQL = $.trim($('#fSQL').val());
         
-        console.log(filter);
+        if(check != 0) { return false; }
+        if(filter.SQL.empty()){ $('#filter-err').text('SQL不能空.');return false;}
         
-        if(check != 0) { return; }
-        if(filter.SQL.empty()){ $('#filter-err').text('SQL不能空.');return;}
+        //提交过滤器
+        $.post('ask/category.oper.filter.ajx.php',filter,function(r){ console.log(r);
+        
+        });
         
     });
     
@@ -358,6 +363,106 @@ $(document).ready(function(){
         }
     });
     
+    
 });
 
 ===========================================category.oper.js=======================================
+
+
+===========================================filter.class.php=======================================
+
+<?php
+class filter extends DBO
+{
+    protected $id;
+    protected $name;
+    protected $fieldText;
+    protected $searcher;
+    protected $SQL;
+    protected $position;
+    protected $status;
+    protected $modifiedTime;
+    protected $createTime;
+    
+    protected function definedTableName(){ return 'tb_points_filters'; }
+    protected function definedPrimaryKey(){ return 'id'; }
+    protected function definedRelations()
+    {
+        return array('id'=>'id',
+                     'named'=>'name',
+                     'flds'=>'fieldText',
+                     'scher'=>'searcher',
+                     'fsql'=>'SQL',
+                     'pos'=>'position',
+                     'yes'=>'status',
+                     'mtime'=>'modifiedTime',
+                     'ctime'=>'createTime'      );
+    }
+    
+}
+
+?>
+
+===========================================filter.class.php=======================================
+
+===========================================category.oper.filter.ajx.php=======================================
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+    
+    $back = array('yes'=>0,'tip'=>'');
+    
+    $inserts = array();
+    //校验  murl
+    if(empty($_POST['murl'])){ $back['tip'] = '没有提供管理URL,系统无法处理'; points::jan($back); }
+    $murls = points::SURL($_POST['murl']);
+    if($murls['status'] == 0)
+    {
+        $back['tip'] = '提供的管理URL可能不正确或者不符合规范';
+        points::jan($back);
+    }
+    $inserts['position'] = $murls['md5'];
+    
+    //名称
+    if(empty($_POST['title'])){ $back['tip'] = '没有提供过滤器的名称'; points::jan($back); }
+    //SQL注入检查  ??
+    $inserts['name'] = $_POST['title'];
+    
+    //字段    "fields":"fname=aaaa|dname=bbbbb|translator=f:1,fname=aaaa|dname=bbbbb|translator=f:1"
+    if(empty($_POST['fields'])){ $back['tip'] = '没有提供过滤器的字段内容'; points::jan($back); }
+    $fields = explode(',',$_POST['fields']);
+    $arr = array();
+    for($i=0,$len=count($fields);$i<$len;$i++)
+    {
+        $rows = explode('|',$fields[$i]);
+        for($j=0,$l=count($rows);$j<$l;$j++)
+        {
+            $field = explode('=',$rows[$j]); //SQL注入检查  ??
+            $arr[$i][$field[0]] = $field[1]; //SQL注入检查  ??
+        }
+    }
+    $inserts['fieldText'] = json_encode($arr);
+    
+    //搜索选项
+    if(!empty($_POST['searcher']))
+    {
+        $inserts['searcher'] = $_POST['searcher'];//SQL注入检查  ??
+    }
+    
+    //SQL语句
+    if(empty($_POST['SQL'])){ $back['tip'] = '没有提供过滤器的SQL'; points::jan($back); }
+    $inserts['SQL'] = $_POST['SQL']; //SQL注入检查  ??
+    
+    $filter = new filter(); var_dump($filter->set($inserts));exit;
+    if($filter->set($inserts))
+    {
+        $back['yes'] = 1;
+        $back['tip'] = '保存成功';
+    }else
+    {
+        $back['tip'] = '保存失败';
+    }
+    echo json_encode($back);
+?>
+===========================================category.oper.filter.ajx.php=======================================
+
+
