@@ -8,6 +8,15 @@ color: #EEEEEE 淡灰色
 color: #
 
 filter.class.php  增加 flag 'flag'=>'flag',
+filter.oper.php
+    $fid = isset($_GET['fid']) ? $_GET['fid'] : '';
+    if(empty($fid)){ exit('Required parameter missing!');}
+    if(!ctype_digit($fid)){exit('Exception access violation');}
+    
+    if($fid) //如果用户编辑类别
+    {
+        $title = "编辑数据过滤器[ID:<label id=\"id\">$fid</label>]";
+    }
 
 =================================\points\usr\master\filters\filters.php
 
