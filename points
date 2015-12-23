@@ -183,3 +183,191 @@ $(document).ready(function(){
     }else{ echo points::jen(0,'删除失败');exit; }
 ?>
 =================================\points\usr\master\filters\ask\filters.delete.ajx.php
+
+
+*********************************\points\usr\master\category\js\category.oper.js
+
+$(document).ready(function(){
+    //初始值
+    var vs = values();
+    
+    //为空值对象提供默认值 开始时间 结束时间 变量版本
+    $('#stime,#etime,#vver').focus(function(){
+        var date = new Date();
+        var v = $.trim($(this).val());
+        if (v.empty())
+        {
+            var arr = [];
+            arr.push(date.getFullYear(),String(date.getMonth() + 1).doubled(),String(date.getDate()).doubled());
+            
+            var time = [];
+            time.push(String(date.getHours()).doubled(),String(date.getMinutes()).doubled(),String(date.getSeconds()).doubled());
+            
+            if ($(this).attr('id') == 'vver')
+            {
+                $(this).val(arr.join('') + time.join(''));
+            
+            }else{ $(this).val(arr.join('-') + ' ' + time.join(':'));}
+        }
+    });
+
+    $('#save-category').click(function(event){
+        event.stopPropagation();    
+        var _id = $(this).attr('_id');
+        var j = values();
+        var modify = false; //用户是否修改了值
+        for(var p in j ){ if(j[p] != vs[p]){ modify = true; break;} }
+        if (!modify) { $('#category-err').text('没有可用于提交的内容，请检查输入是否有效！'); return false; }
+        j.id = vs.id = _id;        
+        //不信任校验
+        $.post('ask/category.oper.ajx.php',j,function(r){ //alert(r);return;
+            var json = $.parseJSON(r);
+            $('#category-err').text(json.err);
+            if (j.status == '1') { vs = values(); }
+        });
+    
+    });
+    
+    //初始化变量
+    $('#save-var').click(function(){
+        var vars = {};
+        //获取managingURL的值
+        vars.murl = $('#murl').val();
+        if(vars.murl.empty()){ $('#variable-err').text('必须指定管理URL');return false; }
+        //时间
+        vars.stime = $('#stime').val();
+        vars.etime = $('#etime').val();
+        //版本
+        vars.vver = $('#vver').val();
+        //url
+        vars.surl = $('#surl').val();
+        vars.eurl = $('#eurl').val();
+        //分页大小
+        vars.psize = $('#psize').val();
+        $('#variable-err').text('');
+        
+        //至少有一个变量值不为空
+        var empties = 0;
+        var i = 0;
+        for(var p in vars){  if( p != 'murl'){  i += 1; if(vars[p].empty()){ empties += 1;}  }  }
+        if(empties == i){ $('#variable-err').text('没有为此类别提供任何可初始化的变量,初始化失败');return false; }
+        
+        //提交内容
+        $.post('ask/category.oper.vars.ajx.php',vars,function(r){ //console.log(r);
+            var j = $.parseJSON(r);
+            $('#variable-err').text(j.tip);
+        });
+    
+    });
+    
+    function values()
+    {
+        return {"murl":$('#murl').val(),
+                "pos":$('#pos').val(),
+                "title":$('#title').val(),
+                "regions":$('#regions').val(),
+                "status":$('#status').val(),
+                "aurl":$('#aurl').val()         };
+    }
+    
+    //过滤器 增加字段设定 + 的单击事件
+    $('#fadd').click(function(){
+        $('#fields tbody tr:last-child').after($('#fields tbody .clone:first-child ').clone());
+        $('.check').click(check);
+    });
+    
+    //过滤器 增加字段设定 - 的单击事件
+    $('#fdelete').click(function(){
+        //不能全部删除
+        var tr = $('#fields tbody tr');
+        var trCheck = $('#fields tbody .tr-check');
+        if(trCheck.length != tr.length && trCheck.length > 0){ $('#fields tbody .tr-check').remove(); }        
+    });
+    
+    $('.check').click(check);
+    function check()
+    {
+        $(this).is(':checked') ? $(this).closest('tr').addClass('tr-check') : $(this).closest('tr').removeClass('tr-check');
+    }
+    
+    //保存过滤器
+    var filterOldValue = filtered();
+    function filtered() //收集过滤器值的函数
+    {
+        var filter = {};
+        filter.murl = $('#murl').val();
+        filter.title = $.trim($('#filter-title').val());
+        //过滤器的字段内容 字段名
+        var tr = $('#fields .clone');
+        var trArr = [];
+        tr.each(function(i,obj){
+            var td = $(obj).children('td');
+            var inputValue = [];
+            td.each(function(j,object){                
+                var input = $(object).children('input')
+                if (input.hasClass('fname') && !input.val().empty()){ inputValue.push('fname=' + input.val());}
+                if (input.hasClass('dname') && !input.val().empty()){ inputValue.push('dname=' + input.val());}
+                if (input.hasClass('translator') && !input.val().empty()){ inputValue.push('translator=' + input.val()); }
+            });
+            trArr.push(inputValue.join('|'));
+        });
+        filter.fields = trArr.join(',');
+        filter.searcher = $.trim($('#fsearch').val());
+        filter.SQL = $.trim($('#fSQL').val());
+        return filter;
+    }
+    
+    //提交内容
+    $('#save-filter').click(function(){
+        
+        //重新收集过滤器的值
+        var filter = filtered();  
+        if(filter.murl.empty()){ $('#filter-err').text('必须指定管理URL');return false; }
+        if(filter.title.empty()){ $('#filter-err').text('标题不能空.');return false;}
+        var fields = filter.fields.split(','); 
+        if(filter.fields.empty()){ $('#filter-err').text('没有提供过滤器字段内容.');return false; }
+        var err = 0;
+        for(var i=0;i<fields.length;i++)
+        {
+            var splits = fields[i].split('|'); 
+            if(splits.length < 2){ err += 1; }
+            for(var j=0;j<splits.length;j++)
+            {
+                var field = splits[j].split('=');
+                if(field[0] && field[1].empty()){ err += 1; }
+            }
+        }
+        if (err !=0 ) { $('#filter-err').text('字段名或者显示名不能为空');return false; }
+        if(filter.SQL.empty()){ $('#filter-err').text('SQL不能空.');return false;}
+        var compare = false;
+        for(var p in filter){ if(filter[p] != filterOldValue[p]){ compare = true; break;}}
+        if(!compare){ $('#filter-err').text('没有可用于提交的内容');return false; }
+        //提交过滤器
+        $.post('ask/category.oper.filter.ajx.php',filter,function(r){ console.log(r);
+               
+            filterOldValue = filtered();//更新初始值 阻止重复提交
+        });
+        
+    });
+    
+    //variable filter的折叠显示
+    $('.closed').click(function(){
+        if ($(this).hasClass('folded'))
+        {
+            $(this).removeClass('folded');
+            $(this).children('img').attr('src','/points/usr/local/images/plus.png');
+            $(this).parent().parent().children('div').fadeOut();
+        }else
+        {
+            $(this).children('img').attr('src','/points/usr/local/images/minus.png');
+            $(this).addClass('folded');
+            $(this).parent().parent().children('div').fadeIn();
+        }
+    });
+    
+});
+
+*********************************\points\usr\master\category\js\category.oper.js
+
+
+
