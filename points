@@ -9,6 +9,8 @@ color: #EEEEEE 淡灰色
 修改了DBO.class.php 需要测试
 //foreach($arr[0] as $k => $v)	{ if(property_exists($this,$k)) { eval('$this->' . $k . ' = "'. $v . '";'); } }
 
+删除master.css   .width6{width:6%;}  .left{ text-align: left;}
+
 
 CREATE TABLE `tb_points_category` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -492,6 +494,9 @@ $(document).ready(function(){
     white-space:nowrap;
     text-overflow: ellipsis;
 }
+#grids tbody tr .left{ text-align: left;}
+#grids tbody tr .width6{width:6%;}
+
 #grids thead tr td,#grids tbody tr td{border-left:1px solid #B9D1EA;}
 #grids thead tr td:first-child,#grids tbody tr td:first-child{border-left:none;}
 #grids tfoot tr{height:34px;line-height: 34px;}
@@ -507,6 +512,7 @@ $(document).ready(function(){
     margin-left:4px;margin-right:4px;
 }
 #grids tfoot tr #fpage  .page{ width:12px;}
+
 
 ******************************************\points\usr\local\css\grids.css
 
