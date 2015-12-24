@@ -459,4 +459,158 @@ $(document).ready(function(){
 });
 **********************************\points\usr\master\filters\js\filters.oper.js
 
+******************************************\points\usr\local\css\grids.css
+#grids{width:100%;text-align: center;table-layout: fixed;}
+#grids thead{font-weight: bold;font-size:14px;}
+#grids thead tr{height:36px;line-height:36px;background-color:#B9D1EA;}
+#grids tbody tr{height:32px;line-height:32px;}
+#grids thead tr,#grids tbody tr{border-top:1px solid #B9D1EA;border-bottom:1px solid #B9D1EA;}
+#grids tbody tr:hover{background-color:#B9DCE1;cursor: pointer;}
+#grids tbody tr td:first-child .selected
+{
+    display: inline-block;
+    width:10px;height: 10px;
+    margin-left:20%;
+}
+#grids tbody tr#loading
+{
+    height:68px;line-height: 68px;
+    color:#DD5B25;
+    font-size:16px;
+    font-style:italic;
+}
+#grids tbody tr td .transparent
+{
+    background:transparent;
+    border:1px solid #808080;
+    text-align: center;
+    font-weight: bold;
+}
+#grids tbody tr td.hidden
+{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+}
+#grids thead tr td,#grids tbody tr td{border-left:1px solid #B9D1EA;}
+#grids thead tr td:first-child,#grids tbody tr td:first-child{border-left:none;}
+#grids tfoot tr{height:34px;line-height: 34px;}
+#grids tfoot tr{border-top:1px solid #B9D1EA;border-bottom:1px solid #B9D1EA; }
+#grids tfoot tr td #oper,#grids tfoot tr td #fpage{display:inline-block;}
+#grids tfoot tr td #oper{width:40%;background-color:#B9D1DF;}
+#grids tfoot tr td #fpage{width:60%;background-color:#B9D1EA;}
+#grids tfoot tr #fpage a
+{
+    display:inline-block;
+    width:24px;height:24px;line-height: 24px;
+    text-align: center;
+    margin-left:4px;margin-right:4px;
+}
+#grids tfoot tr #fpage  .page{ width:12px;}
+
+******************************************\points\usr\local\css\grids.css
+
+******************************************\points\usr\master\filters\ask\filters.ajx.php
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+    $_SESSION['authority'] = '1111000110';
+    
+    //返回的数据
+    $set = array('status'=>0,'page'=>$_POST['page'],'pageTotal'=>0,'tbody'=>'','operations'=>'','fpage'=>'');
+    
+    //校验一下$page 必须为一个整数
+    if(!ctype_digit($set['page'])){ exit; /**异常的参数传入*/ }
+    
+    //获取符合条件的总数并处理分页
+    $filter = new filter();
+    $pageSize = 15; //分页大小
+    $set['pageTotal'] = ceil($filter->rows() / $pageSize);
+    $limit = $pageSize . ' OFFSET ' . ($set['page'] - 1) * $pageSize;
+    
+    //搜索设置
+    if(isset($_POST['searcher']) && !empty($_POST['searcher']))
+    { 
+        $search = trim($_POST['searcher']);  $where = "name LIKE '%{$search}%'";
+        
+    }else{ $where = ''; }
+    
+    //获取数据
+    $filter = new filter($where,array('order'=>'createTime DESC','limit'=>$limit));
+    $filters  = $filter->get(array('id','name','fieldText','searcher','SQL','status','createTime'));
+    
+    //准备显示的内容
+    $tbody = '';
+    for($i=0;$i<$filter->iTotal();$i++)
+    {
+        $tbody .= '<tr><td class="width6">' . $filters['id'][$i] . '<label class="selected"></label></td>';
+        $tbody .= '<td>' . $filters['name'][$i] . '</td>';
+        $title = $filters['fieldText'][$i];
+        $tbody .= "<td class=\"hidden\" title={$title}>" . $filters['fieldText'][$i] . '</td>';
+        $tbody .= '<td class="left hidden" title="' . $filters['searcher'][$i].  '">' . $filters['searcher'][$i] . '</td>';
+        $tbody .= '<td class="left hidden" title="' . $filters['SQL'][$i].  '">' . $filters['SQL'][$i] . '</td>';
+        $tbody .= '<td>' . $filters['status'][$i] . '</td>';
+        $tbody .= '<td>' . $filters['createTime'][$i] . '</td></tr>';   
+    }
+    if($filter->iTotal() > 0) //有可用数据提供显示
+    {
+        $set['status'] = 1;
+        $set['tbody'] = $tbody;
+        $set['operations'] = points::authorized($_SESSION['authority'],array('add','apply','import','export'));
+        $fpage = points::fpage($set['pageTotal'],$set['page'],$pageSize);
+        $set['fpage'] = empty($fpage) ? '&nbsp' : $fpage;
+    }else
+    {
+        $set['status'] = 2;
+        $set['operations'] = '&nbsp;';
+        $set['fpage'] = empty($fpage) ? '&nbsp;' : $fpage;
+    }    
+    points::jan($set);
+?>
+
+******************************************\points\usr\master\filters\ask\filters.ajx.php
+
+******************************************\points\usr\master\filters\filters.php
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php'; ?>
+<!DOCTYPE html>
+<html>
+    <head>
+       <?php points::head(0); ?>
+       <link rel="stylesheet" href="/points/usr/local/css/master.css" />
+       <link rel="stylesheet" href="/points/usr/local/css/grids.css" />
+       <script src="/points/usr/local/js/f.js"></script>
+       <script src="js/filters.js"></script>
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1>管理用户数据过滤器</h1><span id="err"></span></div>
+            <table id="grids">
+                <thead>
+                    <tr>
+                        <td class="width6">编号</td>
+                        <td>过滤器名称</td>
+                        <td>过滤器字段内容</td>
+                        <td>过滤器搜索选项</td>
+                        <td>SQL</td>
+                        <td>状态</td>
+                        <td>创建时间</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="loading"><td colspan="7">loading data！please wait......</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="7"><span id="oper">&nbsp</span><span id="fpage">&nbsp</span></td></tr>
+                </tfoot>
+            </table>
+        </div>
+        <div id="tip">
+            <p class="first">友情提示：顶部的搜索框可以按<strong>过滤器名称</strong>模糊搜索输入搜索条件后可以按下回车<strong>ENTER</strong>键或者旁边的搜索小图标</p>
+        </div>
+    </body>
+</html>
+
+******************************************\points\usr\master\filters\filters.php
+
+
+
 
