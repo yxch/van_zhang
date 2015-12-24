@@ -494,8 +494,7 @@ $(document).ready(function(){
     white-space:nowrap;
     text-overflow: ellipsis;
 }
-#grids tbody tr .left{ text-align: left;}
-#grids tbody tr .width6{width:6%;}
+#grids tbody tr td.left{ text-align: left;}
 
 #grids thead tr td,#grids tbody tr td{border-left:1px solid #B9D1EA;}
 #grids thead tr td:first-child,#grids tbody tr td:first-child{border-left:none;}
@@ -512,6 +511,11 @@ $(document).ready(function(){
     margin-left:4px;margin-right:4px;
 }
 #grids tfoot tr #fpage  .page{ width:12px;}
+
+.width6{width:6%;}
+.width10{width:20%;}
+.width25{width:25%;}
+.width30{width:30%;}
 
 
 ******************************************\points\usr\local\css\grids.css
