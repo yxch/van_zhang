@@ -12,6 +12,21 @@ color: #EEEEEE 淡灰色
 删除master.css   .width6{width:6%;}  .left{ text-align: left;}
 
 
+/*
+SQLyog Ultimate v11.24 (32 bit)
+MySQL - 5.1.61 : Database - drupal_activity
+*********************************************************************
+*/
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*Table structure for table `tb_points_category` */
+
 CREATE TABLE `tb_points_category` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `md5` char(32) DEFAULT NULL COMMENT '路径MD5值',
@@ -27,11 +42,115 @@ CREATE TABLE `tb_points_category` (
   UNIQUE KEY `md5` (`md5`),
   KEY `pos` (`pos`),
   KEY `yes` (`yes`)
-) ENGINE=InnoDB AUTO_INCREMENT=701 DEFAULT CHARSET=utf8
+) ENGINE=InnoDB AUTO_INCREMENT=719 DEFAULT CHARSET=utf8;
 
+/*Data for the table `tb_points_category` */
 
+insert  into `tb_points_category`(`id`,`md5`,`title`,`rid`,`murl`,`aurl`,`pos`,`yes`,`mtime`,`ctime`) values (713,'250828e1dc75d74209cc680afad2e58d','测试用户过滤器',602,'	http://test.cigna.com/mc/','/points/usr/servant/filter.php','2','1',NULL,'2015-12-24 08:02:59'),(714,'c78df70a4cad178d8481bd4d669e916a','测试用例一',602,'http://test.cignacm.com/m/a/','/points/usr/servant/a.php','1','1',NULL,'2015-12-24 08:44:39'),(715,'5382d232732c8d060cf588e8257886d2','测试用例二',602,'http://test.cignacm.com/m/b/','/points/usr/servant/b.php','1','1',NULL,'2015-12-24 08:45:02'),(716,'8e80ca9dabda3a67a5730f4ef26e3441','测试用例三',602,'http://test.cignacm.com/m/c/','/points/usr/servant/c.php','1','1',NULL,'2015-12-24 08:45:18'),(717,'717e59c439047db4c695bce11cf7562e','测试用例四',602,'http://test.cignacm.com/m/d/','/points/usr/servant/d.php','1','1',NULL,'2015-12-24 08:45:30'),(718,'09fbff4ca35252262897be5d64257c9c','测试用例五',602,'http://test.cignacm.com/m/e/','/points/usr/servant/e.php','1','1',NULL,'2015-12-24 08:45:44');
 
+/*Table structure for table `tb_points_filters` */
 
+CREATE TABLE `tb_points_filters` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `named` varchar(64) DEFAULT NULL COMMENT '过滤器名称',
+  `cid` int(11) DEFAULT NULL COMMENT '所属类别id',
+  `flds` text COMMENT '字段设定',
+  `scher` varchar(254) DEFAULT NULL COMMENT '探索设定',
+  `fsql` text COMMENT 'SQL语句',
+  `flag` char(32) DEFAULT NULL COMMENT '唯一标识',
+  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '是否废弃 1使用 0废弃',
+  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `flag` (`flag`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+
+/*Data for the table `tb_points_filters` */
+
+insert  into `tb_points_filters`(`id`,`named`,`cid`,`flds`,`scher`,`fsql`,`flag`,`yes`,`mtime`,`ctime`) values (18,'my filter of 5',713,'[{\"fname\":\"a\",\"dname\":\"b\",\"translator\":\"c\"}]','N:B','aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb','b6eae2a17887d5d3c5a4cf2af8ea41f5','1','2015-12-24 12:09:31','2015-12-24 11:25:43'),(19,'my filter of 2',713,'[{\"fname\":\"e\",\"dname\":\"b\",\"translator\":\"c\"},{\"fname\":\"f\",\"dname\":\"n\",\"translator\":\"c\"}]','N:M','aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa','af7b29c49c4c81859a1a3e47ba836cb4','1','2015-12-24 12:06:07','2015-12-24 11:26:28');
+
+/*Table structure for table `tb_points_powers` */
+
+CREATE TABLE `tb_points_powers` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `rid` int(11) DEFAULT NULL COMMENT '区域id',
+  `cid` int(11) DEFAULT NULL COMMENT '分类id',
+  `auth` char(10) NOT NULL DEFAULT '1000000000' COMMENT '权限值',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Data for the table `tb_points_powers` */
+
+/*Table structure for table `tb_points_regions` */
+
+CREATE TABLE `tb_points_regions` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `named` varchar(64) DEFAULT NULL COMMENT '区域的中文显示名',
+  `region` char(1) NOT NULL DEFAULT '1' COMMENT '1:用户数据2:控制台3:定制',
+  `auth` char(10) NOT NULL DEFAULT '1000000000' COMMENT '区域的默认权限',
+  `dir` varchar(254) DEFAULT NULL COMMENT '区域的默认目录',
+  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '区域的默认状态',
+  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '区域的创建时间',
+  PRIMARY KEY (`id`),
+  KEY `named` (`named`),
+  KEY `dir` (`dir`)
+) ENGINE=InnoDB AUTO_INCREMENT=604 DEFAULT CHARSET=utf8;
+
+/*Data for the table `tb_points_regions` */
+
+insert  into `tb_points_regions`(`id`,`named`,`region`,`auth`,`dir`,`yes`,`mtime`,`ctime`) values (601,'招商信诺','2','1111000000','/points/usr/master/','1','2015-12-16 10:30:47','2015-12-15 17:55:40'),(602,'招商银行','1','1000000000','/points/usr/servant/','1','2015-12-16 10:36:10','2015-12-15 17:57:38'),(603,'兴业银行','3','1111000000','/points/usr/custom/','1','2015-12-16 10:51:57','2015-12-15 17:59:26');
+
+/*Table structure for table `tb_points_users` */
+
+CREATE TABLE `tb_points_users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '表主键 id',
+  `usr` varchar(64) DEFAULT NULL COMMENT '用户名',
+  `pwd` char(32) DEFAULT NULL COMMENT '密码',
+  `alias` varchar(64) DEFAULT NULL COMMENT '中文别名',
+  `email` char(64) DEFAULT NULL COMMENT '邮箱地址',
+  `tye` char(1) NOT NULL DEFAULT '1' COMMENT '作用范围: 1前端页面 2后台页面 3通用',
+  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '用户状态',
+  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uni_usr` (`usr`),
+  KEY `passwd` (`pwd`),
+  KEY `yes` (`yes`)
+) ENGINE=InnoDB AUTO_INCREMENT=1002 DEFAULT CHARSET=utf8;
+
+/*Data for the table `tb_points_users` */
+
+insert  into `tb_points_users`(`id`,`usr`,`pwd`,`alias`,`email`,`tye`,`yes`,`mtime`,`ctime`) values (1000,'service','787dfc280603869444e5011193722b8e','我是\n客服',NULL,'1','1',NULL,'2015-11-30 08:03:16'),(1001,'Jim Zhang','afdd0b4ad2ec172c586e2150770fbf9e','测试万能险',NULL,'1','1',NULL,'2015-11-30 08:57:33');
+
+/*Table structure for table `tb_points_variables` */
+
+CREATE TABLE `tb_points_variables` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `named` varchar(64) DEFAULT NULL COMMENT '变量名',
+  `val` varchar(254) DEFAULT NULL COMMENT '变量值',
+  `pos` char(32) DEFAULT NULL COMMENT '变量应用在',
+  `url` varchar(254) DEFAULT NULL COMMENT '应用路径',
+  `note` varchar(254) DEFAULT NULL COMMENT '变量的描述',
+  `txt` text COMMENT '变量文本',
+  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '状态 1:用户变量 2:系统变量 0:废弃',
+  `rule` varchar(32) DEFAULT NULL COMMENT '校验规则',
+  `isuser` char(1) NOT NULL DEFAULT '1' COMMENT '是否用户可控 0不可控 1可控',
+  `tye` varchar(32) NOT NULL DEFAULT 'text' COMMENT 'input的显示类型',
+  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`,`ctime`),
+  KEY `pos` (`pos`)
+) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8;
+
+/*Data for the table `tb_points_variables` */
+
+insert  into `tb_points_variables`(`id`,`named`,`val`,`pos`,`url`,`note`,`txt`,`yes`,`rule`,`isuser`,`tye`,`mtime`,`ctime`) values (80,'stime','2015-12-18 08:34:24','7d401f825747b45c872aca35285a16a2','http://test.cignacmb.com/campaign/mc/cmbcc/201601/','活动开始时间','','2','datetime','1','text',NULL,'2015-12-18 08:38:22'),(81,'etime','2015-12-19 08:34:24','7d401f825747b45c872aca35285a16a2','http://test.cignacmb.com/campaign/mc/cmbcc/201601/','活动结束时间','','2','datetime','1','text',NULL,'2015-12-18 08:38:22'),(82,'vver','20151218083433','7d401f825747b45c872aca35285a16a2','http://test.cignacmb.com/campaign/mc/cmbcc/201601/','变量新版本','','2','digit','1','text',NULL,'2015-12-18 08:38:22'),(83,'surl','http://m/c/a.php','7d401f825747b45c872aca35285a16a2','http://test.cignacmb.com/campaign/mc/cmbcc/201601/','活动未开始时的页面URL','','2','url','1','text',NULL,'2015-12-18 08:38:22'),(84,'eurl','http://m/c/b.php','7d401f825747b45c872aca35285a16a2','http://test.cignacmb.com/campaign/mc/cmbcc/201601/','活动结束时的页面URL','','2','url','1','text',NULL,'2015-12-18 08:38:22'),(85,'psize','15','7d401f825747b45c872aca35285a16a2','http://test.cignacmb.com/campaign/mc/cmbcc/201601/','分页大小','','2','int','1','text',NULL,'2015-12-18 08:38:22'),(86,'lver','20151218083433','7d401f825747b45c872aca35285a16a2','http://test.cignacmb.com/campaign/mc/cmbcc/201601/','变量旧版本','','2','digit','1','text',NULL,'2015-12-18 08:38:22');
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 **********************************\points\usr\local\filter.class.php
 <?php
