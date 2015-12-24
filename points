@@ -5,10 +5,253 @@ color: #444A54 黑灰色
 color: #797979 浅灰色
 color: #686868 深灰色
 color: #EEEEEE 淡灰色
-color: #
 
-filter.class.php  增加 flag 'flag'=>'flag',
-filter.oper.php
+修改了DBO.class.php 需要测试
+//foreach($arr[0] as $k => $v)	{ if(property_exists($this,$k)) { eval('$this->' . $k . ' = "'. $v . '";'); } }
+
+
+CREATE TABLE `tb_points_category` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `md5` char(32) DEFAULT NULL COMMENT '路径MD5值',
+  `title` varchar(64) DEFAULT NULL COMMENT '类别中文标题',
+  `rid` int(11) DEFAULT NULL COMMENT '区域id',
+  `murl` varchar(254) DEFAULT NULL COMMENT '管理路径',
+  `aurl` varchar(254) DEFAULT NULL COMMENT '访问路径',
+  `pos` char(1) DEFAULT '1' COMMENT '隶属于1:前端页面显示2:后台管理页面',
+  `yes` char(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  `mtime` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `md5` (`md5`),
+  KEY `pos` (`pos`),
+  KEY `yes` (`yes`)
+) ENGINE=InnoDB AUTO_INCREMENT=701 DEFAULT CHARSET=utf8
+
+
+
+
+
+**********************************\points\usr\local\filter.class.php
+<?php
+class filter extends DBO
+{
+    protected $id;
+    protected $name;
+    protected $categoryId;
+    protected $fieldText;
+    protected $searcher;
+    protected $SQL;
+    protected $flag;
+    protected $status;
+    protected $modifiedTime;
+    protected $createTime;
+    
+    protected function definedTableName(){ return 'tb_points_filters'; }
+    protected function definedPrimaryKey(){ return 'id'; }
+    protected function definedRelations()
+    {
+        return array('id'=>'id',
+                     'named'=>'name',
+                     'cid'=>'categoryId',
+                     'flds'=>'fieldText',
+                     'scher'=>'searcher',
+                     'fsql'=>'SQL',
+                     'flag'=>'flag',
+                     'yes'=>'status',
+                     'mtime'=>'modifiedTime',
+                     'ctime'=>'createTime'      );
+    }
+    
+}
+?>
+**********************************\points\usr\local\filter.class.php
+
+**********************************\points\usr\master\filters\css\filters.oper.css
+#filter
+{
+    border:1px solid #998514;
+    margin-bottom: 10px;
+}
+#filter div
+{
+    width:96%;
+    margin:10px auto;
+    line-height: 32px;
+    border-bottom: 1px solid #A0C9D6;
+    padding-bottom:10px;
+}
+#filter input
+{
+    width:20%;
+    background-color:transparent;
+    border-top:none;border-left:none;
+    border-right:1px solid transparent;
+    border-bottom:1px solid #808080;
+    text-align: center;
+}
+#filter div .desc{ color:#808080; }
+#filter #categories ul li{height:22px;margin-bottom:4px;}
+#filter #categories ul li label{display: inline-block;width:20%;overflow: hidden;}
+#filter #categories input{width:auto;vertical-align: middle;margin-right:2%;}
+#filter #ftitle span{margin-left:25%;}
+#filter #ftitle select{background-color:transparent;border:1px solid #808080;width:10%;}
+#filter #field #fields
+{
+    width:100%;height:auto;
+    margin-bottom: 12px;
+}
+#filter #field #fields thead .width30{ width:30%;} 
+#filter #field #fields thead
+{
+    margin-top:20px;margin-bottom: 6px;
+    background-color:#797979;
+    color:#FF9900;
+}
+#filter #field #fields thead tr td:last-child {color:blue;/**用适合的颜色替换 mock here */font-weight: 900;}
+#filter #field #fields thead tr #fadd{margin-right:10%;}
+#filter #field #fields tbody input{width:90%;}
+#filter #field #fields tbody tr td:last-child input{width:auto;margin-top:8px;line-height: 18px;vertical-align: bottom;}
+#filter #where input{ width:40%;}
+#filter #sql label{vertical-align: top;}
+#filter #sql textarea{background-color:transparent;width:60%;height:8%;border:1px solid #808080;}
+#filter #apply{ position: relative;border-bottom: none;width:100%;height:40px;}
+
+#filter #apply #error
+{
+    color:#DD5B25;
+    font-style:italic;
+    float:right;
+    margin-right:15%;
+}
+
+#filter #apply #applied
+{
+    display:inline-block;
+    width:8%;height:32px;line-height: 32px;
+    position: absolute;
+    right:5%; top:6px;
+    background-color:#73E4FE; /**替换此背景色*/
+    text-align: center;
+    font-weight:bold;
+    border-radius: 6px;
+}
+#announce
+{
+    width:98%;height:48px;line-height: 24px;
+    margin: 10px auto;
+    color:#8194AA;
+    font-style:italic;   
+}
+**********************************\points\usr\master\filters\css\filters.oper.css
+
+**********************************\points\usr\master\category\ask\category.oper.filter.ajx.php
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+    
+    $back = array('yes'=>0,'tip'=>''); //响应请求的结果
+    
+    $inserts = array();
+    if(isset($_POST['id']) && ctype_digit($_POST['id'])) //编辑操作
+    {
+       if(!in_array($_POST['status'],array('1','0'))){ $back['tip'] = '状态值异常'; points::jan($back); }
+       if(!ctype_digit($_POST['status'])){ $back['tip'] = '类别id异常'; points::jan($back); }
+       
+       $category = new category(array('id'=>$_POST['categoryId']));
+       if($category->iTotal() > 0)
+       {
+            $inserts['categoryId'] = $_POST['categoryId'];
+            $inserts['status'] = $_POST['status'];
+        
+       }else{ $back['tip'] = '未找到此类别信息'; points::jan($back); }
+       
+    }else //新增即在类别管理界面下初始化过滤器
+    {
+        //校验  murl
+        if(empty($_POST['murl'])){ $back['tip'] = '没有提供管理URL,系统无法处理'; points::jan($back); }
+        $murls = points::SURL($_POST['murl']);
+        if($murls['status'] == 0)
+        {
+            $back['tip'] = '提供的管理URL可能不正确或者不符合规范';
+            points::jan($back);
+        }
+        //查找是否存在此URL的类别记录
+        $category = new category(array('MD5'=>$murls['md5']));
+        if($category->iTotal() == 0){ $back['tip'] = '初始化用户数据过滤器之前必须初始此类别'; points::jan($back); }
+        
+        $categories = $category->get(array('id'));
+        $inserts['categoryId'] = $categories['id'][0];
+    }
+    
+    //名称
+    if(empty($_POST['title'])){ $back['tip'] = '没有提供过滤器的名称'; points::jan($back); }
+    //SQL注入检查  ??
+    $inserts['name'] = $_POST['title'];
+    
+    //字段    "fields":"fname=aaaa|dname=bbbbb|translator=f:1,fname=aaaa|dname=bbbbb|translator=f:1"
+    $fieldTip = '过滤器的字段名或者显示名不能为空';
+    if(empty($_POST['fields'])){ $back['tip'] = $fieldTip; points::jan($back); }
+    $fields = explode(',',$_POST['fields']);
+    $arr = array();
+    for($i=0,$len=count($fields);$i<$len;$i++)
+    {
+        $rows = explode('|',$fields[$i]);
+        if(count($rows) < 2){ $back['tip'] = $fieldTip; points::jan($back); }
+        for($j=0,$l=count($rows);$j<$l;$j++)
+        {
+            $field = explode('=',$rows[$j]); //SQL注入检查  ??
+            if(empty($field[1])){ $back['tip'] = $fieldTip; points::jan($back); }
+            $arr[$i][$field[0]] = $field[1]; //SQL注入检查  ??
+        }
+    }
+    $inserts['fieldText'] = json_encode($arr);
+    $inserts['flag'] = $fmd5 = md5($inserts['fieldText']);   
+    
+    //搜索选项
+    if(!empty($_POST['searcher']))
+    {
+        $inserts['searcher'] = $_POST['searcher'];//SQL注入检查  ??
+    }
+    
+    //SQL语句
+    if(empty($_POST['SQL'])){ $back['tip'] = '没有提供过滤器的SQL'; points::jan($back); }
+    $inserts['SQL'] = $_POST['SQL']; //SQL注入检查  ??
+    
+    if(isset($_POST['id']) && ctype_digit($_POST['id'])) //编辑操作
+    {
+        $where = "id !=" . $_POST['id'] . " AND flag = '{$fmd5}' AND categoryId = " .  $inserts['categoryId'];
+        $filter = new filter($where);
+        if($filter->iTotal() > 0)
+        {
+            $back['tip'] = '存在相同的数据过滤器'; points::jan($back);
+        }else
+        {
+            $inserts['modifiedTime'] = date('Y-m-d H:i:s');
+            $filter = new filter(array('id'=>$_POST['id']));
+            if($filter->set($inserts))
+            {
+                $back['yes'] = 1;
+                $back['tip'] = '修改成功';
+            }else{ $back['tip'] = '修改失败'; }
+        }
+    }else
+    {
+        //是否存在相同的过滤器
+        $filter = new filter(array('flag'=>$fmd5,'categoryId'=>$inserts['categoryId']));
+        if($filter->iTotal() > 0){ $back['tip'] = '在此URL下可能存在相同的用户数据过滤器'; points::jan($back); }
+        $filter = new filter(); 
+        if($filter->set($inserts))
+        {
+            $back['yes'] = 1; $back['tip'] = '保存成功';
+        }else{ $back['tip'] = '保存失败'; }
+    }
+    points::jan($back);
+?>
+**********************************\points\usr\master\category\ask\category.oper.filter.ajx.php
+
+**********************************\points\usr\master\filters\filters.oper.php
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
+    
     $fid = isset($_GET['fid']) ? $_GET['fid'] : '';
     if(empty($fid)){ exit('Required parameter missing!');}
     if(!ctype_digit($fid)){exit('Exception access violation');}
@@ -16,269 +259,101 @@ filter.oper.php
     if($fid) //如果用户编辑类别
     {
         $title = "编辑数据过滤器[ID:<label id=\"id\">$fid</label>]";
+        $filter = new filter(array('id'=>$fid));
+        $filters = $filter->get(array('name','categoryId','searcher','fieldText','SQL'));   //var_dump($filters);exit;
+        $fields = json_decode($filters['fieldText'][0],true); //var_dump($fields);exit;
+        
+        $cid = $filters['categoryId'][0]; //此过滤器所属类别id
+        //显示全部类别以供用户选择 
+        $category = new category(); 
+        $categories = $category->get(array('id','title')); 
+        $categoryArr = array();
+        for($i=0;$i<$category->iTotal();$i++){ $categoryArr[$categories['id'][$i]] = $categories['title'][$i]; }
+        $groups = array_chunk($categoryArr,3,true); //分组显示 每组显示3个，如果组数大于则第一组显示其余隐藏 用户点击更多时显示
+        $li = '';
+        $len = count($groups);
+        for($j=0;$j<$len;$j++)
+        {
+            $li .= $j > 0 ? "<li id=\"dis{$j}\" style=\"display:none;\">" : '<li>';
+            foreach($groups[$j] as $k=>$val)
+            {
+                $checked = $k == $cid ? 'checked' : '';
+                $li .= "<label><input type=\"radio\" name=\"categories\" value=\"{$k}\" {$checked} />{$val}</label>";
+            }
+            //是否显示更多
+            if($len > 0 && $j < $len - 1){ $n = $j + 1; $li .= "<label><a class=\"more\" id=\"more-{$n}\">更多>></a></label>"; }
+            $li .= '</li>';
+        }
     }
-
-=================================\points\usr\master\filters\filters.php
-
-<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php'; ?>
-<!DOCTYPE html>
+?>
+<!DCOTYPE html>
 <html>
     <head>
-       <?php points::head(0); ?>
+       <?php points::head(false); ?>
        <link rel="stylesheet" href="/points/usr/local/css/master.css" />
-       <link rel="stylesheet" href="/points/usr/local/css/grids.css" />
-       <script src="/points/usr/local/js/f.js"></script>
-       <script src="js/filters.js"></script>
+       <link rel="stylesheet" href="css/filters.oper.css" />
+       <script src="/points/usr/local/js/func.js"></script>
+       <script src="js/filters.oper.js"></script>
+       <!--<script src="js/category.oper.js"></script>-->
     </head>
     <body>
         <div id="outset">
-            <div id="topic"><h1>管理用户数据过滤器</h1><span id="err"></span></div>
-            <table id="grids">
-                <thead>
-                    <tr>
-                        <td class="width6">编号</td>
-                        <td>过滤器名称</td>
-                        <td>过滤器字段内容</td>
-                        <td>过滤器搜索选项</td>
-                        <td>SQL</td>
-                        <td>状态</td>
-                        <td>创建时间</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr id="loading"><td colspan="7">loading data！please wait......</td></tr>
-                </tbody>
-                <tfoot>
-                    <tr><td colspan="7"><span id="oper">&nbsp</span><span id="fpage">&nbsp</span></td></tr>
-                </tfoot>
-            </table>
+            <div id="topic"><h1><?php echo $title; ?></h1></div>
+            <div id="filter">
+                <div id="categories">
+                    <label>为此数据过滤器指定所属类别【单选】：</label>
+                    <ul><?php echo $li; ?></ul>
+                </div>
+                <div id="ftitle">
+                    <label>为此数据过滤器定义一个标题：</label><input type="text" id="filter-title" value="<?php echo $filters['name'][0]; ?>" />
+                    <span>
+                        <label>过滤器状态:</label>
+                        <select id="status">
+                            <option value="1">启用</option>
+                            <option value="0">废弃</option>
+                        </select>
+                    </span>
+                    <p class="desc">标题可以识别此数据过滤器，易于用户在多个不同的数据过滤器之间切换，并根据标题来识别此数据过滤器的用途。</p>
+                </div>
+                <div id="field">
+                    <label>为此数据过滤器添加数据字段和显示字段及翻译设定：</label>
+                    <table id="fields">
+                        <thead>
+                            <tr><td class="width30">数据表字段</td><td class="width30">显示名</td><td class="width30">翻译设定</td><td><a id="fadd">+</a><a id="fdelete">-</a></td></tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($fields as $v){ ?>
+                                <tr class="clone">
+                                    <td><input type="text" class="fname" value="<?php echo $v['fname']; ?>" /></td>
+                                    <td><input type="text" class="dname" value="<?php echo $v['dname']; ?>" /></td>
+                                    <td><input type="text" class="translator" value="<?php echo $v['translator']; ?>" /></td>
+                                    <td><input type="checkbox" class="check" /></td>
+                                </tr> 
+                            <?php } ?>                           
+                        </tbody>
+                    </table>
+                    <p class="desc">数据表字段必须与相关表的字段一致 (此处映射名将不可用，映射名无法在此条件下处理)，显示名在用户查询数据时显示，通常是表字段中文名称。翻译设定值是数组的单元通常是关联数组，比如：要将F显示成女，翻译字段内容填写为 'F':'女'多个翻译值用英文逗隔开。</p>
+                </div>
+                <div id="where">
+                    <label>基于此过滤器的搜索设定：</label><input type="text" id="fsearch" value="<?php echo $filters['searcher'][0]; ?>" />
+                    <p class="desc">设定此数据过滤器的搜索选项,比如按名称模糊搜索的值为 "name":0,按性别精确搜索的值为 "gender":1</p>
+                </div>
+                <div id="sql">
+                    <label>基于数据过滤器的SQL语句：</label>
+                    <textarea id="fSQL" value=""><?php echo $filters['SQL'][0]; ?></textarea>
+                    <p class="desc">数组过滤器的SQL语句请不要包含limit部分,由本系统自动处理。limit仅用于分页。</p>
+                </div>
+                <div id="apply"><span id="error"></span><a id="applied">保存</a></div>
+            </div>
         </div>
-        <div id="tip">
-            <p class="first">友情提示：顶部的搜索框可以按<strong>过滤器名称</strong>模糊搜索输入搜索条件后可以按下回车<strong>ENTER</strong>键或者旁边的搜索小图标</p>
-        </div>
+        <div id="announce">增加对类别管理的描述内容</div>
     </body>
 </html>
+**********************************\points\usr\master\filters\filters.oper.php
 
-=================================\points\usr\master\filters\filters.php
-
-=================================\points\usr\master\filters\js\filters.js
+**********************************\points\usr\master\filters\js\filters.oper.js
 $(document).ready(function(){
-    posts.page = 1;//默认显示第一页
-    f.grid('ask/filters.ajx.php');
-    
-    //编辑过滤器
-    $('#grids tfoot tr td').delegate('#edit','click',function(){ 
-        var tr = $('#grids tbody .checked');
-        var err = document.getElementById('err');
-        if (tr.length == 0) { err.innerHTML = '没有条目选中'; return; }
-        if (tr.length > 1) { err.innerHTML = '一次只能编辑一个条目'; return; }
-        err.innerHTML = '';
-        var id = tr.find(':first-child').text();
-        window.location.href="filters.oper.php?fid=" + id;    
-    });
-    
-    //删除过滤器
-    $('#grids tfoot tr td').delegate('#delete','click',function(){
-        var tr = $('#grids tbody .checked');
-        var err = document.getElementById('err');
-        if (tr.length == 0) { err.innerHTML = '没有条目选中'; return; }
-        err.innderHTML = '';
-        var id = [];
-        tr.each(function(i,obj){
-            id.push($(obj).find(':first-child').text());        
-        });
-        if (window.confirm('你确定要删除这些条目吗？'))
-        {
-            $.post('ask/filters.delete.ajx.php',{"id":id.join('|')},function(r){
-                var j = $.parseJSON(r);
-                $('#err').text(j.message);
-            });        
-        }        
-    });
-    
-    //搜索功能
-    $('#searcher',window.top.document).keyup(function(e){
-        var v = $(this).val();
-        if(e.which == 13)
-        {
-            posts.searcher = v;
-            f.grid('ask/filters.ajx.php');
-        }
-    });
-    $('#ico-search',window.top.document).click(function(){
-        var v = $(this).parent().find('#searcher').val();
-        posts.searcher = v;
-        f.grid('ask/filters.ajx.php');
-    });   
 
-});
-
-=================================\points\usr\master\filters\js\filters.js
-
-=================================\points\usr\master\filters\ask\filters.ajx.php
-<?php
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
-    $_SESSION['authority'] = '1111000110';
-    
-    //返回的数据
-    $set = array('status'=>0,'page'=>$_POST['page'],'pageTotal'=>0,'tbody'=>'','operations'=>'','fpage'=>'');
-    
-    //校验一下$page 必须为一个整数
-    if(!ctype_digit($set['page'])){ exit; /**异常的参数传入*/ }
-    
-    //获取符合条件的总数并处理分页
-    $filter = new filter();
-    $pageSize = 15; //分页大小
-    $set['pageTotal'] = ceil($filter->rows() / $pageSize);
-    $limit = $pageSize . ' OFFSET ' . ($set['page'] - 1) * $pageSize;
-    
-    //搜索设置
-    if(isset($_POST['searcher']) && !empty($_POST['searcher']))
-    { 
-        $search = trim($_POST['searcher']);  $where = "name LIKE '%{$search}%'";
-        
-    }else{ $where = ''; }
-    
-    //获取数据
-    $filter = new filter($where,array('order'=>'createTime DESC','limit'=>$limit));
-    $filters  = $filter->get(array('id','name','fieldText','searcher','SQL','status','createTime'));
-    
-    //准备显示的内容
-    $tbody = '';
-    for($i=0;$i<$filter->iTotal();$i++)
-    {
-        $tbody .= '<tr><td class="width6">' . $filters['id'][$i] . '<label class="selected"></label></td>';
-        $tbody .= '<td>' . $filters['name'][$i] . '</td>';
-        $tbody .= '<td>' . $filters['fieldText'][$i] . '</td>';
-        $tbody .= '<td class="left">' . $filters['searcher'][$i] . '</td>';
-        $tbody .= '<td class="left">' . $filters['SQL'][$i] . '</td>';
-        $tbody .= '<td>' . $filters['status'][$i] . '</td>';
-        $tbody .= '<td>' . $filters['createTime'][$i] . '</td></tr>';   
-    }
-    if($filter->iTotal() > 0) //有可用数据提供显示
-    {
-        $set['status'] = 1;
-        $set['tbody'] = $tbody;
-        $set['operations'] = points::authorized($_SESSION['authority'],array('add','apply','import','export'));
-        $fpage = points::fpage($set['pageTotal'],$set['page'],$pageSize);
-        $set['fpage'] = empty($fpage) ? '&nbsp' : $fpage;
-    }else
-    {
-        $set['status'] = 2;
-        $set['operations'] = '&nbsp;';
-        $set['fpage'] = empty($fpage) ? '&nbsp;' : $fpage;
-    }    
-    points::jan($set);
-?>
-=================================\points\usr\master\filters\ask\filters.ajx.php
-
-=================================\points\usr\master\filters\ask\filters.delete.ajx.php
-<?php
-    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
-    
-    if(empty($_POST['id'])){ echo points::jen(0,'没有条目选中，异常的请求！'); exit; }
-    
-    $arr = explode('|',$_POST['id']);
-    $len = count($arr);
-    //校验用户输入
-    for($i=0;$i<$len;$i++){  if(!ctype_digit($arr[$i])){ echo points::jen(0,'包含了异常的请求！'); exit; }   }
-    
-    //删除条目
-    $where = ' id IN(' . implode(',',$arr) . ')';
-    $filter = new filter($where);
-    if($filter->delete())
-    {
-        echo points::jen(1,'删除了共 ' . $len . ' 个条目,请刷新当前页面！');exit;
-        
-    }else{ echo points::jen(0,'删除失败');exit; }
-?>
-=================================\points\usr\master\filters\ask\filters.delete.ajx.php
-
-
-*********************************\points\usr\master\category\js\category.oper.js
-$(document).ready(function(){
-    //初始值
-    var vs = values();
-    
-    //为空值对象提供默认值 开始时间 结束时间 变量版本
-    $('#stime,#etime,#vver').focus(function(){
-        var date = new Date();
-        var v = $.trim($(this).val());
-        if (v.empty())
-        {
-            var arr = [];
-            arr.push(date.getFullYear(),String(date.getMonth() + 1).doubled(),String(date.getDate()).doubled());
-            
-            var time = [];
-            time.push(String(date.getHours()).doubled(),String(date.getMinutes()).doubled(),String(date.getSeconds()).doubled());
-            
-            if ($(this).attr('id') == 'vver')
-            {
-                $(this).val(arr.join('') + time.join(''));
-            
-            }else{ $(this).val(arr.join('-') + ' ' + time.join(':'));}
-        }
-    });
-
-    $('#save-category').click(function(event){
-        event.stopPropagation();    
-        var _id = $(this).attr('_id');
-        var j = values();
-        var modify = false; //用户是否修改了值
-        for(var p in j ){ if(j[p] != vs[p]){ modify = true; break;} }
-        if (!modify) { $('#category-err').text('没有可用于提交的内容，请检查输入是否有效！'); return false; }
-        j.id = vs.id = _id;        
-        //不信任校验
-        $.post('ask/category.oper.ajx.php',j,function(r){ //alert(r);return;
-            var json = $.parseJSON(r);
-            $('#category-err').text(json.err);
-            if (j.status == '1') { vs = values(); }
-        });
-    
-    });
-    
-    //初始化变量
-    $('#save-var').click(function(){
-        var vars = {};
-        //获取managingURL的值
-        vars.murl = $('#murl').val();
-        if(vars.murl.empty()){ $('#variable-err').text('必须指定管理URL');return false; }
-        //时间
-        vars.stime = $('#stime').val();
-        vars.etime = $('#etime').val();
-        //版本
-        vars.vver = $('#vver').val();
-        //url
-        vars.surl = $('#surl').val();
-        vars.eurl = $('#eurl').val();
-        //分页大小
-        vars.psize = $('#psize').val();
-        $('#variable-err').text('');
-        
-        //至少有一个变量值不为空
-        var empties = 0;
-        var i = 0;
-        for(var p in vars){  if( p != 'murl'){  i += 1; if(vars[p].empty()){ empties += 1;}  }  }
-        if(empties == i){ $('#variable-err').text('没有为此类别提供任何可初始化的变量,初始化失败');return false; }
-        
-        //提交内容
-        $.post('ask/category.oper.vars.ajx.php',vars,function(r){ //console.log(r);
-            var j = $.parseJSON(r);
-            $('#variable-err').text(j.tip);
-        });
-    
-    });
-    
-    function values()
-    {
-        return {"murl":$('#murl').val(),
-                "pos":$('#pos').val(),
-                "title":$('#title').val(),
-                "regions":$('#regions').val(),
-                "status":$('#status').val(),
-                "aurl":$('#aurl').val()         };
-    }
-    
     //过滤器 增加字段设定 + 的单击事件
     $('#fadd').click(function(){
         $('#fields tbody tr:last-child').after($('#fields tbody .clone:first-child ').clone());
@@ -304,8 +379,10 @@ $(document).ready(function(){
     function filtered() //收集过滤器值的函数
     {
         var filter = {};
-        filter.murl = $('#murl').val();
+        filter.id = $('#id').text();
+        filter.categoryId = $("input:radio[name='categories']:checked").val(); 
         filter.title = $.trim($('#filter-title').val());
+        filter.status = $('#status').val();
         //过滤器的字段内容 字段名
         var tr = $('#fields .clone');
         var trArr = [];
@@ -327,14 +404,12 @@ $(document).ready(function(){
     }
     
     //提交内容
-    $('#save-filter').click(function(){
-        
+    $('#applied').click(function(){        
         //重新收集过滤器的值
         var filter = filtered();  
-        if(filter.murl.empty()){ $('#filter-err').text('必须指定管理URL');return false; }
-        if(filter.title.empty()){ $('#filter-err').text('标题不能空.');return false;}
+        if(filter.title.empty()){ $('#error').text('标题不能空.');return false;}
         var fields = filter.fields.split(','); 
-        if(filter.fields.empty()){ $('#filter-err').text('没有提供过滤器字段内容.');return false; }
+        if(filter.fields.empty()){ $('#error').text('没有提供过滤器字段内容.');return false; }
         var err = 0;
         for(var i=0;i<fields.length;i++)
         {
@@ -346,19 +421,18 @@ $(document).ready(function(){
                 if(field[0] && field[1].empty()){ err += 1; }
             }
         }
-        if (err !=0 ) { $('#filter-err').text('字段名或者显示名不能为空');return false; }
-        if(filter.SQL.empty()){ $('#filter-err').text('SQL不能空.');return false;}
+        if (err !=0 ) { $('#error').text('字段名或者显示名不能为空');return false; }
+        if(filter.SQL.empty()){ $('#error').text('SQL不能空.');return false;}
         var compare = false;
         for(var p in filter){ if(filter[p] != filterOldValue[p]){ compare = true; break;}}
-        if(!compare){ $('#filter-err').text('没有可用于提交的内容');return false; }
+        if(!compare){ $('#error').text('没有可用于提交的内容');return false; }
         //提交过滤器
-        $.post('ask/category.oper.filter.ajx.php',filter,function(r){ 
+        $.post('../category/ask/category.oper.filter.ajx.php',filter,function(r){ 
             var j = $.parseJSON(r);
             //更新初始值 阻止重复提交
             if(j.yes == '1'){  filterOldValue = filtered(); }
-            $('#filter-err').text(j.tip);
+            $('#error').text(j.tip);
         });
-        
     });
     
     //variable filter的折叠显示
@@ -376,85 +450,13 @@ $(document).ready(function(){
         }
     });
     
-    
+    //用户点击更多
+    $('.more').click(function(){ 
+        var id = $(this).attr('id').split('-')[1]; 
+        $('#dis' + id).show();    
+    });
+
 });
-
-*********************************\points\usr\master\category\js\category.oper.js
-
-
-*********************************\points\usr\master\category\ask\category.oper.filter.ajx.php
-<?php
-    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/master/master.inc.php';
-    
-    $back = array('yes'=>0,'tip'=>'');
-    
-    $inserts = array();
-    //校验  murl
-    if(empty($_POST['murl'])){ $back['tip'] = '没有提供管理URL,系统无法处理'; points::jan($back); }
-    $murls = points::SURL($_POST['murl']);
-    if($murls['status'] == 0)
-    {
-        $back['tip'] = '提供的管理URL可能不正确或者不符合规范';
-        points::jan($back);
-    }
-    $inserts['position'] = $murls['md5'];
-    //查找是否存在此URL的类别记录
-    $category = new category(array('MD5'=>$murls['md5']));
-    if($category->iTotal() == 0){ $back['tip'] = '初始化用户数据过滤器之前必须初始此类别'; points::jan($back); }
-    
-    //名称
-    if(empty($_POST['title'])){ $back['tip'] = '没有提供过滤器的名称'; points::jan($back); }
-    //SQL注入检查  ??
-    $inserts['name'] = $_POST['title'];
-    
-    //字段    "fields":"fname=aaaa|dname=bbbbb|translator=f:1,fname=aaaa|dname=bbbbb|translator=f:1"
-    $fieldTip = '过滤器的字段名或者显示名不能为空';
-    if(empty($_POST['fields'])){ $back['tip'] = $fieldTip; points::jan($back); }
-    $fields = explode(',',$_POST['fields']);
-    $arr = array();
-    for($i=0,$len=count($fields);$i<$len;$i++)
-    {
-        $rows = explode('|',$fields[$i]);
-        if(count($rows) < 2){ $back['tip'] = $fieldTip; points::jan($back); }
-        for($j=0,$l=count($rows);$j<$l;$j++)
-        {
-            $field = explode('=',$rows[$j]); //SQL注入检查  ??
-            if(empty($field[1])){ $back['tip'] = $fieldTip; points::jan($back); }
-            $arr[$i][$field[0]] = $field[1]; //SQL注入检查  ??
-        }
-    }
-    $inserts['fieldText'] = json_encode($arr);
-    $inserts['flag'] = $fmd5 = $inserts['fieldText'];   
-    
-    //搜索选项
-    if(!empty($_POST['searcher']))
-    {
-        $inserts['searcher'] = $_POST['searcher'];//SQL注入检查  ??
-    }
-    
-    //SQL语句
-    if(empty($_POST['SQL'])){ $back['tip'] = '没有提供过滤器的SQL'; points::jan($back); }
-    $inserts['SQL'] = $_POST['SQL']; //SQL注入检查  ??
-    
-    if(isset($_POST['id']) && ctype_digit($_POST['id'])) //编辑操作
-    {
-        
-    }else
-    {
-        //是否在pos下存在相同的过滤器
-        $filter = new filter(array('flag'=>$fmd5,'position'=>$murls['md5']));
-        if($filter->iTotal() > 0){ $back['tip'] = '在此URL下可能存在相同的用户数据过滤器'; points::jan($back); }
-        $filter = new filter(); 
-        if($filter->set($inserts))
-        {
-            $back['yes'] = 1; $back['tip'] = '保存成功';
-            
-        }else{ $back['tip'] = '保存失败'; }
-    }
-    echo json_encode($back);
-?>
-
-*********************************\points\usr\master\category\ask\category.oper.filter.ajx.php
-
+**********************************\points\usr\master\filters\js\filters.oper.js
 
 
