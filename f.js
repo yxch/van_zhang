@@ -395,6 +395,14 @@ function random(min,max)
   return parseInt(Math.random() * (max - min + 1) + min);   
 }
 
+Array.prototype.random = function(start)
+{
+   var min = parseInt(start) || 0;
+   if (start > this.length - 1) { return ''; }
+   var max = this.length - 1;
+   return this[parseInt(Math.random() * (max - min + 1) + min)];
+}
+
 //由name操作属性
 function byName(name,tag)
 {
