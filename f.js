@@ -398,7 +398,7 @@ function random(min,max)
 Array.prototype.random = function(start)
 {
    var min = parseInt(start) || 0;
-   if (start > this.length - 1) { return ''; }
+   if (min > this.length - 1) { return ''; }
    var max = this.length - 1;
    return this[parseInt(Math.random() * (max - min + 1) + min)];
 }
