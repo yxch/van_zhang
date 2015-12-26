@@ -127,7 +127,7 @@ class STR
       //确保第一个字符是数字或者字母
       if(!ctype_digit($arr[0][0]) && !ctype_alpha($arr[0][0])){ return false; }
       //确保@后半部分至少有一个.，并且长度至少是3
-      $dots = explode('.',$arr[1]); var_dump($dots);
+      $dots = explode('.',$arr[1]); 
       if(count($dots) < 1){ return false; }
       if(!strlen($dots[0]) || !ctype_digit($dots[0][0]) && !ctype_alpha($dots[0][0])){ return false; }
       return true;
