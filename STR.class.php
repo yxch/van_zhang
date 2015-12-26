@@ -132,7 +132,37 @@ class STR
       if(!strlen($dots[0]) || !ctype_digit($dots[0][0]) && !ctype_alpha($dots[0][0])){ return false; }
       return true;
   }
-        
+  
+  /**
+   *密码检查函数
+   *@param string $pwd 要检查的字符
+   *@param boolean $strict
+   *@return 如果检查通过返回md5加密后的结果 否则直接返回结果
+   */
+  public static function password($pwd,$strict=true)
+  {
+      $ar = array('status'=>0,'encrypt'=>'','err'=>'');
+      if($strict)
+      {
+          if(empty($pwd)){ $ar['err'] = '强密码要求密码不能为空'; return $ar; }
+          $len = strlen($pwd);
+          if($len < 6){ $ar['err'] = '密码长度不少于6个字符'; return $ar; }
+          $upper = 0; $lower = 0; $symbol = 0; $num = 0;
+          for($i=0;$i<$len;$i++)
+          {
+              if(ctype_lower($pwd[$i])){ $lower += 1;}
+              if(ctype_upper($pwd[$i])){ $upper += 1;}
+              if(ctype_digit($pwd[$i])){ $num += 1; }
+              if(ctype_print($pwd[$i]) && !ctype_digit($pwd[$i]) && !ctype_alpha($pwd[$i])){ $symbol += 1;}
+          }
+          if($upper == 0){ $ar['err'] = '至少包含一个大写字母'; return $ar; }       
+          if($lower == 0){ $ar['err'] = '至少包含一个小写字母'; return $ar; }       
+          if($symbol == 0){ $ar['err'] = '至少包含一个特殊字符'; return $ar; }       
+          if($num == 0){ $ar['err'] = '至少包含一个数字'; return $ar; }       
+      }
+      $ar['status'] = 1; $ar['encrypt'] = md5($pwd);
+      return $ar;        
+  }   
   /**
    *格式化日期
    *@param int $unixTime unix 时间戳
