@@ -93,7 +93,7 @@ class STR
     *@param $split 日期分隔符。
     *@return boolean 
    */
-  function timed($t,$split)
+  public static function timed($t,$split)
   {
       $arr = explode(' ',trim($t));
       if(count($arr) != 2){ return false; }
@@ -118,7 +118,7 @@ class STR
    *@param string $email
    *@return boolean
    */
-  function email($email)
+  public static function email($email)
   {
       $arr = explode('@',$email); 
       if(count($arr) != 2){ return false; }
