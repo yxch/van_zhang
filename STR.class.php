@@ -10,33 +10,12 @@ class STR
 {
   //输入是否可用
   // $str = ' ' $str = null  $str = false $str = ''都返回假
-  public static function isReal($str){  return $str == '0' && $str !== false ? true : !(empty($str) || $str == ' ');  }
+  public static function fine($str){  return $str == '0' && $str !== false ? true : !(empty($str) || $str == ' ');  }
   
   //检查输入是否全是中文
-  public static function isChinese($str){   return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u',trim($str)) ? $str : false;  }
-      
-  /**
-   *url 中特殊字符串的处理函数
-   *@param string
-   *@param boolean
-   *@return string
-   */
-  public static function URLCode($string,$encode=true)
-  {
-    $arRelations = array(
-                   '%2B' => '+',
-                   '%20' => ' ',
-                   '%2F' => '/',
-                   '%3F' => '?',
-                   '%25' => '%',
-                   '%23' => '#',
-                   '%26' => '&',
-                   '%3D' => '='
-    );
-    return $encode ? strtr($string,array_flip($arRelations)) : strtr($string,$arRelations);
-  }
+  public static function isChinese($str){ return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u',trim($str)) ? $str : false;  }
   
-  /** 安全过滤函数，用于系统中除带html格式的表单提交，如用户名、关键字等
+  /** 过滤函数，用于系统中除带html格式的表单提交，如用户名、关键字等
    * @param $string
    * @return string
    */
@@ -46,7 +25,8 @@ class STR
     return strtr($string,$arReplace);    
   }
   
-  /**字符模式转换，默认将全角转换成半角
+  /**
+   *字符模式转换，默认将全角转换成半角
    *@param string @character 要转换的字符
    *@param bool @full 如果为真则将半角转换成全角
    *@return string or false 返回转换后的字符
@@ -64,7 +44,7 @@ class STR
    * @param    string     $chars   可选的 ，默认为 0123456789
    * @return   string     字符串
    */  
-  public static function random($length, $chars='0123456789abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ')
+  public static function random($length, $chars = '0123456789abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ')
   {
     $r = '';
     $max = strlen($chars) - 1;
@@ -85,6 +65,48 @@ class STR
     if(!$unixTime) return false;
     foreach($arFormat as $format){if(date($format,$unixTime) == $date) return true;}
     return false;
+  }
+  
+  /**
+   *模糊显示字符串
+   *@param string $str
+   *@param int $start 开始位置
+   *@param int $len 长度  
+   *@param string $symbol 替换的字符
+   *@return string $string
+   */
+  public static function fuzzy($str,$start=0,$len=0,$symbol='*')
+  {
+    if(!is_int($start) || !is_int($len) || $start < 0 || $len < 0) { return $str; }
+    $iLen = strlen($str);
+    if($start >= $iLen){ return $str;}
+    $string = '';
+    for($i=0;$i<$iLen;$i++){   $string .= ($i >= $start -1 && $i < $start -1 + $len) ? $symbol : $str[$i]; }
+    return $string;
+  }
+  
+  /**
+   *判断是否是一个手机号码
+   *@param string $mobile
+   *@return boolean
+   */
+  public static function isMobile($mobile)
+  {
+    if(empty($mobile)){ return false;}
+    //第一位必须是1且长度必须是11
+    if($mobile[0] != '1' || strlen($mobile) != 11){ return false;}
+    //第二位可能的数字
+    $sarr = array('3','4','5','7','8');
+    $ar = array('0','1','2','3','4','5','6','7','8','9');
+    //检查第二位
+    if( !in_array($mobile[1],$sarr)){ return false; }
+    //如果第二位是4,第三位必须是5或7
+    if($mobile[1] == '4' && !in_array($mobile[2],array('5','7'))){ return false;}
+    //检查其它几位
+    for($i=2;$i<11;$i++){  if(!in_array($mobile[$i],$ar)){ return false;} }
+    return true;
+    //用正则表达式的方法
+    //return preg_match(' /^(13[0-9]|147|145|15[0-9]|17[0-9]|18[0-9])\d{8}$/',$mobile);
   }
   
   /**
@@ -174,48 +196,6 @@ class STR
     if(empty($unixTime) || $unixTime <= 0 ) return '';
     //if(!is_int($unixTime) || $unixTime < 0) return ''; //在window上表示的时间范围(1970-01-01 06:00:00---2038-01-19 09:14:07)
     return $displayTime ? date('Y' . $separator . 'm' . $separator . 'd' . ' H:i:s',$unixTime) : date('Y' . $separator . 'm' . $separator . 'd',$unixTime);
-  }
-  
-  /**
-   *模糊显示字符串
-   *@param string $str
-   *@param int $start 开始位置
-   *@param int $len 长度  
-   *@param string $symbol 替换的字符
-   *@return string $string
-   */
-  public static function fuzzy($str,$start=0,$len=0,$symbol='*')
-  {
-    if(!is_int($start) || !is_int($len) || $start < 0 || $len < 0) { return $str; }
-    $iLen = strlen($str);
-    if($start >= $iLen){ return $str;}
-    $string = '';
-    for($i=0;$i<$iLen;$i++){   $string .= ($i >= $start -1 && $i < $start -1 + $len) ? $symbol : $str[$i]; }
-    return $string;
-  }
-  
-  /**
-   *判断是否是一个手机号码
-   *@param string $mobile
-   *@return boolean
-   */
-  public static function isMobile($mobile)
-  {
-    if(empty($mobile)){ return false;}
-    //第一位必须是1且长度必须是11
-    if($mobile[0] != '1' || strlen($mobile) != 11){ return false;}
-    //第二位可能的数字
-    $sarr = array('3','4','5','7','8');
-    $ar = array('0','1','2','3','4','5','6','7','8','9');
-    //检查第二位
-    if( !in_array($mobile[1],$sarr)){ return false; }
-    //如果第二位是4,第三位必须是5或7
-    if($mobile[1] == '4' && !in_array($mobile[2],array('5','7'))){ return false;}
-    //检查其它几位
-    for($i=2;$i<11;$i++){  if(!in_array($mobile[$i],$ar)){ return false;} }
-    return true;
-    //用正则表达式的方法
-    //return preg_match(' /^(13[0-9]|147|145|15[0-9]|17[0-9]|18[0-9])\d{8}$/',$mobile);
   }
   
   /**
