@@ -193,19 +193,17 @@ color: #EEEEEE 淡灰色
     $arr = array('head'=>array('title'=>$_SESSION['points']['region']['name']),
                  'username'=>$_SESSION['points']['user']['username'],
                  'status'=>'[' . $_SESSION['points']['user']['id'] . '] ' . $_SESSION['points']['user']['alias'] . ' online.',
-                 'group'=>$_SESSION['points']['region']['name']   );
+                 'group'=>$_SESSION['points']['region']['name'] . '  ' . $_SESSION['points']['subrange']['name']    );
     
     $arr['item'] = array();
     $serial = 0;
     foreach($_SESSION['points']['category'] as $key=>$val)
     {
         $arr['item'][$serial]['id'] = $key;
-        $arr['item'][$serial]['title'] = $_SESSION['points']['subrange']['name'] . '】  ' . $val['title'];
+        $arr['item'][$serial]['title'] = '【' . $_SESSION['points']['subrange']['name'] . '】  ' . $val['title'];
         $arr['item'][$serial]['path'] = $val['aurl'];
         if($serial == 0){ $arr['iframe'] = $val['aurl'] . '?cid=' . $key; } //默认显第一个可访问的类别 以后将改为默认访问全局菜单
         $serial++;
     }
     points::shell($arr);
 ?>
-
-
