@@ -6,38 +6,168 @@ color: #797979 浅灰色
 color: #686868 深灰色
 color: #EEEEEE 淡灰色
 
-注意CMB.class.php isbind方法存在问题
-
-function PCURL($url,$data)
-	{ 
-		$curl = curl_init();                            // 启动一个CURL会话
-		curl_setopt($curl, CURLOPT_URL, $url);          // 要访问的地址
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);  // 对认证证书来源的检查
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);  // 从证书中检查SSL加密算法是否存在
-		curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
-		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);  // 使用自动跳转
-		curl_setopt($curl, CURLOPT_AUTOREFERER, 1);     // 自动设置Referer
-		curl_setopt($curl, CURLOPT_POST, 1);            // 发送一个常规的Post请求
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $data);  // Post提交的数据包
-		curl_setopt($curl, CURLOPT_TIMEOUT, 30);        // 设置超时限制防止死循环
-		curl_setopt($curl, CURLOPT_HEADER, 0);          // 显示返回的Header区域内容
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);  // 获取的信息以文件流的形式返回
-		$tmpInfo = curl_exec($curl);                    // 执行操作
-		//捕抓异常
-		if (curl_errno($curl)){  echo curl_error($curl);}    
-		curl_close($curl); // 关闭CURL会话
-		return $tmpInfo; // 返回数据
-	}
-	
-	function GCURL($url)
-	{
-	  $ch = curl_init();
-	  curl_setopt($ch,CURLOPT_URL,$url);
-	  curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-	  curl_setopt($ch,CURLOPT_HEADER,0);
-	  $res = curl_exec($ch);
-	  //捕抓异常
-	  if(curl_errno($ch)){  echo curl_error($ch);}    
-	  curl_close($ch);
-	  return $res;
-	}
+==========================\points\usr\master\users\ask\users.save.ajx.php
+<?php
+    session_start();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php';    
+    
+    $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+    $userType = $_SESSION['points']['user']['type'];
+    
+    $set = array('status'=>0,'err'=>'');
+    
+    $power = false; //为真时向权限表中写入权限记录
+    $check = false; //为真时校验用户输入
+    $lastInsertId = 0;  $categoryTitle = '';  $categoryId = 0;  $regionAuthority = '';
+    
+    if(isset($_POST['murl']))
+    {
+        $murls = points::SURL($_POST['murl']);
+        if($murls['status'] != 1){ $set['err'] = '提供的管理URL可能不符合规范'; points:jan($set); }
+        $category = new category(array('MD5'=>$murls['md5']));
+        $categories = $category->get(array('id','regionId','title')); 
+        if($category->iTotal() > 0)
+        {
+            $categoryTitle = $categories['title'][0];
+            $categoryId = $categories['id'][0];
+            $region = new regions(array('id'=>$categories['regionId'][0]));
+            $regions = $region->get(array('authority'));
+            $regionAuthority = $regions['authority'][0];
+            
+        }else{ $set['err'] = '不应该在没有保存类别的条件下指派用户，如果要这样做请转到用户管理页面.'; points::jan($set); }
+        
+        $arr = array('username'=>trim($_POST['username']),
+                     'alias'=>$_POST['alias'],
+                     'email'=>'',
+                     'portrait'=>'',
+                     'type'=>$_POST['type'],
+                     'status'=>1                     );
+        
+        //向用户表中写入新用户并在权限表中写入权限条目(包括新用户和uid)
+        if(!empty($_POST['username']) && !empty($_POST['uid'])){ $power = true; $check = true;  }
+        if(empty($_POST['username']) && empty($_POST['uid']))
+        {
+            $set['err'] = '未正确提供参数';
+            points::jan($set);
+        }        
+        //向权限表中写入相关权限(uid)
+        if(empty($_POST['username']) && !empty($_POST['uid'])){ $power = true; }
+        
+        //向用户表中写入新用户并在权限表中写入权限条目
+        if(!empty($_POST['username']) && empty($_POST['uid'])){ $power = true; $check = true; }
+        
+    }else
+    {
+        $check = true;
+        $arr = array('username'=>trim($_POST['username']),
+                    'alias'=>$_POST['alias'],
+                    'email'=>trim($_POST['email']),
+                    'portrait'=>trim($_POST['portrait']),
+                    'type'=>$_POST['type'],
+                    'status'=>$_POST['status']       );
+    }
+    
+    if($check)
+    {
+        //检验 用户名
+        if(empty($arr['username'])){ $set['err'] = '用户名不能为空不建议中文'; points::jan($set); }
+        
+        //电子邮件
+        if(!empty($arr['email']) && !STR::email($arr['email']))
+        {
+            $set['err'] = 'email地址格式可能不规范';points::jan($set);
+        }
+        if(!in_array($arr['type'],array('1','2','3','9'))){ $set['err'] = '用户类型不正确'; points::jan($set);}
+        if(!in_array($arr['status'],array('1','0')) ){ $set['err'] = '状态值不正确'; points::jan($set);}
+        //如果提供了密码，则使用强密码规则进行验证
+        if(isset($_POST['password']))
+        {
+            $pwd = STR::password($_POST['password']); 
+            if($pwd['status'] != 1){  $set['err'] = $pwd['err']; points::jan($set); }
+            $arr['password'] = $pwd['encrypt'];
+            
+        //如果没有提供密码字段则使用默认的默认
+        }else{ $arr['password'] = md5('Aa123456'); }
+    
+        //写入内容
+        if(isset($_POST['id'])) //修改条目
+        {
+            if(!ctype_digit($_POST['id'])){ $set['err'] = '不正确的ID值'; points::jan($set); }
+            
+            //查找是否还存在其它相同的用户(不是本id)
+            $where = 'id != ' . $_POST['id'] . ' AND username = "' . $_POST['username'] .'"';
+            $user = new users($where);
+            if($user->iTotal() > 0){ $set['err'] = '存在相同的用户名'; points::jan($set); }
+            
+            $user = new users(array('id'=>$_POST['id']));
+            if($user->iTotal() == 1)
+            {
+                $users = $user->get(array('type'));
+                if($userType < $users['type'][0])
+                {
+                    $set['err'] = '修改用户失败，试图修改一个比当前用户级别要高的用户信息时出错'; points::jan($set);
+                }
+                //当前用户是否有修改条目的权限以防止恶意写入
+                if(!points::allowed($authority,'edit')){ $set['err'] = '用户权限请求'; points::jan($set); }
+            
+                $arr['modifiedTime'] = date('Y-m-d H:i:s');  
+                if($user->set($arr))
+                {
+                    $set['status'] = 1; points::jan($set);
+                    
+                }else{ $set['err'] = '修改失败'; points::jan($set); }
+                
+            }else{ $set['err'] = '未找到的内容'; points::jan($set); }
+            
+        }else //新增条目
+        {
+            if($userType < $arr['type']){ $set['err'] = '增加用户失败，试图增加一个比当前用户级别要高的用户时出错'; points::jan($set); }
+            //当前用户是否有新建条目的权限以防止恶意写入
+            if(!points::allowed($authority,'add')){ $set['err'] = '用户权限请求'; points::jan($set); }
+            ////如果增加用户没有提供密码字段则使用默认的密码 
+            //if(!isset($_POST['password'])){ $arr['password'] = md5('Aa123456'); }
+            $user = new users();
+            if($user->set($arr))
+            {
+                $set['status'] = 1;
+                if(!$power){ points::jan($set); }
+                $lastInsertId = $user->lastInsertedId();
+                
+            }else{ $set['err'] = '提交失败,请重试！'; points::jan($set); }
+        }
+    }
+    
+    //更新用户权限表
+    if($power)
+    {
+        $uid = empty($_POST['uid']) ? array() : explode('|',$_POST['uid']);
+        //检查是否存在相同的权限记录 uid cid两个都相等则为相同
+        for($i=0,$len=count($uid);$i<$len;$i++)
+        {
+            $power = new power(array('userId'=>$uid[$i],'categoryId'=>$categoryId));
+            if($power->iTotal() > 0 )
+            {
+                $set['err'] = "在此类别下，用户ID:{$uid[$i]}已经定义了此权限条目，请转到权限管理页面修改，或者在此页面放弃该用户";
+                points::jan($set);
+            }
+        }
+        if($lastInsertId){ $uid[] = $lastInsertId; }
+        $inserts = array();
+        for($j=0,$l=count($uid);$j<$l;$j++)
+        {
+            $inserts[$j]['userId'] = $uid[$j];
+            $inserts[$j]['categoryId'] = $categoryId;
+            $inserts[$j]['categoryTitle'] = $categoryTitle;
+            $inserts[$j]['authority'] = $regionAuthority;
+        }
+        //当前用户是否有新建条目的权限以防止恶意写入
+        if(!points::allowed($authority,'add')){ $set['err'] = '用户权限请求'; points::jan($set); }
+        $power = new power();
+        if($power->set($inserts))
+        {
+            $set['status'] = 1;
+            $set['err'] = '用户指派成功';
+        }else{ $set['err'] = '用户指派失败'; }
+        points::jan($set);
+    }
+?>
