@@ -45,3 +45,541 @@ color: #EEEEEE 淡灰色
 ?>
 
 
+===============================/points/usr/master/category/js/category.oper.js
+//自定义函数
+String.prototype.empty = function(){ return this == '' || this == ' ' || typeof(this) == 'undefined'; };
+String.prototype.doubled = function(){ var i = parseInt(this); return i < 10 ? '0' + i : i; };
+
+$(document).ready(function(){
+    
+    //初始化默认显示的访问URL路径
+    $('#dir').text($('#regions').find("option:selected").attr('dir'));
+    
+    var select = document.getElementById('regions');
+    select.onchange = function()
+    {
+        $('#dir').text($(this).find('option:selected').attr('dir'));
+    }
+    //初始值
+    var vs = values();
+    
+    //获取category的初始值
+    function values()
+    {
+        return {"murl":$('#murl').val(),
+                "pos":$('#pos').val(),
+                "title":$('#title').val(),
+                "regions":$('#regions').val(),
+                "status":$('#status').val(),
+                "aurl":$('#dir').text() + $.trim($('#aurl').val())    };
+    }
+
+    $('#save-category').click(function(event){
+        $('#category-err').text('');
+        event.stopPropagation();    
+        var _id = $(this).attr('_id');
+        var j = values();
+        var modify = false; //用户是否修改了值
+        for(var p in j ){ if(j[p] != vs[p]){ modify = true; break;} }
+        if (!modify) { $('#category-err').text('没有可用于提交的内容，请检查输入是否有效！'); return false; }
+        j.id = vs.id = _id;        
+        //不信任校验
+        $.post('ask/category.oper.ajx.php',j,function(r){ 
+            var json = $.parseJSON(r);
+            $('#category-err').text(json.err);
+            if (j.status == '1') { vs = values(); }
+        });
+    
+    });
+    
+    var user = users();
+    //用户指派
+    $('#save-user').click(function(){
+        $('#user-err').text('');
+        var j = users(); //获取新值
+        //基本校验
+        if (j.murl.empty()) { $('#user-err').text('必须指定管理URL'); return false; }
+        if (j.uid.empty() && j.username.empty()){$('#user-err').text('必须有用户指派'); return false; }
+        if (!j.username.empty())
+        {
+            if ((!j.pwd1.empty() || !j.pwd2.empty()) && j.pwd1 != j.pwd2)
+            {
+                $('#user-err').text('两次输入的密码不一致,如果为空，则使用默认的密码'); return false;
+            }
+        }
+        $('#user-err').text('');
+        //是否允许提交
+        var allowed = false;
+        for(var p in j){ if(j[p] != user[p]){ allowed = true; break;}}
+        if (!allowed){ $('#user-err').text('没有可用于提交的内容!'); return false; }
+        //提交内容
+        var json = {"murl":j.murl,
+                    "uid":j.uid,
+                    "username":j.username,
+                    "alias":j.alias,
+                    "type":j.type        };
+        if(!j.pwd1.empty()){ json.password = j.pwd1; }
+        $.post('../users/ask/users.save.ajx.php',json,function(r){ 
+            var jn = $.parseJSON(r);
+            if(jn.status == '1'){ user = users(); }
+            $('#user-err').text(jn.err);
+        });
+    });
+    
+    $('#user #lists .more').click(function(){
+        var serial = $(this).attr('id').split('-')[1];
+        if ($(this).hasClass('extend'))
+        {
+            $('#dis' + serial).fadeOut();
+            $(this).removeClass('extend');
+            $(this).text('更多>>');
+        }else
+        {
+            $(this).addClass('extend');
+            $('#dis' + serial).fadeIn();
+            $(this).text('折叠>>');
+        }
+    });
+    
+    function users()
+    {
+        var user = document.getElementsByName('user');
+        var selects = [];
+        for(var i=0;i<user.length;i++){ if(user[i].checked){selects.push(user[i].value); } }
+        
+        return {"murl":$.trim($('#murl').val()),
+                "rid":$('regions').val(),
+                "uid":selects.join('|'),
+                "username":$.trim($('#username').val()),
+                "alias":$.trim($('#alias').val()),
+                "type":$('#type').val(),
+                "pwd1":$('#password').val(),
+                "pwd2":$('#pwd').val()                      };
+    }
+    
+    //为空值对象提供默认值 开始时间 结束时间 变量版本
+    $('#stime,#etime,#vver').focus(function(){
+        var date = new Date();
+        var v = $.trim($(this).val());
+        if (v.empty())
+        {
+            var arr = [];
+            arr.push(date.getFullYear(),String(date.getMonth() + 1).doubled(),String(date.getDate()).doubled());
+            
+            var time = [];
+            time.push(String(date.getHours()).doubled(),String(date.getMinutes()).doubled(),String(date.getSeconds()).doubled());
+            
+            if ($(this).attr('id') == 'vver')
+            {
+                $(this).val(arr.join('') + time.join(''));
+            
+            }else{ $(this).val(arr.join('-') + ' ' + time.join(':'));}
+        }
+    });
+    
+    //初始化变量
+    $('#save-var').click(function(){
+        var vars = {};
+        //获取managingURL的值
+        vars.murl = $('#murl').val();
+        if(vars.murl.empty()){ $('#variable-err').text('必须指定管理URL');return false; }
+        //时间
+        vars.stime = $('#stime').val();
+        vars.etime = $('#etime').val();
+        //版本
+        vars.vver = $('#vver').val();
+        //url
+        vars.surl = $('#surl').val();
+        vars.eurl = $('#eurl').val();
+        //分页大小
+        vars.psize = $('#psize').val();
+        $('#variable-err').text('');
+        
+        //至少有一个变量值不为空
+        var empties = 0;
+        var i = 0;
+        for(var p in vars){  if( p != 'murl'){  i += 1; if(vars[p].empty()){ empties += 1;}  }  }
+        if(empties == i){ $('#variable-err').text('没有为此类别提供任何可初始化的变量,初始化失败');return false; }
+        
+        //提交内容
+        $.post('ask/category.oper.vars.ajx.php',vars,function(r){ //console.log(r);
+            var j = $.parseJSON(r);
+            $('#variable-err').text(j.tip);
+        });
+    
+    });
+    
+    //过滤器 增加字段设定 + 的单击事件
+    $('#fadd').click(function(){
+        $('#fields tbody tr:last-child').after($('#fields tbody .clone:first-child ').clone());
+        $('.check').click(check);
+    });
+    
+    //过滤器 增加字段设定 - 的单击事件
+    $('#fdelete').click(function(){
+        //不能全部删除
+        var tr = $('#fields tbody tr');
+        var trCheck = $('#fields tbody .tr-check');
+        if(trCheck.length != tr.length && trCheck.length > 0){ $('#fields tbody .tr-check').remove(); }        
+    });
+    
+    $('.check').click(check);
+    function check()
+    {
+        $(this).is(':checked') ? $(this).closest('tr').addClass('tr-check') : $(this).closest('tr').removeClass('tr-check');
+    }
+    
+    //保存过滤器
+    var filterOldValue = filtered();
+    function filtered() //收集过滤器值的函数
+    {
+        var filter = {};
+        filter.murl = $('#murl').val();
+        filter.title = $.trim($('#filter-title').val());
+        //过滤器的字段内容 字段名
+        var tr = $('#fields .clone');
+        var trArr = [];
+        tr.each(function(i,obj){
+            var td = $(obj).children('td');
+            var inputValue = [];
+            td.each(function(j,object){                
+                var input = $(object).children('input')
+                if (input.hasClass('fname') && !input.val().empty()){ inputValue.push('fname=' + input.val());}
+                if (input.hasClass('dname') && !input.val().empty()){ inputValue.push('dname=' + input.val());}
+                if (input.hasClass('translator') && !input.val().empty()){ inputValue.push('translator=' + input.val()); }
+            });
+            trArr.push(inputValue.join('|'));
+        });
+        filter.fields = trArr.join(',');
+        filter.searcher = $.trim($('#fsearch').val());
+        filter.SQL = $.trim($('#fSQL').val());
+        return filter;
+    }
+    
+    //提交内容
+    $('#save-filter').click(function(){
+        $('#filter-err').text('');
+        //重新收集过滤器的值
+        var filter = filtered();  
+        if(filter.murl.empty()){ $('#filter-err').text('必须指定管理URL');return false; }
+        if(filter.title.empty()){ $('#filter-err').text('标题不能空.');return false;}
+        var fields = filter.fields.split(','); 
+        if(filter.fields.empty()){ $('#filter-err').text('没有提供过滤器字段内容.');return false; }
+        var err = 0;
+        for(var i=0;i<fields.length;i++)
+        {
+            var splits = fields[i].split('|'); 
+            if(splits.length < 2){ err += 1; }
+            for(var j=0;j<splits.length;j++)
+            {
+                var field = splits[j].split('=');
+                if(field[0] && field[1].empty()){ err += 1; }
+            }
+        }
+        if (err !=0 ) { $('#filter-err').text('字段名或者显示名不能为空');return false; }
+        if(filter.SQL.empty()){ $('#filter-err').text('SQL不能空.');return false;}
+        var compare = false;
+        for(var p in filter){ if(filter[p] != filterOldValue[p]){ compare = true; break;}}
+        if(!compare){ $('#filter-err').text('没有可用于提交的内容');return false; }
+        //提交过滤器
+        $.post('ask/category.oper.filter.ajx.php',filter,function(r){ 
+            var j = $.parseJSON(r);
+            //更新初始值 阻止重复提交
+            if(j.yes == '1'){  filterOldValue = filtered(); }
+            $('#filter-err').text(j.tip);
+        });
+        
+    });
+    
+    //variable filter的折叠显示
+    $('.closed').click(function(){
+        if ($(this).hasClass('folded'))
+        {
+            $(this).removeClass('folded');
+            $(this).children('img').attr('src','/points/usr/local/images/plus.png');
+            $(this).parent().parent().children('div').fadeOut();
+        }else
+        {
+            $(this).children('img').attr('src','/points/usr/local/images/minus.png');
+            $(this).addClass('folded');
+            $(this).parent().parent().children('div').fadeIn();
+        }
+    });
+    
+});
+
+
+==================================/points/usr/master/category/category.oper.php
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php'; 
+    
+    $categoryId = isset($_GET['cid']) ? $_GET['cid'] : '';
+    if($categoryId && !ctype_digit($categoryId)){exit('Exception access violation');}
+    
+    $region = new regions(array('status'=>1),array('order'=>'region ASC,createTime DESC'));
+    $regions = $region->get(array('id','name','region','directory')); 
+    //处理成id=>'用户数据-招商信诺'形式
+    $arr = array();
+    $regionRelations = points::regions(); 
+    for($i=0;$i<$region->iTotal();$i++){ $arr[$regions['id'][$i]] = $regionRelations[$regions['region'][$i]] . '=>' . $regions['name'][$i];}
+    
+    //变量定义
+    $title = "增加类别";$murl = '';$name = '';$aurl = ''; $pos = ''; $rid = ''; $vver = '';$psize = '';
+    if($categoryId) //如果用户编辑类别
+    {
+        $title = "编辑类别[ID:<label id=\"id\">$categoryId</label>]";
+        $category = new category(array('id'=>$categoryId));
+        $categories = $category->get(array('regionId','title','managingURL','accessedURL','position')); 
+        $murl = $categories['managingURL'][0];
+        $name = $categories['title'][0];
+        $aurl = strtr($categories['accessedURL'][0],array($regions['directory'][array_search($categories['regionId'][0],$regions['id'])]=>''));
+        $pos = $categories['position'][0];
+        $rid = $categories['regionId'][0];        
+        $vver = ''; /** 从变量表中取值替换 mock here */
+        $psize = '';
+    }    
+    
+    //显示全部用户以供选择 
+    $user = new users(); 
+    $users = $user->get(array('id','username','alias')); 
+    $usersArr = array();
+    for($i=0;$i<$user->iTotal();$i++)
+    {
+        $alias = $users['alias'][$i] ? '[' . $users['alias'][$i] . ']' : '';
+        $usersArr[$users['id'][$i]] = $users['username'][$i] .$alias;
+    }
+    $groups = array_chunk($usersArr,3,true); //分组显示 每组显示3个，如果组数大于则第一组显示其余隐藏 用户点击更多时显示
+    $li = '';
+    $len = count($groups);
+    for($j=0;$j<$len;$j++)
+    {
+        $li .= $j > 0 ? "<li id=\"dis{$j}\" style=\"display:none;\">" : '<li>';
+        foreach($groups[$j] as $k=>$val)
+        {
+            $li .= "<label><input type=\"checkbox\" name=\"user\" value=\"{$k}\" />{$val}</label>";
+        }
+        //是否显示更多
+        if($len > 0 && $j < $len - 1){ $n = $j + 1; $li .= "<label><a class=\"more\" id=\"more-{$n}\">更多>></a></label>"; }
+        $li .= '</li>';
+    }
+
+?>
+<!DCOTYPE html>
+<html>
+    <head>
+       <?php points::head(false); ?>
+       <link rel="stylesheet" href="/points/usr/local/css/master.css" />
+       <link rel="stylesheet" href="css/category.oper.css" />
+       <script src="js/category.oper.js"></script>
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1><?php echo $title; ?></h1><span id="err"></span></div>
+            <div id="category">
+                <div id="categories">
+                    <p class="title"><a>为此类别指定管理URL参数</a></h2>
+                    <div id="dv-url">                        
+                        <p id="m-url">
+                            <label>管理路径：</label><input type="text" id="murl" value="<?php echo $murl; ?>" />
+                            <label>隶属于：</label>
+                            <select id="pos">
+                                <option value="1" <?php echo $pos == 1 ? 'selected' : ''; ?>>前端页面显示</option>
+                                <option value="2" <?php echo $pos == 2 ? 'selected' : ''; ?>>后端管理页面</option>
+                            </select>
+                        </p>
+                        <p class="desc">输入要管理的URL。如：http://www.test.org/aaaa/bbbb/ccc/.请确保输入没有空白且符合url规范。可以为不同的目录下的文件管理不同的类别内容。</p>
+                    </div>
+                    <div id="dv-title">
+                        <label>类别的中文显示名：</label><input type="text" id="title" value="<?php echo $name; ?>" />
+                        <span class="desc">为此类别确定一个描述性中文显示名，这有助于与其它类别明确地区分开。</span>
+                    </div>
+                    <div id="dv-region">
+                        <p>
+                            <label>类别的显示区域：</label>
+                            <select id="regions">
+                                <?php foreach($arr as $k=>$v){ ?>
+                                    <option dir="<?php echo $regions['directory'][array_search($k,$regions['id'])]; ?>" value="<?php echo $k; ?>" <?php echo $rid == $k ? 'selected' : ''; ?>><?php echo $v; ?></option>
+                                <?php } ?>
+                            </select>
+                            
+                            <label>指定该类别的状态：</label>
+                            <select id="status">
+                                <option value="1">使用</option>
+                                <option value="0">废弃</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label>指定该类别的访问路径：</label>
+                            <label id="dir"></label>
+                            <input type="text" id="aurl" value="<?php echo $aurl; ?>" />
+                        </p>
+                        <p class="desc">区域的目录与类别的访问路径组合成访问URL，即为此类别指定模块文件。</p>
+                    </div>
+                    <div class="apply"><span class="error" id="category-err"></span><a id="save-category" _id="<?php echo $categoryId; ?>">保存此类别</a></div>
+               </div>
+               
+               <div id="user">
+                    <p class="title"><a class="closed"><img src="/points/usr/local/images/plus.png" />  为此类别指定访问用户及相关权限</a></h2>
+                    <div id="old-users">
+                        <label>从用户表中选择用户：</label>
+                        <ul id="lists"><?php echo $li; ?></ul>
+                    </div>
+                    <div id="new-user">
+                        <label>快速创建一个新用户:</label>
+                        <p>
+                            <label>用户名称：</label><input type="text" id="username" value="" />
+                            <label>用户显示名：</label><input type="text" id="alias" value="" />
+                            <span id="sp-type">
+                                <label>用户类型：</label>
+                                <select id="type">
+                                    <option value="1">前端页面</option>
+                                    <option value="2">后台页面</option>
+                                    <option value="3">通用</option>
+                                </select>
+                            </span>
+                        </p>
+                        <p><label>用户密码：</label><input type="password" id="password" value="" /><label>确认此密码：</label><input type="password" id="pwd" value="" /></p>
+                        <p class="desc">通常情况下，在为类别绑定用户时，使用从用户列表中选择用户或者快速创建一个新用户的一种方式即可。但如果为多个用户绑定类别并且一些用户并不存在则可结合两者来完成。</p>
+                    </div>
+                    <div class="apply"><span class="error" id="user-err"></span><a id="save-user">用户指派</a></div>
+               </div>
+        
+                <div id="variable">
+                    <p class="title"><a class="closed"><img src="/points/usr/local/images/plus.png" />  为此类别初始化变量</a></h2>
+                    <div id="time">
+                        <label>开始时间：</label><input type="text" id="stime" value="" />
+                        <label>结束时间：</label><input type="text" id="etime" value="" />
+                        <p class="desc">如果初始化了时间变量，则此类别可以根据用户输入的时间值来确定某些活动有效时间范围。时间必须有效且格式为:2015-12-16 14:17:30,否则不能初始化</p>
+                    </div>
+                    <div id="ver">
+                        <label>变量版本：<input type="text" id="vver" value="<?php echo $vver; ?>" /></label>
+                        <p class="desc">此变量的值为纯数字字符串，如：20151213171033。如果初始化了此变量，用户在修改此变量后，系统自动保存上一次的版本号。可以根据这两个值来定义系统的一些功能。</p>
+                    </div>
+                    <div id="dv-aurl">
+                        <label>活动未开始时的页面URL：</label><input type="text" id="surl" value="" />
+                        <label>活动结束后的页面URL：</label><input type="text" id="eurl" value="" />
+                        <p class="desc">如果初始化了这两个变量，则用户可以指定活动未开始或活动结束后的URL。请指定完整的URL，如:http://m.cignacmb.com/campaign/cgb201501/zaodo.html</p>
+                    </div>
+                    <div>
+                        <label>用户数据分页大小:</label><input type="text" id="psize" value="<?php echo $psize; ?>" />
+                        <span class="desc">如果初始化了此变量，则用户可以指定自定义的分页大小。</span>
+                    </div>
+                    <div class="apply"><span class="error" id="variable-err"></span><a id="save-var">初始化变量</a></div>
+               </div>
+               <div id="filter">
+                    <p class="title"><a class="closed"><img src="/points/usr/local/images/plus.png" /> 为此类别初始化用户数据过滤器 </a></p>
+                    <div id="ftitle">
+                        <label>为此数据过滤器定义一个标题：</label><input type="text" id="filter-title" value="" />
+                        <span class="desc">标题可以识别此数据过滤器，易于用户在多个不同的数据过滤器之间切换，并根据标题来识别此数据过滤器的用途。</span>
+                    </div>
+                    <div id="field">
+                        <label>为此数据过滤器添加数据字段和显示字段及翻译设定：</label>
+                        <table id="fields">
+                            <thead>
+                                <tr><td class="width30">数据表字段</td><td class="width30">显示名</td><td class="width30">翻译设定</td><td><a id="fadd">+</a><a id="fdelete">-</a></td></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="clone">
+                                     <td><input type="text" class="fname" value="" /></td>
+                                     <td><input type="text" class="dname" value="" /></td>
+                                     <td><input type="text" class="translator" value="" /></td>
+                                     <td><input type="checkbox" class="check" /></td>
+                                </tr> 
+                            </tbody>
+                        </table>
+                        <p class="desc">数据表字段必须与相关表的字段一致 (不要写映射名，映射名无法在此条件下处理)，显示名在用户查询数据时显示，通常是表字段中文名称。翻译设定值是数组的单元通常是关联数组，比如：要将F显示成女，翻译字段内容填写为 'F':'女'多个翻译值用英文逗号隔开。</p>
+                    </div>
+                    <div id="where">
+                        <label>基于此过滤器的搜索设定：</label><input type="text" id="fsearch" value="" />
+                        <p class="desc">设定此数据过滤器的搜索选项,比如按名称模糊搜索的值为 "name":0,按性别精确搜索的值为 "gender":1</p>
+                    </div>
+                    <div id="sql">
+                        <label>基于数据过滤器的SQL语句：</label>
+                        <textarea id="fSQL"></textarea>
+                        <p class="desc">数组过滤器的SQL语句请不要包含limit部分,由本系统自动处理。limit仅用于分页。</p>
+                    </div>
+                    <div class="apply" ><span class="error" id="filter-err"></span><a id="save-filter">保存此过滤器</a></div>
+               </div>
+            </div>
+        </div>
+        <div id="announce">增加对类别管理的描述内容</div>
+    </body>
+</html>
+
+===================================/points/usr/master/category/ask/category.oper.ajx.php
+<?php
+    session_start();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php'; 
+    
+    $set = array('status'=>0,'err'=>'');
+    $murls = points::SURL($_POST['murl'],true); //echo $murls['url'];
+    //用户输入校验
+    if(!$murls['status']){ $set['err'] = '无效的管理URL,请检查输入！'; points::jan($set); }
+    if(!ctype_digit($_POST['pos'])){ $set['err'] = '位置不是一个有效的值.';points::jan($set); }
+    if(!ctype_digit($_POST['regions'])){ $set['err'] = '区域不是一个有效的值.';points::jan($set); }
+    if(!ctype_digit($_POST['status'])){ $set['err'] = '类别的状态不是一个有效的值.';points::jan($set); }
+    $titleLen = mb_strlen($_POST['title'],'UTF-8');
+    if( $titleLen > 14 || $titleLen == 0 ){ $set['err'] = '标题不能为空且最大长度为13'; points::jan($set);}
+    //访问URL
+    if(empty($_POST['aurl'])){ $set['err'] = '访问URL不能为空'; points::jan($set);}
+    
+    //准备表数据
+    $tables = array('managingURL'=>$murls['url'],
+                    'MD5'=>$murls['md5'],
+                    'title'=>$_POST['title'],
+                    'regionId'=>$_POST['regions'],
+                    'accessedURL' => $_POST['aurl'],
+                    'position'=>$_POST['pos']            );
+    
+    if(!empty($_POST['id'])) //编辑一个类别
+    {
+        if(!ctype_digit($_POST['id'])){ $set['err'] = '非法的修改id'; points::jan($set);}
+        //当前用户是否有修改条目的权限以防止恶意写入
+        $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+        if(!points::allowed($authority,'edit')){ $set['err'] = '用户权限请求'; points::jan($set); }
+        //编辑id的内容
+        $md5 = $murls['md5'];
+        $where = 'id !=' . $_POST['id'] . " AND MD5 = '{$md5}'";
+        $category = new category($where);
+        if($category->iTotal() > 0)
+        {
+            $set['err'] = '存在相同的管理URL.';
+            points::jan($set);
+        }else
+        {
+            $category = new category(array('id'=>$_POST['id']));
+            $tables['modifiedTime'] = date('Y-m-d H:i:s');
+            if($category->set($tables))
+            {
+                $set['status'] = 1;
+                $set['err'] = '更新类别成功';            
+            }else{ $set['err'] = '更新类别失败';}
+            points::jan($set);
+        }
+        
+    }else //增加一个类别
+    {
+        //当前用户是否有新增条目的权限以防止恶意写入
+        $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+        if(!points::allowed($authority,'add')){ $set['err'] = '用户权限请求'; points::jan($set); }
+        
+        $category = new category(array('MD5'=>$murls['md5']));
+        if($category->iTotal() > 0)
+        {
+            $set['err'] = '指定的管理URL已经存在，只能编辑。';  points::jan($set);
+        }else
+        {
+            $category = new category();
+            if($category->set($tables))
+            {
+                $set['status'] = 1;
+                $set['err'] = '保存类别成功';                
+            }else{ $set['err'] = '保存类别失败';}
+            points::jan($set);
+        }
+    }
+?>
+
+
+
+
