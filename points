@@ -193,7 +193,7 @@ color: #EEEEEE 淡灰色
     $arr = array('head'=>array('title'=>$_SESSION['points']['region']['name']),
                  'username'=>$_SESSION['points']['user']['username'],
                  'status'=>'[' . $_SESSION['points']['user']['id'] . '] ' . $_SESSION['points']['user']['alias'] . ' online.',
-                 'group'=>$_SESSION['points']['region']['name'] . '  ' . $_SESSION['points']['subrange']['name']    );
+                 'group'=>$_SESSION['points']['region']['name']  );
     
     $arr['item'] = array();
     $serial = 0;
