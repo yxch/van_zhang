@@ -7,6 +7,640 @@ color: #686868 深灰色
 color: #EEEEEE 淡灰色
 
 
+=========================\points\usr\service\universal\universal.php
+
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/service/service.inc.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php';   
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <?php points::head(0); ?>
+        <link rel="stylesheet" href="css/universal.css" />
+    </head>
+    <body>
+        <div id="grids">            
+            <div id="topoper">
+                <?php if($auth[3] == '1'){ ?><a id="add">增加</a><?php } ?>
+                <select id="products">
+                    <option value="">万能险</option>
+                </select>
+                <span id="month">
+                    <select id="years">
+                        <option value="">选择年份</option>
+                        <option value="2015">2015年</option>
+                        <option value="2016">2016年</option>
+                        <option value="2017">2017年</option>
+                        <option value="2018">2018年</option>
+                        <option value="2019">2019年</option>
+                        <option value="2020">2020年</option>
+                        <option value="2021">2021年</option>
+                        <option value="2022">2022年</option>
+                        <option value="2023">2023年</option>
+                        <option value="2024">2024年</option>
+                        <option value="2025">2025年</option>
+                    </select>
+                    <select id="months">
+                        <option value="">选择月份</option>
+                        <option value="01">1月</option>
+                        <option value="02">2月</option>
+                        <option value="03">3月</option>
+                        <option value="04">4月</option>
+                        <option value="05">5月</option>
+                        <option value="06">6月</option>
+                        <option value="07">7月</option>
+                        <option value="08">8月</option>
+                        <option value="09">9月</option>
+                        <option value="10">10月</option>
+                        <option value="11">11月</option>
+                        <option value="12">12月</option>
+                    </select>
+                </span>
+            </div>
+            <div id="announce"><span>输入利率时请输入精确值,前端显示结果为精确值除以 100 后并四舍五入 如：623.55显示为 6.24%.利率的最大值为:9999.99999999 </span><span id="tip"></span></div>
+            <table id="plaid"></table>
+            <div id="loading">正在加载数据，请稍候......</div>
+        </div>    
+    </body>
+    <script type="text/javascript" src="js/universal.js"></script>
+</html>
+
+
+=====================================points\usr\service\universal\js\universal.js
+
+var posts = {"product":'100000',"page":1,"year":'',"month":''};
+var cached = {}; //缓存
+var pageTotal = 0; //页总数
+
+$(document).ready(function(){
+    f.grid();
+    
+    var tip = $('#tip');
+    //新增
+    $('#add').click(function(){
+        //一次只能新增一条记录，每个月一条记录
+        if ($('.newly').length > 0) { tip.text('应用后再新增'); return;  }
+        if ($('.modifying').length > 0) { tip.text('应用更改后再新增'); return; }
+        tip.text('');
+        posts.before = true;
+        $.post('ask/universal.ajx.php',posts,function(r){
+            //alert(r);return;
+            var j = $.parseJSON(r);
+            if (j.add){ $('#plaid').html(j.add); }
+            if (j.append)
+            {
+                var tr0 = $('#plaid tbody').find('tr').get(0);
+                $(tr0).before(j.append);
+            }
+            $(".newly").delegate(".time",'focus',function(){
+                var date = new Date();
+                if (!$('.time').val()){ $(this).val(date.getFullYear() + '-' + (parseInt(date.getMonth()) + 1)); }
+            });
+        });
+    });
+    
+    //用户改变年份值
+    document.getElementById('years').onchange=function(){
+        posts.year = this.value; 
+        f.grid();
+    }
+    
+    //用户改变月份值
+    document.getElementById('months').onchange=function(){
+        posts.month = this.value;
+        f.grid();
+    }
+    
+});
+var f = {};
+f.grid = function(url)
+{
+    $.post('ask/universal.ajx.php',posts,function(r){ console.log(r);
+        var j = $.parseJSON(r); 
+        if(j.plaid)
+        {
+            pageTotal = j.pageTotal;
+            posts.page = j.page;
+            $('#plaid').html(j.plaid); 
+            $('#loading').hide();
+            
+        }else{ $('#loading').show();  }        
+    });
+}
+
+==========================\points\usr\service\universal\js\universal.ajx.js
+$(document).ready(function(){
+    var tip = $('#tip');
+    
+    var init = {};
+    $('.edit').click(function(){
+        if ($('.newly').length > 0) { tip.text('应用新增后再编辑');return; }
+        tip.text('');
+        var parent = $(this).parent().parent();
+        var child = parent.children('td');
+        if(parent.hasClass('modifying')){ return; } //重复单击时返回
+        parent.addClass('modifying');    //正在修改的行
+        var date = '';
+        child.each(function(i,n){
+            var index = parseInt(i);
+            var td = $(n);
+            if(index == 0){ date = td.text();};
+            if (index > 0 && index < child.length - 1)
+            {               
+                var v = parseInt(td.text()) >= 0 ? td.text() : '';
+                var dataId = td.attr('data_id');
+                var key = date + '-' + dataId; 
+                if (typeof(init[key] != 'undefined')) { init[key] = v;  }
+                td.text('');
+                var input = '<input class="modified" value="' + v + '" />';
+                td.append(input);
+            }        
+        });
+    });
+    
+    $('#apply').click(function(){ 
+        var mod = [];
+        if ($('.modifying').length > 0) //修改
+        {   
+            $('.modifying').each(function(i,n){
+                var tr = $(n);
+                var children = tr.children('td');            
+                var date = '';
+                children.each(function(j,name){                
+                    var o = $(name);
+                    var index = parseInt(j);
+                    
+                    if (index == 0) { date = o.text();}
+                    if (index >= 1 && o.attr('data_id'))
+                    {
+                        var v = o.children('input').val();
+                        var key = date + '-' + o.attr('data_id');
+                        //是否修改了值
+                        if (init[key] != v){  mod.push(date + ':' + o.attr('data_id') + '-' + v); }
+                    }
+                });          
+            });
+        }
+        if ($('.newly').length > 0) //新增
+        { 
+            $('.newly').each(function(i,n){
+                var tr = $(n);
+                var children = tr.children('td');       
+                var date = '';
+                children.each(function(j,name){                
+                    var o = $(name);
+                    var index = parseInt(j);
+                    if (index == 0) 
+                    {
+                        var _date = o.children('input').val();
+                        if (_date){ date = _date; }
+                    }
+                    if (index >= 1 && o.attr('data_id'))
+                    {
+                        var v = o.children('input').val();
+                        if(v){  mod.push(date + ':' + o.attr('data_id') + '-' + v); }
+                    }
+                });          
+            });
+        }
+        //alert(mod);return;
+        if (mod.length > 0)
+        {     
+            $.post('ask/universal.edit.ajx.php',{"pdata":mod.join('|')},function(r){
+                //alert(r);return;
+                var j = $.parseJSON(r);
+                if(j.status)
+                {
+                    tip.text('');
+                    window.location.href = window.location.href;
+                    
+                }else{   tip.text(j.message);    }
+            });
+        }
+    });
+    
+    $('.del').click(function(){
+        var child = $(this).parent().parent().children();
+        var del = [];        
+        child.each(function(i,n){
+            var o = $(n);
+            if (parseInt(i) < child.length - 1)
+            {
+                var text = o.attr('data_id') ? o.attr('data_id') + '-' + o.text() : o.text();
+                del.push(text);
+            }
+        });
+        
+        $.post('ask/universal.del.ajx.php',{"data":del.join(',',del)},function(r){
+            //alert(r);return;
+            var j = $.parseJSON(r);
+            
+            if (j.status)
+            {
+                tip.text(j.message);
+                window.location.href = window.location.href;
+            }
+        });
+    });
+    
+    //用户点击首页 上一页 下一页 尾页
+    $('#first,#previous,#next,#end').click(function(){
+        var id = $(this).attr('id'); 
+        var total = parseInt(pageTotal);
+        var i = parseInt(posts.page);
+        
+        posts.year = $('#years').val();
+        posts.month = $('#months').val();
+        
+        switch(id)
+        {
+            case 'first': //首页
+                if (i != 1){ posts.page = 1; f.grid();;	/**更新表显示内容 这个函数在wnxljll.js中定义	*/ }
+                break;
+            case 'previous': //上一页
+                if (i > 1 && i - 1 >= 1){  posts.page = i - 1; f.grid(); }
+                break;
+            case 'next': //下一页
+                if(i <= total && i + 1 <= total){  posts.page = i + 1; f.grid(); }
+                break;
+            case 'end': //尾页
+                if (i != total){  posts.page = total; f.grid(); }
+                break;
+        }    
+    });
+    
+    $('.paged').click(function(){
+        posts.page = $(this).attr('id').split('-')[1];
+        f.grid();    
+    });
+    
+    $('.export').click(function(){
+        //todo
+    
+    });
+
+});
+
+===================================\points\usr\service\universal\css\universal.css
+#grids{width:98%;padding-top:40px;font-size:12px;}
+#topoper #add,#topoper #import,#topoper #products,tfoot tr td  #oper a
+{
+    height:24px;line-height: 24px;
+    vertical-align:middle;
+}
+#topoper #tpl
+{
+    text-decoration: underline;
+    color:blue;font-size:12px;vertical-align: bottom;
+}
+#topoper #add,#topoper #import{text-decoration: none;}
+#topoper #add,#topoper #import
+{
+    display: inline-block;
+    margin-left:12px;
+    width:6%;
+    text-align: center;color:#EFF3F3;
+    background-color:#16A085;
+    border-radius: 2px;
+}
+
+#topoper #products
+{
+    margin-left:20px;
+    background-color:transparent;
+    border:1px solid #808080;
+    width:20%;
+}
+#topoper #month{ display:inline-block;height:24px;line-height: 24px;vertical-align: bottom;margin-left:30%;}
+#topoper #month #months,#topoper #month #years{height:24px;background-color:transparent;border:1px solid #808080;}
+
+#announce{height:32px;line-height:32px;margin:6px auto;}
+#announce span
+{
+    display:inline-block;
+    -webkit-text-size-adjust:none;
+    height:24px;
+    font-size:10px;margin-left:12px;
+    /*border-bottom: 1px solid #808080;*/
+}
+#announce #tip{margin-left:2%;color:#FF0000;border-bottom: none;}
+
+#plaid{width:98%;background-color:transparent;margin:0 auto;}
+#plaid thead{border-top:1px solid #07A4AE;}
+#plaid thead tr td,#plaid tbody tr td
+{
+    border-left:1px solid #07A4AE;
+    border-bottom: 1px solid #07A4AE;
+    text-align: center;
+}            
+#plaid thead
+{
+    height:32px;line-height:32px;font-weight:bold;
+}
+#plaid tbody tr{height:28px;}
+#plaid tbody tr:hover{background-color: #EFF3F3;}
+
+#plaid tbody tr td .modified
+{
+    background-color:transparent;
+    border:1px solid #808080;
+    text-align: center;
+    font-weight: bold;
+    color:#CB4025;
+}
+
+#plaid td.left-border{border-left:none;}
+#plaid tfoot{height:36px;line-height: 36px;}
+#plaid tfoot tr td{height: 40px;text-align: center;line-height: 40px;}
+#plaid tfoot tr td a{ display: inline-block; margin-left:5px; }
+#plaid tfoot tr td a#exports{  width:64px; }
+#plaid tfoot tr td a#apply
+{
+    background-color:#16A085;
+    width:62px;height:24px;line-height: 24px;
+    margin-left:15%;
+    box-shadow:1px 1px 1px #808080;
+}
+#loading{ color:#DE5B25; }
+#plaid #empty,#loading
+{
+    width:100%;height:320px;line-height: 200px;
+    font-size:18px;text-align: center;
+    vertical-align: bottom;
+    font-style:italic;
+}
+#plaid #empty{ color:#7A8897; }
+
+tfoot tr td span
+{
+    display:inline-block;
+    text-align: left;
+}
+tfoot tr td #oper{width:30%;}
+tfoot tr td #fpage{width:50%;}
+tfoot tr td #counts{width:20%;}
+tfoot tr td  #oper a
+{
+    display:inline-block;
+    width:12%;
+    margin-left:12px;
+    text-align: center;color:#EFF3F3;
+    background-color:#A27AC4;
+    border-radius: 2px;
+}
+
+===========================\points\usr\service\universal\ask\universal.ajx.php
+
+<?php
+    session_start();
+    require $_SERVER['DOCUMENT_ROOT']  . '/points/loader.inc.php';
+    //此用户是否有导出权限
+    $auth = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+       
+    //产品到账户的映射
+    $products = array('100000'=>points::accounts() );
+    //校验产品编号
+    if(!isset($products[$_POST['product']])){  exit; /**产品编号异常，可能不是正常访问*/ }
+    $acc = $products[$_POST['product']]; 
+   
+    $page = $_POST['page']; //第几页 当前页
+    //校验一下$page 必须为一个整数
+    if(!ctype_digit($page)){ exit; /**异常的参数传入*/ }
+    //返回的json_encode数组
+    $collect = array('page'=>$page,'pageTotal'=>0,'plaid'=>'','fpage'=>'');
+    
+    //利率结算时间
+    $year = $_POST['year'];
+    $month = $_POST['month'];
+    //验证时间值
+    if(!empty($year))
+    {
+        if(!ctype_digit($year) || $year < 1900 || $year > 2999){ points::jan($collect); }
+    }
+    if(!empty($month))
+    {
+        if(!ctype_digit($month) || $month < 1 || $month > 12 ){ points::jan($collect); }
+    }
+
+    //生成确保账户状态为1的查询条件
+    $keys = array_keys($acc);
+    for($i=0,$l=count($keys);$i<$l;$i++){ $keys[$i] = "account = '" . $keys[$i] . "'"; }
+    //确保账户状态为1才执行单位价格查询
+    $accounts = new account('(' . implode(' OR ',$keys) . ')' . ' AND status = 1');
+    $accountArr = $accounts->get(array('id','account'));
+  
+    //table标题
+    $header = '<thead><tr><td class="left-border">结算时间</td>';
+    $empty = '<div id="empty">没有可用数据!</div>';
+    
+    //标题添加账户信息
+    if($accounts->iTotal() > 0)
+    {
+        for($i=0;$i<$accounts->iTotal();$i++){   $header .= '<td>' . $acc[$accountArr['account'][$i]] . '</td>'; }
+        $header .= '<td>操作</td></tr></thead>';
+        
+    //查询账户的status都为0即都不可用
+    }else{ $collect['plaid'] = $empty;  points::jan($collect);  }
+    
+    //用户允许的操作
+    $oper = points::authorized($auth,array('add','export','import'));
+    
+    //获取表数据
+    $pageSize = 15; //分页大小
+    //查询条件
+    $ids = implode(',',$accountArr['id']);
+    $where = "accountId IN($ids) "; //注意有一个空白
+    
+    //如果结算月份为空则显示当前月份结算价值
+    if(empty($year) && empty($month)){ $where .= ''; }
+    if(!empty($year) && empty($month)){  $where .= 'AND substring(settleTime,1,4)=' . $year; }
+    if(!empty($year) && !empty($month))
+    {
+        $_time = $year . '-' . $month;
+        $where .= "AND substring(settleTime,1,7)='{$_time}'";
+    }
+    if(empty($year) && !empty($month)){  $where .= 'AND substring(settleTime,6,2)=' . $month; }
+    
+    //查出全部日期并排序分组
+    $price = new prices($where);
+    $dates = $price->get(array('settleTime'));
+    $settles = array_unique($dates['settleTime']); 
+    rsort($settles);
+    $chunk = array_chunk($settles,$pageSize);
+    $pageTotal = count($chunk); //总页数
+    $collect['pageTotal'] = $pageTotal;
+    
+    //如果用户请求增加价值记录
+    if(isset($_POST['before']) && $_POST['before'])
+    {
+        $add = array('append'=>'','add'=>'');
+        $row = '<tr class="newly"><td class="left-border"><input class="modified time" value="" /></td>';
+        for($i=0;$i<$accounts->iTotal();$i++){ $row .= '<td data_id="' .$accountArr['id'][$i] .'"><input class="modified" value="" /></td>'; }
+        $row .= '<td>&nbsp;</td></tr>';
+        if($price->iTotal() > 0)
+        {            
+            $add['append'] = $row; points::jan($add);
+        }else
+        {
+            $add['add'] = $header . '<tbody>' . $row . '</tbody>';
+            $cols = $accounts->iTotal() + 2;
+            $tfoot = '</tbody><tfoot><tr><td colspan="' . $cols . '">';
+            if($auth[1] == '1' || $auth[3] == '1'){ $tfoot .= '<a id="apply">应用</a>'; }
+            $tfoot .= '</td></tr></tfoot>';
+            $tfoot .= '<script type="text/javascript" src="/points/usr/service/universal/js/universal.ajx.js"></script>';
+            $add['add'] .= $tfoot;
+            points::jan($add);
+        }
+    }
+    
+    //指定的当前页
+    if(!isset($chunk[$page-1])){ $collect['plaid'] = $empty;  points::jan($collect); }
+    $or = '';
+    for($k=0,$l=count($chunk[$page-1]);$k<$l;$k++)
+    {
+        if($k == $l-1){ $or .= "substring(settleTime,1,7)='{$chunk[$page-1][$k]}'";
+        }else{          $or .= "substring(settleTime,1,7)='{$chunk[$page-1][$k]}'". ' OR ';}
+    }
+    $where .= ' AND (' . $or . ')';
+    
+    $prices = new prices($where,array('order'=>'settleTime DESC'));
+    $pricesArr = $prices->get(array('accountId','price','settleTime'));
+    
+    //分组
+    $ar = array();
+    for($j=0;$j<$prices->iTotal();$j++)
+    {
+        $ar[$pricesArr['settleTime'][$j]][$pricesArr['accountId'][$j]] = $pricesArr['price'][$j];
+    }
+    //分页显示
+    $fpage = points::fpage($pageTotal,$_POST['page'],$pageSize);
+    $fpages = empty($fpage) ? '&nbsp' : $fpage; 
+    
+    if(count($ar) > 0)
+    {
+        $rows = '<tbody>';
+        foreach($ar as $k=>$v)
+        {
+            $rows .= '<tr><td class="left-border">' . $k . '</td>';
+            for($k=0;$k<$accounts->iTotal();$k++)
+            {
+                $rows .= isset($v[$accountArr['id'][$k]]) ?  '<td data_id="' . $accountArr['id'][$k] .  '">' . $v[$accountArr['id'][$k]] . '</td>' : '<td data_id="' . $accountArr['id'][$k] .  '">' . '－</td>';
+            }
+            $rows .= '<td>' . $oper . '</td>';
+            $rows .= '</tr>';
+        }
+        $rows .= '</tbody>';
+        
+        $tfoot = '<tfoot><tr><td colspan="' . ($accounts->iTotal() + 2) . '">';
+        $tfoot .= '<span id="oper">' . $oper . '</span>';
+        $tfoot .= '<span id="fpage">'. $fpages . '</span>';
+        $tfoot .= '<span id="counts">总记录数:'. count($settles) . '</span>';
+        $tfoot .= '</tr></tfoot>';
+        $tfoot .= '<script type="text/javascript" src="/points/usr/service/universal/js/universal.ajx.js"></script>';
+        
+        $collect['plaid'] = $header . $rows . $tfoot;
+        points::jan($collect);
+        
+    }else{ $collect['plaid'] = $empty; points::jan($collect); }
+    
+?>
+
+========================\points\usr\service\universal\ask\universal.del.ajx.php
+<?php
+    require $_SERVER['DOCUMENT_ROOT']  . '/points/usr/servant/servant.inc.php';
+    $username = $_SESSION['username'];
+    $auth = $_SESSION['authority'];
+    
+    if($auth[2] == '1')
+    {
+        $data = $_POST['data'];
+        $arr = explode(',',$data);
+        if(strlen($arr[0]) > 10){ exit;}
+        
+        $date = $arr[0];
+        $id = array();        
+        for($i=1,$l=count($arr);$i<$l;$i++)
+        {
+            $price = explode('-',$arr[$i]);
+            if(ctype_digit($price[0]) && $price[1] != '-'){ $id[] = $price[0]; }
+        }
+        $idstr = implode(',',$id);
+        $where = "accountId IN($idstr) AND settleTime = '{$date}'";
+        $prices = new prices($where);
+        $deleted = $prices->delete();
+        if($deleted)
+        {
+            echo points::jen(1,'删除成功');exit;
+            
+        }else{ echo points::jen(0,'删除失败');exit; }        
+       
+    }else{ echo points::jen(0,'用户权限请求');exit;}
+    
+
+?>
+
+========================\points\usr\service\universal\ask\universal.edit.ajx.php
+<?php
+    require $_SERVER['DOCUMENT_ROOT'] . '/points/usr/servant/servant.inc.php';
+    $pdata = $_POST['pdata'];
+    $arr = explode('|',$pdata);
+    
+    $updates = array();
+    //校验数据并准备填充更新的数组$updates 多维数组
+    for($i=0,$l=count($arr);$i<$l;$i++)
+    {
+        $explodes = explode(':',$arr[$i]);
+        $_date = explode('-',$explodes[0]);
+        if($_date[0] < 1900 || $_date[0] > 2999){ echo points::jen(0,'年份可能输入错误');exit;}
+        if($_date[1] <1 || $_date[1] > 12){ echo points::jen(0,'月份可能输入错误');exit; }
+        if($_date[1] < 10){ $explodes[0] = $_date[0] . '-0' . (int)$_date[1]; } //格式化用户输入
+        
+        $prices = explode('-',$explodes[1]);
+        $updates[$i]['where']['settleTime'] = $explodes[0];
+        if(!ctype_digit($prices[0])){ echo points::jen(0,'提供了无效的账号ID');exit; }
+        
+        $updates[$i]['where']['accountId'] = $prices[0];
+        
+        if(!is_numeric($prices[1])){ echo points::jen(0,'价格或价值只接受数值，请保留相应小数位数');exit; }
+        $updates[$i]['value']['price'] = $prices[1];       
+    }
+    //var_dump($updates);exit;
+    $i = 0;
+    //循环更新表内容 ??
+    for($k=0,$len=count($updates);$k<$len;$k++)
+    {
+        $price = new prices($updates[$k]['where']);
+        if($price->iTotal() > 0) //存在记录更新否则新增
+        {
+            $updates[$k]['value']['modifiedTime'] = date('Y-m-d H:i:s');
+            $updated = $price->set($updates[$k]['value']);
+        }else
+        {
+            if($updates[$k]['value']['price']) //用户提供了值才插入新记录
+            {
+                $insert = new prices();
+                $inserted = $insert->set(array_merge($updates[$k]['where'],$updates[$k]['value']));
+            }
+        }
+        if((isset($updated) && $updated) || (isset($inserted) && $inserted)){ $i++; }
+    }
+    echo points::jen($i,'成功更新了' . $i .'个记录');
+?>
+
+
+
+insert  into `tb_account`(`id`,`aname`,`aliase`,`yes`,`ctime`) values (601,'rate_day','日结算利率','1','2015-11-30 09:11:47'),(602,'rate_year','年结算利率','1','2015-11-30 09:11:47');
+
+/*Data for the table `tb_account_price` */
+
+insert  into `tb_account_price`(`id`,`aid`,`price`,`etime`,`mtime`,`ctime`) values (44,601,'2234.23560000','2015-11','2015-11-30 12:12:43','2015-11-30 12:15:30'),(45,601,'9999.99999999','2016-01',NULL,'2015-11-30 12:16:13'),(46,602,'22.32548000','2016-01',NULL,'2015-11-30 12:16:13'),(47,601,'2222.12465000','2015-03',NULL,'2015-11-30 12:16:56'),(48,601,'9999.99999999','2015-05',NULL,'2015-11-30 12:17:21'),(49,601,'225.32316540','2016-11',NULL,'2015-11-30 12:24:45');
+
+
+
+
+
+
 
 
 
