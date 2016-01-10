@@ -660,6 +660,706 @@ function hideMask(target){
 }
 
 
+
+
+                <div id="variable">
+                    <p class="title"><a class="closed"><img src="/points/usr/local/images/plus.png" />  为此类别初始化变量</a></p>
+                    <div id="dv-time">
+                        <label>标准时间变量一[stime]：</label><input type="text" id="stime" value="" />
+                        <label>标准时间变量二[etime]：</label><input type="text" id="etime" value="" />
+                        <p class="desc">如果初始化了时间变量，则此类别可以根据用户输入的时间值来确定某些活动有效时间范围。时间必须有效且格式为:2015-12-16 14:17:30,否则不能初始化</p>
+                    </div>
+                    <div id="dv-serial">
+                        <label>标准类别序列号[serial]：</label>　<input type="text" id="serial" value="" />
+                        <span class="desc">此变量的值为纯数字字符串，如：20151213171033。用户可以利用此变量来识别类别和程序流程判定。</span>
+                    </div>
+                    <div id="dv-psize">
+                        <label>用户数据分页值[psize]：</label>　<input type="text" id="psize" value="" />
+                        <span class="desc">如果初始化了此变量，则用户可以指定自定义的分页大小</span>
+                    </div>
+                    <div id="dv-cached">
+                        <label>缓存有效时间值[cached]:</label>　<input type="text" id="cached" value="" />
+                        <span class="desc">此变量可以定义缓存时间长度，请指定一个有效的时间值如86400秒。</span>
+                    </div>
+                    <div id="dv-shortid">
+                        <label>类别变量短标识[shortid]:</label>　<input type="text" id="shortid" value="" />
+                        <span class="desc">此变量可以定义类别短标识符，此标识的长度不得超过8个字符。</span>
+                    </div>                    
+                    <div id="dv-ssign">
+                        <label>启用起始标识符[ssign]:</label>　　<input type="text" id="ssign" value="" />
+                        <span class="desc">此变量定义一个标识符通常是一个URL,其作用是在活动未开始时进入的页面地址。也可以用作其它用途。</span>
+                    </div>
+                    <div id="dv-esign">
+                        <label>启用终止标识符[esign]:</label>　　<input type="text" id="esign" value="" />
+                        <span class="desc">此变量定义一个标识符通常是一个URL,其作用是在活动已结束时进入的页面地址。也可以用作其它用途。</span>
+                    </div>
+                    <div id="dv-limited">
+                        <label>类别范围变量值[limited]:</label>　<input type="text" id="limited" value="" />
+                        <span class="desc">此变量定义一个整型的范围，比如：0-100，请使用标准的分隔符，否则校验失败。</span>
+                    </div>
+                    <div id="dv-auxiliary">
+                        <label>附加信息标识符[auxiliary]:</label>　<input type="text" id="auxiliary" value="" />
+                        <span class="desc">此变量定义一个0-9之间的任意值来标识附加信息是否启用以及启用类型。</span>
+                    </div>
+                    <div class="apply"><span class="error" id="variable-err"></span><a id="save-var">初始化变量</a></div>
+               </div>
+
+
+
+============================/points/usr/master/category/css/category.oper.css
+第45行处开始：
+#categories input,#variable input,#filter input,#user input,
+#categories select,#variable select,#filter select,#user select
+{
+    background-color:transparent;
+    border-top:none;border-left:none;border-right:1px solid transparent;
+    border-bottom:1px solid #808080;
+    border-radius: 2px;
+    height:22px;
+    text-align:left;text-indent: 4%;
+    font-weight: bold;
+}
+#categories select,#variable select,#filter select,#user select
+{
+    border-radius:0;
+    border:1px solid #808080;
+    text-align:left;text-indent:0;
+    font-weight:normal;
+}
+将变量的样式改以下一行即可
+#variable input{width:30%;}
+
+===================================/points/usr/master/category/js/category.oper.js
+
+第103行改为："rid":$('#regions').val(),
+在第68行处增加："rid":j.rid,
+
+
+//为空值对象提供默认值 开始时间 结束时间 变量版本
+    $('#stime,#etime,#serial').focus(function(){
+        var date = new Date();
+        var v = $.trim($(this).val());
+        if (v.empty())
+        {
+            var arr = [];
+            arr.push(date.getFullYear(),String(date.getMonth() + 1).doubled(),String(date.getDate()).doubled());
+            
+            var time = [];
+            time.push(String(date.getHours()).doubled(),String(date.getMinutes()).doubled(),String(date.getSeconds()).doubled());
+            
+            if ($(this).attr('id') == 'serial')
+            {
+                $(this).val(arr.join('') + time.join(''));
+            
+            }else{ $(this).val(arr.join('-') + ' ' + time.join(':'));}
+        }
+    });
+    
+    function vars()
+    {
+        return {"murl":$.trim($('#murl').val()),   "stime":$.trim($('#stime').val()),
+                "etime":$.trim($('#etime').val()), "serial":$.trim($('#serial').val()),
+                "psize":$.trim($('#psize').val()), "cached":$.trim($('#cached').val()),
+                "shortid":$.trim($('#shortid').val()), "ssign":$.trim($('#ssign').val()),
+                "esign":$.trim($('#esign').val()),     "limited":$.trim($('#limited').val()),
+                "auxiliary":$.trim($('#auxiliary').val())
+        }
+    }
+    
+    var vared = vars();
+    //初始化变量
+    $('#save-var').click(function(){
+        $('#variable-err').text(''); //清空错误提示
+        var v = vars();
+        //获取managingURL的值
+        if(v.murl.empty()){ $('#variable-err').text('必须指定管理URL');return false; }
+        //至少有一个变量值不为空
+        var empties = 0;
+        for(var p in v){  if( p != 'murl' && v[p].empty()){ empties += 1; } } 
+        if(empties == 10){ $('#variable-err').text('没有为此类别提供任何可初始化的变量,初始化失败');return false; }
+        var allowed = false;
+        
+        if(!v.serial.empty() && isNaN(parseInt(v.serial))){ $('#variable-err').text('标准类别序列号只能是数字'); return false;}
+        if(!v.psize.empty() && isNaN(parseInt(v.psize))){ $('#variable-err').text('用户数据分页值只能是数字'); return false;}
+        if(!v.cached.empty() && isNaN(parseInt(v.cached))){ $('#variable-err').text('缓存有效时间值只能是数字'); return false;}
+        if(!v.auxiliary.empty() && isNaN(parseInt(v.auxiliary))){ $('#variable-err').text('附加信息标识符只能是一个数字'); return false;}
+        
+        for(var q in v){ if(v[q] != vared[q]){ console.log(v[q]); allowed = true; break; }}
+        if(!allowed){ $('#variable-err').text('没有可用于提交的内容，此内容可能提交过');return false; }
+        //提交内容
+        $.post('ask/category.oper.vars.ajx.php',v,function(r){
+            var j = $.parseJSON(r);
+            if(j.status == 1){ vared = vars();}
+            $('#variable-err').text(j.tip);
+        });    
+    });
+
+
+    //过滤器 增加字段设定 + 的单击事件
+    $('#fadd').click(function(){
+        var trCheck = $('#fields tbody .tr-check');
+        if (trCheck.length == 0)
+        {
+            $('#fields tbody tr:last-child').after($('#fields tbody .clone:first-child ').clone());
+        }else if (trCheck.length == 1)
+        {
+            $('#fields tbody .tr-check').after($('#fields tbody .clone:first-child ').clone());
+        }else{ return false; }
+        $('.check').click(check);
+    });
+    
+    //过滤器 增加字段设定 - 的单击事件
+    $('#fdelete').click(function(){        
+        var tr = $('#fields tbody tr');
+        var trCheck = $('#fields tbody .tr-check'); //不能全部删除
+        if(trCheck.length != tr.length && trCheck.length > 0){ $('#fields tbody .tr-check').remove(); }        
+    });
+
+
+==========================================/points/usr/master/category/ask/category.oper.vars.ajx.php
+
+<?php
+    session_start();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php'; 
+    
+    $set = array('status'=>0,'tip'=>'');
+    
+    $murls = points::SURL($_POST['murl'],true);
+    if(!$murls['status']){ $set['tip'] = '提供了不正确的管理URL'; points::jan($set); }    
+    
+    $var = new vars(array('position'=>$murls['md5']));
+    if($var->iTotal() > 0)
+    {
+        $set['tip'] = '此管理URL似乎被初始化过,请转到变量管理页面处理'; points::jan($set);
+    }else
+    {
+        //保存可初始化的变量
+        $pst = array();        
+        foreach($_POST as $k=>$v){  if(!empty($v) && $k != 'murl'){ $pst[$k] = $v; }  }        
+        if(count($pst) == 0) //初始化此类别的变量的空值没有意义 初始化失败
+        {
+            $set['tip'] = '没有为此类别提供任何可初始化的变量,初始化失败';
+            points::jan($set);
+            
+        }else //初始化变量
+        {
+            //当前用户是否有新增条目的权限以防止恶意写入
+            $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+            if(!points::allowed($authority,'add')){ $set['tip'] = '用户权限请求'; points::jan($set); }
+            
+            //校验一些值 开始时间 结束时间 变量版本 分页大小
+            if(isset($pst['stime']) && !STR::timed($pst['stime'])){$set['tip'] = '标准时间变量一[stime]错误'; points::jan($set);}
+            if(isset($pst['etime']) && !STR::timed($pst['etime'])){$set['tip'] = '标准时间变量二[etime]错误'; points::jan($set);}
+            if(isset($pst['serial']))
+            {
+                $len = strlen($pst['serial']); 
+                for($i=0;$i<$len;$i++){ if(!ctype_digit($pst['serial'][$i])){ $set['tip'] = '标准类别序列号只能是数字'; points::jan($set); } }
+                if($len > 15){ $set['tip'] = '版本值的最大长度为15'; points::jan($set); }
+            }
+            if(isset($pst['psize']) && !ctype_digit($pst['psize'])){ $set['tip'] = '用户数据分页值只能是数字'; points::jan($set); }
+            if(isset($pst['cached']) && !ctype_digit($pst['cached'])){ $set['tip'] = '缓存有效时间值只能是数字'; points::jan($set); }
+            if(isset($pst['shortid']))
+            {
+                for($j=0,$len=strlen($pst['shortid']);$j<$len;$j++)
+                {
+                    if(!ctype_alnum($pst['shortid'][$j]))
+                    {
+                        $set['tip'] = '类别变量短标识符只能是数字或者字母'; points::jan($set);
+                    }
+                }
+                if(strlen($pst['shortid']) > 8){ $set['tip'] = '类别变量短标识符的长度不能大于8个字符'; points::jan($set); }
+            }
+            
+            if(isset($pst['ssign'])){ } /*待补充验证规则*/
+            if(isset($pst['esign'])){ } /*待补充验证规则*/
+            
+            if(isset($pst['limited']))
+            {
+               if(strpos($pst['limited'],'-') !== false)
+               {
+                    $exp = explode('-',$pst['limited']);
+                    if(count($exp) != 2){ $set['tip'] = '类别范围变量值不合规范,格式如0-100'; points::jan($set); }
+                    if(!ctype_digit($exp[0]) || !ctype_digit($exp[1]) || $exp[0] >= $exp[1]){ $set['tip'] = '类别范围变量值不合规范,格式如0-100'; points::jan($set); }
+                
+               }else{ $set['tip'] = '类别范围变量值不合规范,格式如0-100'; points::jan($set); }
+            }
+            if(isset($pst['auxiliary']) && (!ctype_digit($pst['auxiliary'])|| $pst['auxiliary'] > 9)){ $set['tip'] = '附加信息标识符只能是一个数字'; points::jan($set); }
+            
+            //变量描述映射集
+            $desc = array('stime'=>'标准时间变量一',  'etime'=>'标准时间变量二',
+                          'serial'=>'标准系统序列号', 'psize'=>'用户数据分页值',
+                          'cached'=>'缓存有效时间值', 'shortid'=>'类别变量短标识',
+                          'limited'=>'类别范围变量值','auxiliary'=>'附加信息标识符',
+                          'ssign'=>'启用起始标识符',  'esign'=>'启用终止标识符');
+            
+            $rules = array('stime'=>'datetime','etime'=>'datetime',
+                           'serial'=>'digit','psize'=>'digit',
+                           'cached'=>'digit','shortid'=>'entext',
+                           'limited'=>'limit','auxiliary'=>'digit',
+                           'ssign'=>'entext','esign'=>'entext'      );
+            
+            $i = 0; $inserts = array();
+            foreach($pst as $k=>$v)
+            {
+                $inserts[$i]['name'] = $k;
+                $inserts[$i]['value'] = $v;
+                $inserts[$i]['position'] = $murls['md5'];
+                $inserts[$i]['url'] = $murls['url'];
+                $inserts[$i]['note'] = $desc[$k];
+                $inserts[$i]['text'] = '';
+                $inserts[$i]['status'] = '2';
+                $inserts[$i]['rule'] = $rules[$k];
+                $inserts[$i]['isUserControl'] = 0;
+                $i++;
+            }
+            $var = new vars();
+            if($var->set($inserts))
+            {
+                $set['status'] = 1; $set['tip'] = '初始化变量成功';                
+            }else{ $set['tip'] = '初始化变量失败，请检查提供的值'; }
+            points::jan($set);
+        }
+    }
+?>
+
+
+=================================/points/usr/master/variable/css/variable.oper.css
+第25行：#dv-murl #murl{width:40%;}
+第26行：#dv-murl select,#dv-val select{width:10%;}
+
+第34行：#dv-val #val{margin-right:6%;}
+第35行：#dv-murl #status,#dv-val #rule{margin-right:3%;}
+
+
+================================/points/usr/local/vars.class.php
+<?php
+class vars extends DBO
+{
+    protected $id;
+    protected $name;
+    protected $value;
+    protected $position;
+    protected $url;
+    protected $note;
+    protected $text;
+    protected $status;
+    protected $rule;
+    protected $isUserControl;
+    protected $type;
+    protected $modifiedTime;
+    protected $createTime;
+    
+    protected function definedTableName(){ return 'tb_points_variables'; }
+    protected function definedPrimaryKey(){ return 'id'; }
+    protected function definedRelations()
+    {
+        return array('id'=>'id',
+                     'named'=>'name',
+                     'val'=>'value',
+                     'pos'=>'position',
+                     'url'=>'url',
+                     'note'=>'note',
+                     'txt'=>'text',
+                     'yes'=>'status',
+                     'rule'=>'rule',
+                     'isuser'=>'isUserControl',
+                     'tye'=>'type',
+                     'mtime'=>'modifiedTime',
+                     'ctime'=>'createTime'     );
+    }
+    
+}
+
+
+
+======================================/points/usr/master/variable/variable.oper.php
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php'; 
+    
+    $variableId = isset($_GET['vid']) ? $_GET['vid'] : '';
+    if($variableId && !ctype_digit($variableId)){exit('Exception access violation');}
+    $title = "存储新变量";  $murl = ''; $status = ''; $note = '';
+    $name = ''; $value = ''; $text = ''; $rule = ''; $isUser = '1'; $type = 'text';
+    if($variableId) //如果用户编辑类别
+    {
+        $title = "编辑变量[ID:<label id=\"id\">$variableId</label>]";
+        $var = new vars(array('id'=>$variableId));
+        $vars = $var->get(array('name','value','url','note','text','rule','isUserControl','status','type'));
+        $murl = $vars['url'][0];
+        $status = $vars['status'][0];
+        $note = $vars['note'][0];
+        $name = $vars['name'][0];
+        $value = $vars['value'][0];
+        $text = $vars['text'][0];
+        $rule = $vars['rule'][0];
+        $isUser = $vars['isUserControl'][0];
+        $type = $vars['type'][0];
+    }
+?>
+<!DCOTYPE html>
+<html>
+    <head>
+       <?php points::head(false); ?>
+       <link rel="stylesheet" href="/points/usr/local/css/master.css" />
+       <link rel="stylesheet" href="css/variable.oper.css" />
+       <script src="js/variable.oper.js"></script>
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1><?php echo $title; ?></h1></div>
+            <div id="variable">
+                <div id="dv-murl">
+                    <label>变量应用于：</label><input type="text" id="murl" value="<?php echo $murl; ?>" />
+                    <span>
+                        <label>状态：</label>
+                        <select id="status">
+                            <option value="1" <?php if($status == '1'){ echo 'selected'; }?>>用户的变量</option>
+                            <option value="2" <?php if($status == '2'){ echo 'selected'; }?>>系统的变量</option>
+                            <option value="0" <?php if($status == '0'){ echo 'selected'; }?>>废弃的变量</option>
+                        </select>
+                    </span>
+                    <span>
+                        <label>是否用户可控制：</label>
+                        <select id="isuser">
+                            <option value="1" <?php if($isUser == '1'){ echo 'selected';} ?> >用户可控</option>
+                            <option value="0" <?php if($isUser == '0'){ echo 'selected';} ?> >用户不可控</option>
+                        </select>
+                    </span>
+                    <p class="desc">声明此变量应用的URL(此URL即在类别管理页所申请的URL，也是唯一识别ID),可以通过某些方法快速获取这个URL下的变量.</p>
+                </div>
+                <div id="dv-note">
+                    <label>变量描述：</label><input type="text" id="note" value="<?php echo $note; ?>" />
+                    <span class="desc">变量的描述可以方便查找及区分不同变量,请确保此描述符合变量的声明.</span>
+                </div>
+                <div id="dv-name">
+                    <label>变量名称：</label><input type="text" id="named" value="<?php echo $name; ?>" />
+                    <span class="desc">变量的名称必须是大小写字母或下划线开头和数字或字母的组合.</span>
+                </div>
+                <div id="dv-val">
+                    <label>变量的值：</label><input type="text" id="val" value="<?php echo $value; ?>" />
+                    <span id="rule">
+                        <label>变量值校验规则：</label>
+                        <select id="rules">
+                            <option value="digit" <?php if($rule == 'digit'){ echo 'selected'; } ?>>数字文本</option>
+                            <option value="datetime" <?php if($rule == 'datetime'){ echo 'selected'; } ?>>规范的时间格式</option>
+                            <option value="int" <?php if($rule == 'int'){ echo 'selected'; } ?>>整数</option>
+                            <option value="limit" <?php if($rule == 'limit'){ echo 'selected'; } ?>>整数范围</option>
+                            <option value="decimal" <?php if($rule == 'decimal'){ echo 'selected'; } ?>>小数</option>
+                            <option value="entext" <?php if($rule == 'entext'){ echo 'selected'; } ?>>英文文本</option>
+                            <option value="cntext" <?php if($rule == 'cntext'){ echo 'selected'; } ?>>中文文本</option>
+                            <option value="text" <?php if($rule == 'text'){ echo 'selected'; } ?>>混合文本</option>
+                            <option value="telephone" <?php if($rule == 'telephone'){ echo 'selected'; } ?>>电话号码</option>
+                            <option value="mobile" <?php if($rule == 'mobile'){ echo 'selected'; } ?>>手机号码</option>
+                            <option value="email" <?php if($rule == 'email'){ echo 'selected'; } ?>>EMAIL地址</option>
+                            <option value="url" <?php if($rule == 'url'){ echo 'selected'; } ?>>完整URL地址</option>
+                            <option value="postcode" <?php if($rule == 'postcode'){ echo 'selected'; } ?>>邮编号码</option>
+                        </select>
+                    </span>
+                    <span>
+                        <label>变量的显示类型：</label>
+                        <select id="type">
+                            <option value="text" <?php if($type == 'text'){ echo 'selected'; } ?>>文本</option>
+                            <option value="checkbox" <?php if($type == 'checkbox'){ echo 'selected'; } ?>>多选</option>
+                            <option value="radio" <?php if($type == 'radio'){ echo 'selected'; } ?>>单选</option>
+                            <option value="textarea" <?php if($type == 'textarea'){ echo 'selected'; } ?>>字段域</option>
+                        </select>
+                    </span>
+                    <p class="desc">变量的值必须符合选择的校验规则,系统根据校验规则校验。不确定或者过长的变量值请用下面变量文本选项。</p>
+                </div>
+                <div id="dv-txt">
+                    <label>变量的文本：</label>
+                    <textarea id="txt"><?php echo $text; ?></textarea>
+                </div>
+                <div id="apply"><span id="err"></span><a id="applied">应用</a></div>
+            </div>            
+        </div>
+        <div id="announce">增加对变量的说明内容</div>
+    </body>
+</html>
+
+==============================STR.class.php
+public static function checkText($v,$type){ return true; }
+
+
+==============================/points/usr/master/variable/js/variable.oper.js
+//自定义函数
+String.prototype.empty = function(){ return this == '' || this == ' ' || typeof(this) == 'undefined'; };
+String.prototype.doubled = function(){ var i = parseInt(this); return i < 10 ? '0' + i : i; };
+
+$(document).ready(function(){
+    var vs = valued();
+    //应用按钮事件
+    $('#applied').click(function(){
+        $('#err').text('');
+        var v = valued();
+        //用户是否已修改了某个值 
+        var modifed = false
+        for(var p in v){if(v[p] != vs[p]){modifed = true; break; }}
+        if (!modifed) { $('#err').text('没有可用于提交的内容,请检查是否有修改'); return false; }
+        //校验输入
+        var id = $('#id').text();
+        if(!id.empty()){ v.id = id; } 
+        $.post('ask/vars.oper.ajx.php',v,function(r){ console.log(r);
+            var j = $.parseJSON(r);
+            $('#err').text(j.tip);
+            if(j.status == '1'){ vs = valued(); }
+        });     
+    });
+    
+    function valued()
+    {
+        return {"murl":$.trim($('#murl').val()),
+                "status":$('#status').val(),
+                "isuser":$('#isuser').val(),
+                "note":$.trim($('#note').val()),
+                "name":$.trim($('#named').val()),
+                "value":$.trim($('#val').val()),
+                "rule":$('#rules').val(),
+                "type":$('#type').val(),
+                "text":$.trim($('#txt').val())        };
+    }
+
+});
+
+========================/points/usr/master/variable/ask/vars.oper.ajx.php
+<?php
+    session_start();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php'; 
+    $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+    
+    $set = array('status'=>0,'tip'=>'');    
+    if(!empty($_POST['murl']))
+    {
+        $murls = points::SURL($_POST['murl'],1);
+        if($murls['status'] == 0){ $set['tip'] = '提供的管理URL不符合要求';  points::jan($set); }
+    }else{ $set['tip'] = '必须提供管理URL'; points::jan($set); }
+    
+    $v = array();
+    //系统变量名集合
+    $names = array('stime','etime','serial','psize','cached','shortid','limited','auxiliary','ssign','esign');
+    //变量名的验证
+    $name = trim($_POST['name']);
+    $md5 = $murls['md5'];
+    if(isset($_POST['id'])) // 修改 系统变量校验
+    {
+        //当前用户是否有修改条目的权限以防止恶意写入        
+        if(!points::allowed($authority,'edit')){ $set['tip'] = '用户权限请求'; points::jan($set); }
+        if(!ctype_digit($_POST['id'])){ $set['tip'] = '提供的编辑ID可能错误'; points::jan($set); }
+        $var = new vars(array('id'=>$_POST['id']));
+        $vars = $var->get(array('name','status','isUserControl','note','value','rule','type','text'));
+        
+        //无论是否是超级用户都不可以改变系统变量的名称
+        if($vars['status'][0] == 2 && $_POST['name'] != $vars['name'][0]){ $set['tip'] = '不可以改变系统变量的名称'; points::jan($set); }
+        
+        //确认除本身外是否还存在相同的变量名
+        $where = 'id !=' . $_POST['id'] . " AND name = '{$name}' AND position = '{$md5}'";
+        $var = new vars($where);
+        if($var->iTotal() > 0){ $set['err'] = '在' . $murls['url'] . '下已经定义了此变量'; points::jan($set);}
+        if($_POST['name'] != $vars['name'][0]){ $v['name'] = trim($_POST['name']); }
+       
+        if($vars['status'][0] == 2 && $_SESSION['points']['user']['type'] != 9)
+        {
+            if($_POST['status'] != $vars['status'][0]){ $set['tip'] = '当前用户不能改变变量的状态'; points::jan($set); }
+            if($_POST['isuser'] != $vars['isUserControl'][0]){ $set['tip'] = '当前用户不能改变用户控制类型'; points::jan($set); }
+            if($_POST['note'] != $vars['note'][0]){ $set['tip'] = '当前用户不能改变变量的描述'; points::jan($set); }
+        }
+        if($_POST['status'] == 2 && $vars['status'][0] != 2 && $_SESSION['points']['user']['type'] != 9){  $set['tip'] = '当前用户不能将变量状态切换为系统变量'; points::jan($set); }
+        if($_POST['status'] != $vars['status'][0])
+        {
+            $v['status'] = $_POST['status'];
+            if($_POST['status'] != '2' && in_array($_POST['name'],$names)){ $set['tip'] = '当前变量名与系统内置变量名重名'; points::jan($set); }
+        }
+        if($_POST['isuser'] != $vars['isUserControl'][0]){ $v['isUserControl'] = $_POST['isuser']; }
+        if($_POST['note'] != $vars['note'][0]){ $v['note'] = trim($_POST['note']); }
+        if($_POST['value'] != $vars['value'][0] || $_POST['rule'] != $vars['rule'][0])
+        {
+            $v['rule'] = $_POST['rule'];
+            $v['value'] = trim($_POST['value']);
+        }
+        if($_POST['type'] != $vars['type'][0]){ $v['type'] = $_POST['type']; }
+        if(md5($_POST['text']) != md5($vars['text'][0])){ $v['text'] = $_POST['text']; }
+        $v['modifiedTime'] = date('Y-m-d H:i:s');
+        
+    }else
+    {
+        //当前用户是否有新增条目的权限以防止恶意写入
+        if(!points::allowed($authority,'add')){ $set['tip'] = '用户权限请求'; points::jan($set); }
+        
+        $v['url'] = $murls['url'];
+        $v['position'] = $md5;
+        //检查新增变量名是否与系统变量同名
+        if(in_array($_POST['name'],$names)){ $set['tip'] = '增加的变量与系统内置变量同名';points::jan($set);}
+        
+        $where = "name = '{$name}' AND position = '{$md5}'";
+        $var = new vars($where);
+        if($var->iTotal() > 0){ $set['tip'] = '在' . $murls['url'] . '下已经定义了此变量'; points::jan($set); }        
+        $v['name'] = trim($_POST['name']);
+        
+        if($_POST['status'] == '2' && $_SESSION['points']['user']['type'] != 9){ $set['tip'] = '此用户不能增加系统变量'; points::jan($set); }        
+        if($_POST['status'] == 2 && $_SESSION['points']['user']['type'] != 9){ $set['tip'] = '当前用户不能增加系统变量'; points::jan($set); }
+        $v['status'] = $_POST['status'];
+        $v['isUserControl'] = $_POST['isuser'];
+        //校验变量的描述   ？？？？
+        $v['note'] = trim($_POST['note']);
+        $v['value'] = trim($_POST['value']);
+        $v['rule'] = $_POST['rule'];
+        $v['type'] = $_POST['type'];
+        $v['text'] = $_POST['text'];
+    }
+    if(isset($v['status']) && !in_array($v['status'],array('0','1','2'))){ $set['tip'] = '提供的变量状态值可能有误'; points::jan($set); }
+    if(isset($v['isUserControl']) && !in_array($v['isUserControl'],array('0','1'))){ $set['tip'] = '提供的变量控制类型值可能有误'; points::jan($set); }
+    if(isset($v['note']) && empty($v['note'])){ $set['tip'] = '变量的描述非常重要，不能置为空'; points::jan($set); }
+    if(isset($v['name']) && empty($v['name'])){ $set['tip'] = '变量的名称非常重要，不能置为空'; points::jan($set); }
+    if(isset($v['value']) && empty($v['value'])){ $set['tip'] = '变量的值不能为空'; points::jan($set); }
+    $rules = array('digit','datetime','int','limit','decimal','entext','cntext','text','telephone','mobile','email','url','postcode');
+    if(isset($v['rule']) && (!in_array($v['rule'],$rules) || empty($v['rule']))){ $set['tip'] = '提供了无效的值验证规则'; points::jan($set); }
+    if((isset($v['value']) || isset($v['rule'])) && !STR::checkText($v['value'],$v['rule'])){ $set['tip'] = '当前值与选择的值的验证规则不符'; points::jan($set); }    
+    if(isset($v['type']) && !in_array($v['type'],array('text','checkbox','radio','textarea'))){ $set['tip'] = '提供了无效的显示类型'; points::jan($set); }
+            
+    //提交编辑    
+    $name = trim($_POST['name']);  
+    if(isset($_POST['id']))
+    {
+        $var = new vars(array('id'=>$_POST['id']));
+        if($var->set($v)){  $set['status'] = 1;  $set['tip'] = '更新成功';}      
+        else{ $set['tip'] = '更新失败';}   
+    
+    }else //提交新增   
+    {
+        $var = new vars();
+        if($var->set($v)){  $set['status'] = 1; $set['tip'] = '保存成功';}            
+        else{ $set['tip'] = '保存失败'; }
+    }
+    //返回结果
+    points::jan($set);
+?>
+
+====================================/points/usr/master/variable/ask/variable.delete.ajx.php
+<?php
+    session_start();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php';
+    
+    //当前用户是否有修改条目的权限以防止恶意写入
+    $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+    if(!points::allowed($authority,'delete')){ echo points::jen(0,'用户权限请求'); exit;}
+    
+    if(empty($_POST['id'])){ echo points::jen(0,'没有条目选中，异常的请求！'); exit; }
+    
+    $arr = explode('|',$_POST['id']);
+    $len = count($arr);
+    //校验用户输入
+    for($i=0;$i<$len;$i++){  if(!ctype_digit($arr[$i])){ echo points::jen(0,'包含了异常的请求！'); exit; }   }
+    
+    //删除条目
+    $where = ' id IN(' . implode(',',$arr) . ')';
+    $var = new vars($where);
+    $vars = $var->get(array('status'));
+    if(in_array('2',$vars['status']) && $_SESSION['points']['user']['type'] != 9)
+    {
+        echo points::jen(0,'当前用户没有删除系统变量的权限');exit;
+    }
+    if($var->delete())
+    {
+        echo points::jen(1,'删除了共 ' . $len . ' 个条目');exit;
+        
+    }else{ echo points::jen(0,'删除失败');exit; }
+?>
+
+==============================/points/usr/master/category/ask/category.oper.ajx.php
+<?php
+    session_start();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php'; 
+    
+    $set = array('status'=>0,'err'=>'');
+    $murls = points::SURL($_POST['murl'],true); //echo $murls['url'];
+    //用户输入校验
+    if(!$murls['status']){ $set['err'] = '无效的管理URL,请检查输入！'; points::jan($set); }
+    if(!ctype_digit($_POST['pos'])){ $set['err'] = '位置不是一个有效的值.';points::jan($set); }
+    if(!ctype_digit($_POST['regions'])){ $set['err'] = '区域不是一个有效的值.';points::jan($set); }
+    if(!ctype_digit($_POST['status'])){ $set['err'] = '类别的状态不是一个有效的值.';points::jan($set); }
+    $titleLen = mb_strlen($_POST['title'],'UTF-8');
+    if( $titleLen > 14 || $titleLen == 0 ){ $set['err'] = '标题不能为空且最大长度为13'; points::jan($set);}
+    //访问URL
+    if(empty($_POST['aurl'])){ $set['err'] = '访问URL不能为空'; points::jan($set);}
+    
+    //准备表数据
+    $tables = array('managingURL'=>$murls['url'],    'MD5'=>$murls['md5'],
+                    'title'=>$_POST['title'],        'regionId'=>$_POST['regions'],
+                    'accessedURL' => $_POST['aurl'], 'position'=>$_POST['pos'],
+                    'status'=>$_POST['status']);
+    
+    if(!empty($_POST['id'])) //编辑一个类别
+    {
+        if(!ctype_digit($_POST['id'])){ $set['err'] = '非法的修改id'; points::jan($set);}
+        //当前用户是否有修改条目的权限以防止恶意写入
+        $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+        if(!points::allowed($authority,'edit')){ $set['err'] = '用户权限请求'; points::jan($set); }
+        
+        //编辑id的内容
+        $md5 = $murls['md5']; $regionId = $_POST['regions'];
+        $where = 'id !=' . $_POST['id'] . " AND MD5 = '{$md5}' AND regionId = $regionId";
+        $category = new category($where);
+        if($category->iTotal() > 0){ $set['err'] = '在此区域范围内存在相同的管理URL.';  points::jan($set);}
+        
+        $category = new category(array('id'=>$_POST['id']));
+        $tables['modifiedTime'] = date('Y-m-d H:i:s');
+        if($category->set($tables)){  $set['status'] = 1; $set['err'] = '更新类别成功';            
+        }else{ $set['err'] = '更新类别失败';}
+        points::jan($set);
+        
+    }else //增加一个类别
+    {
+        //当前用户是否有新增条目的权限以防止恶意写入
+        $authority = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['authority'];   //获取权限
+        if(!points::allowed($authority,'add')){ $set['err'] = '用户权限请求'; points::jan($set); }
+        
+        $category = new category(array('MD5'=>$murls['md5'],'regionId'=>$_POST['regions']));
+        if($category->iTotal() > 0){ $set['err'] = '在此区域范围内指定的管理URL已经存在，只能编辑。';  points::jan($set);  }
+        
+        $category = new category();
+        if($category->set($tables))
+        {
+            $set['status'] = 1;
+            $set['err'] = '保存类别成功';                
+        }else{ $set['err'] = '保存类别失败';}
+        points::jan($set);
+    }
+?>
+==================================category.oper.php
+第14行：
+//变量定义
+$title = "增加类别";$murl = '';$name = '';$aurl = ''; $pos = ''; $rid = ''; $yes = 1;
+增加：
+$yes = $categories['status'][0];
+
+==================================/points/usr/master/users/ask/users.save.ajx.php
+第18行：
+$category = new category(array('MD5'=>$murls['md5'],'regionId'=>$_POST['rid']));
+$categories = $category->get(array('id','title')); 
+在第17行增加：if(!ctype_digit($_POST['rid'])){ $set['err'] = '提供的区域范围值可能不合法'; points:jan($set); }
+第24行：
+$rid = $_POST['rid'];
+$region = new regions(array('id'=>$rid));
+第138行是否：$power = new power(array('userId'=>$uid[$i],'categoryId'=>$categoryId));
+
+=================================/points/usr/servant/backer/backer.php
+需要修正登录后台程序
+
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/servant/servant.inc.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php';
+    
+    //找到当前类别的md5
+    $MD5 = $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['MD5'];
+    
+    $where = "position = '{$MD5}' AND status > 0 AND isUserControl = 1";    
+    $var = new vars($where);
+    $vars = $var->get(array('note','name','value','rule','type','text'));
+     echo '<pre>';
+    var_dump($vars);
+
+
+
     
 
 
