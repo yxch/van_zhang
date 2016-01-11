@@ -6,6 +6,130 @@ color: #797979 浅灰色
 color: #686868 深灰色
 color: #EEEEEE 淡灰色
 
+=====================================/points/usr/local/GVA.class.php
+
+<?php
+class GVA
+{
+    /*
+       *获取一个或多个变量的值
+       *@param string $pos 变量应用位置
+       *@param array $arr 变量的名称数组
+       *@param array $cache  cache：是否缓存在session中  key:是否提供一个保存的键
+       */
+    public static function more($pos,array $arr,$cache=array('cache'=>false,'key'=>''))
+    {
+        $URL = GVA::SURL($pos);
+        if(empty($arr) || $URL['status'] == 0){ return array(); }
+        
+        $where = "status>0 AND isUserControl=1 AND position='" . $URL['md5'] . "'  AND name IN ('" . implode("','",$arr) . "')";
+        $var = new vars($where);
+        $vars = $var->get(array('name','value'));
+        if($var->iTotal() == 0){ return array(); }
+        $back = array();
+        for($i=0;$i<$var->iTotal();$i++)
+        {
+            $back[$vars['name'][$i]] = $vars['value'][$i];
+            if($cache['cache'])
+            {
+                if(empty($cache['key']))
+                {
+                    $_SESSION[$vars['name'][$i]] = $vars['value'][$i];
+                }else{ $_SESSION[$cache['key']][$vars['name'][$i]] = $vars['value'][$i]; }
+            }
+        }        
+       return $back;        
+    }
+    
+    /*
+       *获取一个变量的值
+       *@param string $pos 变量应用位置
+       *@param string $var 变量的名称
+       *@param array $cache  cache：是否缓存在session中  key:是否提供一个保存的键
+       */    
+    public static function one($pos,$var,$cache=array('cache'=>false,'key'=>''))
+    {
+        $URL = GVA::SURL($pos);
+        if(empty($var) || $URL['status'] == 0){ return false; }
+        
+        $SQL = "SELECT val FROM tb_points_variables WHERE yes>0 AND isuser=1 AND pos='" . $URL['md5'] . "'  AND named='" . $var . "'";
+        $vars = DBC::execute($SQL);
+        if(empty($vars[0]['val'])){ return false; }
+        if($cache['cache'])
+        {
+            if(empty($cache['key']))
+            {
+                $_SESSION[$var] = $vars[0]['val'];
+            }else{ $_SESSION[$cache['key']][$var] = $vars[0]['val']; }
+        }
+        return $vars[0]['val'];
+    }
+    
+    /*
+       *获取一个或多个变量的文本
+       *@param string $pos 变量应用位置
+       *@param array $arr 变量的名称数组
+       */
+    public static function text($pos,array $arr)
+    {
+        $URL = GVA::SURL($pos);
+        if(empty($arr) || $URL['status'] == 0){ return array(); }
+        
+        $SQL = "status>0 AND isUserControl=1 AND position='" . $URL['md5'] . "'  AND name IN ('" . implode("','",$arr) . "')";
+        $var = new vars($SQL);
+        $vars = $var->get(array('name','text'));
+        if($var->iTotal() == 0){ return array(); }
+        $back = array();
+        for($i=0;$i<$var->iTotal();$i++){ $back[$vars['name'][$i]] = $vars['text'][$i]; }        
+        return $back;        
+    }
+    
+    /*
+       *获取一个或多个变量的文本和值
+       *@param string $pos 变量应用位置
+       *@param array $arr 变量的名称数组
+       */
+    public static function vars($pos,array $arr)
+    {
+        $URL = GVA::SURL($pos);
+        if(empty($arr) || $URL['status'] == 0){ return array(); }
+        
+        $SQL = "status>0 AND isUserControl=1 AND position='" . $URL['md5'] . "'  AND name IN ('" . implode("','",$arr) . "')";
+        $var = new vars($SQL);
+        $vars = $var->get(array('name','value','text'));
+        if($var->iTotal() == 0){ return array(); }
+        $back = array();
+        for($i=0;$i<$var->iTotal();$i++)
+        {
+            $back[$vars['name'][$i]]['val'] = $vars['value'][$i];
+            $back[$vars['name'][$i]]['text'] = $vars['text'][$i];
+        }        
+        return $back;        
+    }
+    
+    
+    /**
+       *校验URL并输出结果
+       *@param string $url
+       *@param boolean $removeBasename 是否替换文件名为空
+       *@return array
+       */
+    public static function SURL($url,$removeBasename=false)
+    {
+        $arr = array('status'=>0,'url'=>'','md5'=>'');
+        //把10.140.130.35:8001替换成test.cignacmb.com
+        $url = strtr($url,array('10.140.130.35:8001'=>'test.cignacmb.com'));
+        
+        $urls = parse_url(trim($url));
+        if(!isset($urls['scheme']) || !isset($urls['host'])){ return $arr; }
+        
+        if($url[strlen($url) - 1] != '/' && $removeBasename){ $url = strtr($url,array(basename($url)=>'')); }
+        $arr['status'] = 1;
+        $arr['url'] = implode('',explode(' ',$url)); //去掉全部空格
+        $arr['md5'] = md5($arr['url']); //url的md5值        
+        return $arr;
+    }
+}
 
 
 
