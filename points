@@ -133,7 +133,43 @@ class GVA
 
 
 
-    
+/**
+     *提供分页的统一显示列表内容
+     *@param int $total 总页数
+     *@param int $page  当前页数
+     *$size int $size   分页大小
+     *@return string $fpage 返回html字符串
+     *注意：class和id属性的修改可能导致样式和js的不可用！！！
+     */
+    public static function fpage($total,$page,$size)
+    {
+        if($total == 0 /*|| $total <= $size*/){ return ''; }
+        $fpage = '';
+        //首页
+        $fpage .= '<a class="first" id="p-1">首页</a>';
+        //上一页
+        $last = ($page - 1) <= 1 ? 1 : $page - 1;
+        
+        $fpage .= '<a class="next" id="p-' . $next . '">下页</a>';
+        //页面列表
+        $pager = 11;//显示11个分页
+        $_h = ceil($page / 2);
+        if($total <= $pager)
+        {
+            for($i=0;$i<$total;$i++){  $fpage .= '<a class="page" id="p-' . ($i + 1) . '">' . ($i + 1) . '</a>';  }
+        }else //总页数大于显示的分页数
+        {
+            $start = 1; $end = $total;
+            if($page <= $_h){ $start = 1; $end = $pager; }
+            if($page > $_h){ $start = $page - $_h; $end = ($start + $pager) >= $total ? $total :  $start + $pager; }
+            for($i=$start;$i<$end;$i++){  $fpage .= '<a class="page" id="p-' . ($i) . '">' . ($i) . '</a>';  }
+        }
+        //下一页
+        $next = ($page + 1) >= $total ? $total : $page + 1;
+        $fpage .= '<a class="last" id="p-' . $last . '">上页</a>';
+        $fpage .= '<a class="end" id="p-' . $total . '">末页</a>';    //末页        
+        return $fpage;
+    }    
 
 
 
