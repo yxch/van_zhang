@@ -214,6 +214,8 @@ color: #EEEEEE 淡灰色
     text-align: center;
 }
 
+#none{height:56px;line-height: 56px;text-align: center;color:#DD5B25;font-style:italic;}
+
 #search div{width:96%;margin:auto;}
 
 #search #option span
@@ -244,7 +246,8 @@ color: #EEEEEE 淡灰色
 #search #ways #lb-title,#search #fields #p-title{ font-weight: bold; }
 #search #ways label,#search #ways input{display: inline-block;margin-right:6px;vertical-align:middle;}
 
-#search #fields #select{ margin:30px auto;}
+#search #fields #p-title{height:36px;line-height: 36px;}
+#search #fields #select{ margin:4px auto;}
 #search #fields #select p{height:26px;line-height: 26px;}
 #search #fields #select p input{vertical-align: middle;}
 #search #fields #select p label{display: inline-block; width:24%;}
@@ -263,10 +266,14 @@ color: #EEEEEE 淡灰色
 #search #oper input
 {
     width:15%;
-    font: normal 16px "微软雅黑", "Lucida Grande", "Lucida Sans", Helvetica, Arial, Sans;
+    font: normal 14px "微软雅黑", "Lucida Grande", "Lucida Sans", Helvetica, Arial, Sans;
     color: #000;
     text-shadow: 0 1px 1px #fff;
 }
+
+
+
+
 
 ==============================================/points/usr/servant/search/css/searcher.css
 body{font-family: '微软雅黑',Arial;font-size:12px;}
@@ -276,7 +283,7 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
 {
     width:100%;height:32px;line-height: 32px;
     vertical-align: middle;
-    margin:20px auto;
+    margin:20px auto 0 auto;
 }
 #topic h1
 {
@@ -286,6 +293,9 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
     color: #000;
     text-shadow: 0 1px 1px #fff;
 }
+#desc{margin:0 auto 8px;text-align: right;}
+#desc label{font-size:12px;font-weight: bold;}
+#desc span{display: inline-block;margin:0 10px;border-bottom: 1px solid green; color:red;}
 
 #grid{width:100%;text-align: left;text-indent:6px;}
 #grid thead tr{height:36px;line-height:36px;background-color:#336699;}
@@ -368,6 +378,9 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
         }else{ exit('supplied an invalid field.'); }
     }
     
+    if(!isset($fieldArr[$_POST['search']])){ exit('supplied an invalid search option.');}
+    
+    $searchCondition =  $fieldArr[$_POST['search']] . ' ' . $oper[$_POST['type']] . ' ' . $_POST['searcher'];    
 ?>
 <!DOCTYPE html>
 <html>
@@ -380,6 +393,7 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
     <body>
         <div id="outset">
             <div id="topic"><h1><?php echo $_SESSION['points']['search']['title']; ?></h1></div>
+            <div id="desc"><label>提供的搜索条件:</label><span><?php echo $searchCondition; ?></span><label>共搜索到<?php echo 10; ?>个结果。</label></div>
             <table id="grid">
                 <thead>
                     <tr>
@@ -429,12 +443,12 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
     }
     
     $fields = json_decode($arr['fields'],true); 
-    $fieldNames = array();
-    for($k=0,$len=count($fields);$k<$len;$k++){  $fieldNames[$fields[$k]['fname']] = $fields[$k]['dname']; }
-
+    $fieldNames = array(); $len = count($fields);
+    for($k=0;$k<$len;$k++){  $fieldNames[$fields[$k]['fname']] = $fields[$k]['dname']; }
+    
     $searchers = explode(',',$arr['searcher']);
-    $search = array(); 
-    $counts = count($searchers);
+    $search = array();
+    if(empty($arr['searcher'])){ $counts = 0; }else{ $counts = count($searchers); }
     if($counts > 0)
     {
         for($j=0;$j<$counts;$j++)
@@ -443,6 +457,7 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
             $search[$_search[0]] = $_search[1]; 
         }
     }
+    
     $fields = array_chunk($fieldNames,4,true);
 ?>
 <!DOCTYPE html>
@@ -456,8 +471,9 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
     <body>
         <div id="frm">
             <div id="title"><?php echo $title; ?></div>
-            <div id="none" style="display:none;">此类别没有设置任何可用的搜索选项，请转到后台处理。</div>
-         
+            <?php if($len == 0 || $counts == 0){ ?>
+            <div id="none">此类别没有设置任何可用的搜索选项，请转到后台处理。</div>
+            <?php }else{ ?>
             <form id="search" action="searcher.php" method="post">
                 <div id="option">
                     <span>请选择搜索选项：
@@ -496,16 +512,17 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
                                 <label class="lb-select"><input type="checkbox" name="fields[]" value="<?php echo $key; ?>"><?php echo $name; ?></label>
                             <?php } ?>
                         </p>
-                    <?php } ?>
+                        <?php } ?>
                     </div>
                 </div>
                 <p id="err"></p>
-                <p id="oper"><input type="submit" value="提交" onclick="return check(this.form); " /></p>
+                <p id="oper"><input type="submit" value="搜索结果" onclick="return check(this.form); " /></p>
             </form>
-           
+           <?php } ?>
         </div>
     </body>
 </html>
+    
   
 ===================================/points/usr/servant/search/js/search.js
 
@@ -524,6 +541,80 @@ function check(obj)
     if (select.length == 0) { $('#err').text('至少选择一个显示字段'); return false; }
     return select.length > 0;
 }
+$(document).ready(function(){
+    
+    document.getElementById('categories').onchange = function()
+    {
+        $('#err').text('');
+        var v = this.value;
+        $.post('ask/search.ajx.php',{"cid":v},function(r){
+            var j = $.parseJSON(r);
+            if (j.yes == '1')
+            {
+                $('#searches').html('');
+                $('#searches').html(j.opt);
+                $('#select').html('');
+                $('#select').html(j.field);
+            }else{ $('#err').text('此类别提供的搜索选项不足'); }
+        });
+    }
+});
+
+==============================================================/points/usr/servant/search/ask/search.ajx.php
+<?php
+    session_start();
+    $back = array('yes'=>0,'opt'=>'','field'=>'');
+    if(!isset($_POST['cid']) || !ctype_digit($_POST['cid']))
+    {
+        $back['tip'] = '提供了不合法的类别ID.';
+        echo json_encode($back);exit;
+    }
+    
+    $field = $_SESSION['points']['filters'][$_POST['cid']]['fields'];
+    $search = $_SESSION['points']['filters'][$_POST['cid']]['searcher'];
+    
+    $fields = json_decode($field,true); 
+    $fieldNames = array(); $len = count($fields);
+    for($k=0;$k<$len;$k++){  $fieldNames[$fields[$k]['fname']] = $fields[$k]['dname']; }
+    
+    //查询选项
+    $searchers = explode(',',$search);
+    $searches = array();
+    if(empty($search)){ $counts = 0; }else{ $counts = count($searchers); }
+   
+    if($counts > 0)
+    {
+        for($j=0;$j<$counts;$j++)
+        {
+            $_search = explode(':',$searchers[$j]);
+            if(isset($fieldNames[$_search[0]]))
+            {
+                $back['opt'] .= '<option value="' . $_search[0] . '">' . $fieldNames[$_search[0]]. '</option>';
+            }
+        }
+    }
+    
+    //显示字段
+    $arr = array_chunk($fieldNames,4,true);
+    for($i=0,$l=count($arr);$i<$l;$i++)
+    {
+        $back['field'] .= '<p>';
+        foreach ($arr[$i] as $key=>$name)
+        {
+            $back['field'] .= '<label class="lb-select"><input type="checkbox" name="fields[]" value="' . $key . '">' . $name .'</label>';
+        }
+        $back['field'] .= '</p>';
+    };
+    
+    if(!empty($back['opt']) && !empty($back['field'])){ $back['yes'] = 1;}
+    echo json_encode($back);exit;
+
+
+
+
+
+
+
 
 
 
