@@ -6,175 +6,189 @@ color: #797979 浅灰色
 color: #686868 深灰色
 color: #EEEEEE 淡灰色
 
-=====================================/points/usr/local/GVA.class.php
+去提loing.php中的session设置
+=========================================/points/usr/local/vce.inc.php
+<?php
+  session_start();
+  session_unset();
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php';  
+  $_vc = new VCE(array('width'=>168));		
+  $_vc->showVCE();		
+  $_SESSION['points']['VCE'] = $_vc->getCodes();
+
+
+=========================================/points/usr/login/ask/login.ajx.php
 
 <?php
-class GVA
-{
-    /*
-       *获取一个或多个变量的值
-       *@param string $pos 变量应用位置
-       *@param array $arr 变量的名称数组
-       *@param array $cache  cache：是否缓存在session中  key:是否提供一个保存的键
-       */
-    public static function more($pos,array $arr,$cache=array('cache'=>false,'key'=>''))
+    session_start();
+    require $_SERVER['DOCUMENT_ROOT'].'/points/loader.inc.php';
+    
+    $back = array('status'=>0,'message'=>'未知错误','url'=>''); //响应的结果集
+    //验证码是否正确
+    if(strtolower($_POST['valide']) != $_SESSION['points']['VCE'])
     {
-        $URL = GVA::SURL($pos);
-        if(empty($arr) || $URL['status'] == 0){ return array(); }
-        
-        $where = "status>0 AND isUserControl=1 AND position='" . $URL['md5'] . "'  AND name IN ('" . implode("','",$arr) . "')";
-        $var = new vars($where);
-        $vars = $var->get(array('name','value'));
-        if($var->iTotal() == 0){ return array(); }
-        $back = array();
-        for($i=0;$i<$var->iTotal();$i++)
+        $back['message'] = '检查验证码,输入的验证码可能有误';
+        points::jan($back);
+    }
+    //区域
+    if(!ctype_digit($_POST['region'])){$back['message'] = '异常访问，区域ID不正确'; points::jan($back); }
+    $relations = array('1'=>'用户数据','2'=>'控制台','3'=>'定制');
+    $_SESSION['points']['region']['id'] = $_POST['region'];
+    $_SESSION['points']['region']['name'] = $relations[$_POST['region']];
+    
+    //范围
+    if(!ctype_digit($_POST['subrange'])){ $back['message'] = '异常访问，子区域ID不正确'; points::jan($back); }
+    if($_POST['subrange'] != '0') //超级用户的初始化操作被排除在外
+    {
+        $region = new regions(array('id'=>$_POST['subrange'],'status'=>1));
+        $regions = $region->get(array('name','directory'));
+        if($region->iTotal() > 0)
         {
-            $back[$vars['name'][$i]] = $vars['value'][$i];
-            if($cache['cache'])
+            //缓存区域信息
+            $_SESSION['points']['subrange']['name'] = $regions['name'][0];
+            $_SESSION['points']['subrange']['directory'] = $regions['directory'][0];
+            
+        }else{ $back['message'] = '区域不可用，可能被管理员废弃。'; points::jan($back); }
+    }
+    
+    $username = trim($_POST['username']); 
+    if(empty($username)){ $back['message'] = '用户名不能为空'; points::jan($back); }
+    $_SESSION['points']['user']['username'] = $username;
+    
+    $password = trim($_POST['password']);
+    if(empty($password)){ $back['message'] = '密码不能为空'; points::jan($back); }
+    $password = md5($password); 
+  
+    //是否存在此用户
+    $user = new users(array('username'=>$username));
+    $users = $user->get(array('id','alias','password','type','status'));    
+    if($user->iTotal() == 1) //用户存在
+    {
+        if($users['type'][0] == 1){ $back['message'] = '不允许此类用户在此处登录，请联系管理员'; points::jan($back); }
+        if($users['status'][0] != '1'){$back['message'] = '用户已被锁定'; points::jan($back); }        
+        if($password != $users['password'][0]){$back['message'] = '不正确的用户名或者密码'; points::jan($back); }
+        
+        $_SESSION['points']['user']['id'] = $users['id'][0];
+        $_SESSION['points']['user']['alias'] = $users['alias'][0];
+        $_SESSION['points']['user']['type'] = $users['type'][0];
+        
+        //查找所有此子区域的类别条目
+        $category = new category(array('regionId'=>$_POST['subrange'],'status'=>1));
+        $categories = $category->get(array('id','title','MD5','accessedURL'));
+            
+        if($users['type'][0] == 9) //超级用户
+        {
+            for($i=0;$i<$category->iTotal();$i++)
             {
-                if(empty($cache['key']))
-                {
-                    $_SESSION[$vars['name'][$i]] = $vars['value'][$i];
-                }else{ $_SESSION[$cache['key']][$vars['name'][$i]] = $vars['value'][$i]; }
+                $_SESSION['points']['category'][$categories['id'][$i]]['title'] = $categories['title'][$i];
+                $_SESSION['points']['category'][$categories['id'][$i]]['aurl'] = $categories['accessedURL'][$i];
+                $_SESSION['points']['category'][$categories['id'][$i]]['MD5'] = $categories['MD5'][$i];
+                $_SESSION['points']['category'][$categories['id'][$i]]['authority'] = MAXAUTH;
             }
-        }        
-       return $back;        
-    }
-    
-    /*
-       *获取一个变量的值
-       *@param string $pos 变量应用位置
-       *@param string $var 变量的名称
-       *@param array $cache  cache：是否缓存在session中  key:是否提供一个保存的键
-       */    
-    public static function one($pos,$var,$cache=array('cache'=>false,'key'=>''))
-    {
-        $URL = GVA::SURL($pos);
-        if(empty($var) || $URL['status'] == 0){ return false; }
-        
-        $SQL = "SELECT val FROM tb_points_variables WHERE yes>0 AND isuser=1 AND pos='" . $URL['md5'] . "'  AND named='" . $var . "'";
-        $vars = DBC::execute($SQL);
-        if(empty($vars[0]['val'])){ return false; }
-        if($cache['cache'])
+      
+        }else //不是超级用户
         {
-            if(empty($cache['key']))
+            $uid = $users['id'][0];
+            //从用户权限列表中查出所有此uid的访问条目
+            $power = new power(array('userId'=>$uid,'status'=>1));
+            $powers = $power->get(array('categoryId','authority')); 
+            
+            //求$powers['categoryId'] 与 $categories['id']交集
+            $intersect = array_values(array_intersect($powers['categoryId'],$categories['id']));  
+            $counts = count($intersect);
+            if($counts == 0){ $back['message'] = '在此区域范围内此用户没有任何可访问的类别条目,请联系管理员'; points::jan($back);}
+           
+            for($i=0;$i<$counts;$i++)
             {
-                $_SESSION[$var] = $vars[0]['val'];
-            }else{ $_SESSION[$cache['key']][$var] = $vars[0]['val']; }
+                if(array_search($intersect[$i],$categories['id']) !== false)
+                {
+                    $pos = array_search($intersect[$i],$categories['id']); 
+                    $_SESSION['points']['category'][$intersect[$i]]['title'] = $categories['title'][$pos];
+                    $_SESSION['points']['category'][$intersect[$i]]['aurl'] = $categories['accessedURL'][$pos];
+                    $_SESSION['points']['category'][$intersect[$i]]['MD5'] = $categories['MD5'][$pos];
+                }
+                if(array_search($intersect[$i],$categories['id']) !== false)
+                {
+                    $_SESSION['points']['category'][$intersect[$i]]['authority'] = $powers['authority'][array_search($intersect[$i],$powers['categoryId'])];
+                }
+            }
         }
-        return $vars[0]['val'];
-    }
-    
-    /*
-       *获取一个或多个变量的文本
-       *@param string $pos 变量应用位置
-       *@param array $arr 变量的名称数组
-       */
-    public static function text($pos,array $arr)
-    {
-        $URL = GVA::SURL($pos);
-        if(empty($arr) || $URL['status'] == 0){ return array(); }
+        $back['status'] = 1;
+        $back['message'] = '';
+        $back['url'] = GEN::phost() . $_SESSION['points']['subrange']['directory'];
         
-        $SQL = "status>0 AND isUserControl=1 AND position='" . $URL['md5'] . "'  AND name IN ('" . implode("','",$arr) . "')";
-        $var = new vars($SQL);
-        $vars = $var->get(array('name','text'));
-        if($var->iTotal() == 0){ return array(); }
-        $back = array();
-        for($i=0;$i<$var->iTotal();$i++){ $back[$vars['name'][$i]] = $vars['text'][$i]; }        
-        return $back;        
-    }
-    
-    /*
-       *获取一个或多个变量的文本和值
-       *@param string $pos 变量应用位置
-       *@param array $arr 变量的名称数组
-       */
-    public static function vars($pos,array $arr)
+    }else  //用户不存在
     {
-        $URL = GVA::SURL($pos);
-        if(empty($arr) || $URL['status'] == 0){ return array(); }
+        //是否是内置初始化用户
+        $pointers = parse_ini_file(PLIB . 'pointer.ini',true);
+        if($username != $pointers['username']){ $back['message'] = '不正确的用户名或者密码'; points::jan($back); }
+        if($password != $pointers['password']){ $back['message'] = '不正确的用户名或者密码'; points::jan($back); }
+            
+        $_SESSION['points']['user']['alias'] = $pointers['alias'];
+        $_SESSION['points']['user']['type'] = 9;
+        //使用系统内置的初始化用户初始化一些条目并使注册初始化用户为超级用户
+        if(!($_POST['region'] == '2' && $_POST['subrange'] == '0')){ $back['message'] = '系统异常,超级用户可能被恶意删除'; points::jan($back); } 
         
-        $SQL = "status>0 AND isUserControl=1 AND position='" . $URL['md5'] . "'  AND name IN ('" . implode("','",$arr) . "')";
-        $var = new vars($SQL);
-        $vars = $var->get(array('name','value','text'));
-        if($var->iTotal() == 0){ return array(); }
-        $back = array();
-        for($i=0;$i<$var->iTotal();$i++)
+        $user = new users(array('username'=>$username,'password'=>$password,'type'=>9));
+        if($user->iTotal() > 0){ $back['message'] = '不允许的操作，初始化已完成'; points:jan($back); }
+        //创建一个用户
+        $usersInfo = array('username'=>$username,'alias'=>$pointers['alias'],'password'=>$password,'email'=>$pointers['email'],'type'=>$pointers['type']);
+        $user = new users();
+        if($user->set($usersInfo))
         {
-            $back[$vars['name'][$i]]['val'] = $vars['value'][$i];
-            $back[$vars['name'][$i]]['text'] = $vars['text'][$i];
-        }        
-        return $back;        
-    }
-    
-    
-    /**
-       *校验URL并输出结果
-       *@param string $url
-       *@param boolean $removeBasename 是否替换文件名为空
-       *@return array
-       */
-    public static function SURL($url,$removeBasename=false)
-    {
-        $arr = array('status'=>0,'url'=>'','md5'=>'');
-        //把10.140.130.35:8001替换成test.cignacmb.com
-        $url = strtr($url,array('10.140.130.35:8001'=>'test.cignacmb.com'));
+            $_SESSION['points']['user']['id'] = $user->lastInsertedId();
         
-        $urls = parse_url(trim($url));
-        if(!isset($urls['scheme']) || !isset($urls['host'])){ return $arr; }
+        }else{ $back['message'] = '初始化用户失败'; points::jan($back);}
         
-        if($url[strlen($url) - 1] != '/' && $removeBasename){ $url = strtr($url,array(basename($url)=>'')); }
-        $arr['status'] = 1;
-        $arr['url'] = implode('',explode(' ',$url)); //去掉全部空格
-        $arr['md5'] = md5($arr['url']); //url的md5值        
-        return $arr;
-    }
-}
-
-
-
-/**
-     *提供分页的统一显示列表内容
-     *@param int $total 总页数
-     *@param int $page  当前页数
-     *$size int $size   分页大小
-     *@return string $fpage 返回html字符串
-     *注意：class和id属性的修改可能导致样式和js的不可用！！！
-     */
-    public static function fpage($total,$page,$size)
-    {
-        if($total == 0 /*|| $total <= $size*/){ return ''; }
-        $fpage = '';
-        //首页
-        $fpage .= '<a class="first" id="p-1">首页</a>';
-        //上一页
-        $last = ($page - 1) <= 1 ? 1 : $page - 1;
-        
-        $fpage .= '<a class="next" id="p-' . $next . '">下页</a>';
-        //页面列表
-        $pager = 11;//显示11个分页
-        $_h = ceil($page / 2);
-        if($total <= $pager)
+        //创建一个区域范围
+        $lastInsertedRangeId = '';
+        $regionInfo = array('name'=>$pointers['name'],'region'=>2,'authority'=>$pointers['regionAuth'],'directory'=>$pointers['directory']);
+        $region = new regions();
+        if($region->set($regionInfo))
         {
-            for($i=0;$i<$total;$i++){  $fpage .= '<a class="page" id="p-' . ($i + 1) . '">' . ($i + 1) . '</a>';  }
-        }else //总页数大于显示的分页数
+            $lastInsertedRangeId = $region->lastInsertedId();
+            //缓存区域信息
+            $_SESSION['points']['subrange']['name'] = '设置中心';
+            $_SESSION['points']['subrange']['directory'] = $pointers['directory'];
+            
+        }else{ $back['message'] = '初始化区域失败'; points::jan($back); }
+        
+        //添加系统类别
+        $categoryInfo = array('MD5'=>md5($pointers['murl']),                                          
+                              'title'=>$pointers['title'],
+                              'regionId'=>$lastInsertedRangeId,
+                              'managingURL'=>$pointers['murl'],
+                              'accessedURL'=>$pointers['aurl'],
+                              'position'=>2);
+        $lastInsertedCategoryId = '';
+        $category = new category();
+        if($category->set($categoryInfo))
         {
-            $start = 1; $end = $total;
-            if($page <= $_h){ $start = 1; $end = $pager; }
-            if($page > $_h){ $start = $page - $_h; $end = ($start + $pager) >= $total ? $total :  $start + $pager; }
-            for($i=$start;$i<$end;$i++){  $fpage .= '<a class="page" id="p-' . ($i) . '">' . ($i) . '</a>';  }
-        }
-        //下一页
-        $next = ($page + 1) >= $total ? $total : $page + 1;
-        $fpage .= '<a class="last" id="p-' . $last . '">上页</a>';
-        $fpage .= '<a class="end" id="p-' . $total . '">末页</a>';    //末页        
-        return $fpage;
-    }    
+            $lastInsertedCategoryId = $category->lastInsertedId();
+        }else{ $back['message'] = '初始化类别失败'; points::jan($back); }
+        
+        $_SESSION['points']['category'][$lastInsertedCategoryId]['title'] = $pointers['title'];
+        $_SESSION['points']['category'][$lastInsertedCategoryId]['aurl'] = $pointers['aurl'];
+        $_SESSION['points']['category'][$lastInsertedCategoryId]['MD5'] = md5($pointers['murl']);
+        $_SESSION['points']['category'][$lastInsertedCategoryId]['authority'] = $pointers['authority'];
+        
+        //var_dump($_SESSION['points']);exit;
+        $back['status'] = 1;
+        $back['message'] = '';
+        $back['url'] = GEN::phost() . $pointers['directory'];
+    }
+    points::jan($back);
+
+=================================================================/points/usr/local/loginout.inc.php
+<?php
+    session_start();    
+    session_unset();
+    $_SESSION=array();   //清空SESSION值 
+    //如果客户端的COOKIE开启，则清除COOKIE中的SESSION ID
+    if(isset($_COOKIE[session_name()])){ setCookie(session_name(),'',time()-3600,'/');  }       
+    session_destroy();    //销毁session
+    //用户注销后 销毁session_id 页面将跳转
+    header("Location:/points/usr/login/index.php"); exit;
 
 
-
-
-
-    
-    
 
