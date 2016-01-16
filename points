@@ -189,6 +189,351 @@ color: #EEEEEE 淡灰色
     session_destroy();    //销毁session
     //用户注销后 销毁session_id 页面将跳转
     header("Location:/points/usr/login/index.php"); exit;
+    
+    
+    
+ ==============================================================/points/usr/servant/search/css/search.css
+ 
+ body{font-family: '微软雅黑',Arial;font-size:12px;}
+
+#frm
+{
+    width:80%;
+    margin:4% auto;
+    border-radius: 6px;
+    border:1px solid green; /*替换这个颜色*/
+}
+
+#frm #title
+{
+    font: normal 16px "微软雅黑", "Lucida Grande", "Lucida Sans", Helvetica, Arial, Sans;
+    color: #000;
+    text-shadow: 0 1px 1px #fff;
+    line-height: 48px;
+    border-bottom: 1px solid green;
+    text-align: center;
+}
+
+#search div{width:96%;margin:auto;}
+
+#search #option span
+{
+    display: inline-block;
+    float:right;
+    margin-right:3%;
+}
+#search #option span select
+{
+    background: transparent;
+    border:1px solid #808080;
+}
+
+#search #option{ height:54px;line-height: 54px;}
+
+#search #condition{ height:32px;line-height: 32px;}
+#search #condition select,#search #condition input
+{
+    background:transparent;
+    height:24px;
+    border:1px solid #808080;
+}
+#search #condition select{width:30%;}
+#search #condition input{width:60%;font-weight: bold;text-indent: 2%;}
+
+#search #ways{ height:32px;line-height: 32px;}
+#search #ways #lb-title,#search #fields #p-title{ font-weight: bold; }
+#search #ways label,#search #ways input{display: inline-block;margin-right:6px;vertical-align:middle;}
+
+#search #fields #select{ margin:30px auto;}
+#search #fields #select p{height:26px;line-height: 26px;}
+#search #fields #select p input{vertical-align: middle;}
+#search #fields #select p label{display: inline-block; width:24%;}
+
+#search #err
+{
+    width:100%;height:24px;
+    line-height: 24px;
+    text-align: center;
+    background: none;
+    color:#DD5B25;
+    font-style:italic;
+}
+
+#search #oper{text-align: center;line-height: 48px;border-top:1px solid green;}
+#search #oper input
+{
+    width:15%;
+    font: normal 16px "微软雅黑", "Lucida Grande", "Lucida Sans", Helvetica, Arial, Sans;
+    color: #000;
+    text-shadow: 0 1px 1px #fff;
+}
+
+==============================================/points/usr/servant/search/css/searcher.css
+body{font-family: '微软雅黑',Arial;font-size:12px;}
+#outset{width:98%;height:auto;margin:0 auto;}
+
+#topic
+{
+    width:100%;height:32px;line-height: 32px;
+    vertical-align: middle;
+    margin:20px auto;
+}
+#topic h1
+{
+    display: inline-block;
+    float:left;
+    font: normal 16px "微软雅黑", "Lucida Grande", "Lucida Sans", Helvetica, Arial, Sans;
+    color: #000;
+    text-shadow: 0 1px 1px #fff;
+}
+
+#grid{width:100%;text-align: left;text-indent:6px;}
+#grid thead tr{height:36px;line-height:36px;background-color:#336699;}
+#grid thead tr td{ color:#FFF; text-shadow:text-shadow: 0 1px 1px #000; font-size:14px;}
+
+#grid tbody tr
+{
+    height:32px;line-height:32px;
+    font: normal 12px "微软雅黑", "Lucida Grande", "Lucida Sans", Helvetica, Arial, Sans;
+}
+#grid thead tr,#grid tbody tr{border-top:1px solid #B9D1EA;border-bottom:1px solid #B9D1EA;}
+#grid tbody tr:hover{background-color:#CCCCCC;cursor: pointer;}
+
+#grid tbody tr#loading
+{
+    height:68px;line-height: 68px;
+    color:#DD5B25;
+    font-size:16px;
+    font-style:italic;
+    text-align: center;
+}
+
+#grid tfoot tr
+{
+    height:34px;
+    line-height: 34px;text-indent:0;
+    border-top:1px solid #B9D1EA;
+    border-bottom:1px solid #B9D1EA;
+}
+#grid tfoot tr td #oper,#grid tfoot tr td #fpage{display:inline-block;}
+#grid tfoot tr td #oper{width:46%;background-color:#336699;text-align: center;}
+#grid tfoot tr td #oper a
+{
+    display:inline-block;
+    width:10%;height:24px; line-height: 24px;
+    border:1px solid #335F7D;
+    border-radius: 4px;
+    color:#FFF;font-size:14px;
+}
+#grid tfoot tr td #fpage{width:54%;background-color:#336699;}
+#grid tfoot tr #fpage a
+{
+    display:inline-block;
+    width:24px;height:24px;line-height: 24px;
+    text-align: center;
+    margin-left:4px;margin-right:4px;
+}
+#grid tfoot tr #fpage  .page{ width:12px;}
+
+=====================================================/points/usr/servant/search/searcher.php
+
+<?php
+    session_start();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php';
+    
+    $categories = array_keys($_SESSION['points']['filters']);
+    if(!in_array($_POST['category'],$categories)){ exit('supplied an invalid category id.'); }
+    //搜索选项
+    $searches = explode(',',$_SESSION['points']['filters'][$_POST['category']]['searcher']);
+    if(count($searches) == 0){ exit('supplied empty search condition'); }
+    if(empty($_POST['searcher'])){ exit('supplied empty search value'); }
+    //对$_post['searcher'] 进入SQL注入检查  TODO
+    
+    $oper = array('1'=>'=','2'=>'LIKE','3'=>'>','4'=>'<','5'=>'>=','6'=>'<=','7'=>'!=');
+    if(!isset($oper[$_POST['type']])){ exit('supplied an invalid operation.'); }
+    
+    $fields = $_SESSION['points']['filters'][$_POST['category']]['fields'];
+    $arr = json_decode($fields,true);
+    $len = count($arr);
+    if($len == 0){ exit('supplied empty query field.'); }
+    $fieldArr = array(); 
+    for($i=0;$i<$len;$i++){ $fieldArr[$arr[$i]['fname']] = $arr[$i]['dname']; }
+    $selected = array();  $titles = array();
+    for($j=0,$l=count($_POST['fields']);$j<$l;$j++)
+    {
+        if(isset($fieldArr[$_POST['fields'][$j]]))
+        {
+            $titles[] = $fieldArr[$_POST['fields'][$j]];
+            $selected[] = $_POST['fields'][$j];
+        }else{ exit('supplied an invalid field.'); }
+    }
+    
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <?php points::head(0); ?>
+        <link rel="stylesheet" href="css/searcher.css" />
+        <script src="/points/usr/local/js/f.js"></script>
+        <!--<script src="js/banker.js"></script>-->
+    </head>
+    <body>
+        <div id="outset">
+            <div id="topic"><h1><?php echo $_SESSION['points']['search']['title']; ?></h1></div>
+            <table id="grid">
+                <thead>
+                    <tr>
+                    <?php for($k=0,$l=count($titles);$k<$l;$k++){ ?>
+                        <td><?php echo $titles[$k]; ?></td>
+                    <?php } ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="loading"><td colspan="<?php echo count($titles); ?>">loading data！please wait......</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="<?php echo count($titles); ?>">
+                            <span id="oper"><a>导出</a></span><span id="fpage"><a>首页</a></span>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </body>
+</html>
+
+
+======================================/points/usr/servant/search/search.php
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/usr/servant/servant.inc.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/points/loader.inc.php';
+    $title = $_SESSION['points']['subrange']['name'] . ' ' . $_SESSION['points']['category'][$_SESSION['points']['item']['id']]['title'];
+
+    //获取此类别的信息
+    $filter = new filter(array('categoryId'=>$categoryId));
+    $filters = $filter->get(array('id','name','fieldText','searcher','select','factor','rest'));
+    $arr = array();
+    for($i=0;$i<$filter->iTotal();$i++)
+    {
+        if($i == 0)
+        {
+            $arr['name'] = $filters['name'][0];
+            $arr['fields'] = $filters['fieldText'][0];
+            $arr['searcher'] = $filters['searcher'][0];
+            $_SESSION['points']['search']['title'] = $filters['name'][0];
+        }
+        $_SESSION['points']['filters'][$filters['id'][$i]]['name'] = $filters['name'][$i];
+        $_SESSION['points']['filters'][$filters['id'][$i]]['fields'] = $filters['fieldText'][$i];
+        $_SESSION['points']['filters'][$filters['id'][$i]]['searcher'] = $filters['searcher'][$i];
+    }
+    
+    $fields = json_decode($arr['fields'],true); 
+    $fieldNames = array();
+    for($k=0,$len=count($fields);$k<$len;$k++){  $fieldNames[$fields[$k]['fname']] = $fields[$k]['dname']; }
+
+    $searchers = explode(',',$arr['searcher']);
+    $search = array(); 
+    $counts = count($searchers);
+    if($counts > 0)
+    {
+        for($j=0;$j<$counts;$j++)
+        {
+            $_search = explode(':',$searchers[$j]);
+            $search[$_search[0]] = $_search[1]; 
+        }
+    }
+    $fields = array_chunk($fieldNames,4,true);
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <?php points::head(0); ?>
+        <link rel="stylesheet" href="css/search.css" />
+        <script src="/points/usr/local/js/f.js"></script>
+        <script src="js/search.js"></script>
+    </head>
+    <body>
+        <div id="frm">
+            <div id="title"><?php echo $title; ?></div>
+            <div id="none" style="display:none;">此类别没有设置任何可用的搜索选项，请转到后台处理。</div>
+         
+            <form id="search" action="searcher.php" method="post">
+                <div id="option">
+                    <span>请选择搜索选项：
+                        <select id="categories" name="category">
+                            <?php foreach($_SESSION['points']['filters'] as $k=>$v){ ?>
+                                <option value="<?php echo $k;?>"><?php echo $v['name']; ?></option>
+                            <?php } ?>
+                        </select>
+                    </span>
+                </div>
+                <div id="condition">
+                    <select id="searches" name="search">
+                        <?php foreach($search as $k=>$v){?>
+                            <option value="<?php echo $k;?>"><?php echo $fieldNames[$k]; ?></option>
+                        <?php } ?>
+                    </select>
+                    <input type="text" name="searcher" value="" />
+                </div>
+                <div id="ways">
+                    <label id="lb-title">匹配方式：</label>
+                    <label><input type="radio" name="type" value="1" checked="checked" />精确</label>
+                    <label><input type="radio" name="type" value="2" />模糊</label>
+                    <label><input type="radio" name="type" value="3" />大于</label>
+                    <label><input type="radio" name="type" value="4" />小于</label>
+                    <label><input type="radio" name="type" value="5" />大于或等于</label>
+                    <label><input type="radio" name="type" value="6" />小于或等于</label>
+                    <label><input type="radio" name="type" value="7" />不等于</label>
+                </div>
+                
+                <div id="fields">
+                    <p id="p-title">显示字段：</p>
+                    <div id="select">
+                        <?php for($i=0,$l=count($fields);$i<$l;$i++){ ?>
+                        <p>
+                            <?php foreach ($fields[$i] as $key=>$name){ ?>
+                                <label class="lb-select"><input type="checkbox" name="fields[]" value="<?php echo $key; ?>"><?php echo $name; ?></label>
+                            <?php } ?>
+                        </p>
+                    <?php } ?>
+                    </div>
+                </div>
+                <p id="err"></p>
+                <p id="oper"><input type="submit" value="提交" onclick="return check(this.form); " /></p>
+            </form>
+           
+        </div>
+    </body>
+</html>
+  
+===================================/points/usr/servant/search/js/search.js
+
+function check(obj)
+{
+    if(obj.searcher.value.empty())
+    {
+        $('#err').text('必须提供查询条件的值');
+        return false;
+    }
+    var select = [];
+    $('.lb-select input').each(function(i,obj){
+        var checkbox = $(obj);
+        if (checkbox.is(":checked")) { select.push(checkbox.val()); }
+    });
+    if (select.length == 0) { $('#err').text('至少选择一个显示字段'); return false; }
+    return select.length > 0;
+}
+
+
+
+  
+
+
+
+
+
+
 
 
 
