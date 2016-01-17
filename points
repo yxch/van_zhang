@@ -446,18 +446,8 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
     $fieldNames = array(); $len = count($fields);
     for($k=0;$k<$len;$k++){  $fieldNames[$fields[$k]['fname']] = $fields[$k]['dname']; }
     
-    $searchers = explode(',',$arr['searcher']);
-    $search = array();
-    if(empty($arr['searcher'])){ $counts = 0; }else{ $counts = count($searchers); }
-    if($counts > 0)
-    {
-        for($j=0;$j<$counts;$j++)
-        {
-            $_search = explode(':',$searchers[$j]);
-            $search[$_search[0]] = $_search[1]; 
-        }
-    }
-    
+    $search = explode(',',$arr['searcher']);
+    if(empty($arr['searcher'])){ $counts = 0; }else{ $counts = count($search); }
     $fields = array_chunk($fieldNames,4,true);
 ?>
 <!DOCTYPE html>
@@ -486,8 +476,8 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
                 </div>
                 <div id="condition">
                     <select id="searches" name="search">
-                        <?php foreach($search as $k=>$v){?>
-                            <option value="<?php echo $k;?>"><?php echo $fieldNames[$k]; ?></option>
+                        <?php for($k=0;$k<$counts; $k++){?>
+                            <option value="<?php echo $search[$k];?>"><?php echo $fieldNames[$search[$k]]; ?></option>
                         <?php } ?>
                     </select>
                     <input type="text" name="searcher" value="" />
@@ -522,6 +512,7 @@ body{font-family: '微软雅黑',Arial;font-size:12px;}
         </div>
     </body>
 </html>
+    
     
   
 ===================================/points/usr/servant/search/js/search.js
@@ -578,19 +569,14 @@ $(document).ready(function(){
     for($k=0;$k<$len;$k++){  $fieldNames[$fields[$k]['fname']] = $fields[$k]['dname']; }
     
     //查询选项
-    $searchers = explode(',',$search);
-    $searches = array();
-    if(empty($search)){ $counts = 0; }else{ $counts = count($searchers); }
+    $searches = explode(',',$search);
+    if(empty($search)){ $counts = 0; }else{ $counts = count($searches); }
    
     if($counts > 0)
     {
         for($j=0;$j<$counts;$j++)
         {
-            $_search = explode(':',$searchers[$j]);
-            if(isset($fieldNames[$_search[0]]))
-            {
-                $back['opt'] .= '<option value="' . $_search[0] . '">' . $fieldNames[$_search[0]]. '</option>';
-            }
+            if(isset($fieldNames[$searches[$j])){  $back['opt'] .= '<option value="' . $_search[0] . '">' . $fieldNames[$searches[$j]]. '</option>'; }
         }
     }
     
