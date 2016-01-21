@@ -5,7 +5,36 @@ color: #444A54 黑灰色
 color: #797979 浅灰色
 color: #686868 深灰色
 color: #EEEEEE 淡灰色
-
+<?php
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/samples/loader.inc.php';
+    
+    $back = array('yes'=>0,'tbody'=>'','tip'=>'');
+    
+    $tables = DBC::execute('SHOW TABLES FROM mysqler'); //获取指定数据库中的全部表
+    $tableArr = array();
+    for($i=0,$len=count($tables);$i<$len;$i++)
+    {
+        $_tmp = array_values($tables[$i]);
+        $tableArr[] = $_tmp[0];   
+    }
+    
+    if(!in_array($_POST['tname'],$tableArr)){ $back['tip'] = '无效的表名'; echo json_encode($back);exit;  }
+    
+    //获取表的字段及注释
+    $column = DBC::execute('SHOW FULL COLUMNS FROM ' . $_POST['tname']);
+    for($j=0,$l=count($column);$j<$l;$j++)
+    {
+        $back['tbody'] .= '<tr>';
+        $back['tbody'] .= '<td>' . $column[$j]['Field'] . '</td>';
+        $back['tbody'] .= '<td><input value="' . $column[$j]['Comment'] . '"/></td>';
+        $back['tbody'] .= '<td><input value="" /></td>';
+        $back['tbody'] .= '<td colspan="3"><input value="" /></td>';
+        $back['tbody'] .= '</tr>';
+    }
+    $back['yes'] = 1;
+    
+    echo json_encode($back);exit;
+    
 
 
 
