@@ -5,36 +5,118 @@ color: #444A54 黑灰色
 color: #797979 浅灰色
 color: #686868 深灰色
 color: #EEEEEE 淡灰色
-<?php
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/samples/loader.inc.php';
+
+
+
+$(document).ready(function(){
+    var postURL = 'pager.ajx.php';
     
-    $back = array('yes'=>0,'tbody'=>'','tip'=>'');
+    page(postURL);
     
-    $tables = DBC::execute('SHOW TABLES FROM mysqler'); //获取指定数据库中的全部表
-    $tableArr = array();
-    for($i=0,$len=count($tables);$i<$len;$i++)
+    
+    $('#pager #fpage').delegate('#first,#last,.page,#next,#end','click',function(){
+        var num = $(this).attr('name');
+        $('#pager #fpage #goto').val(num);
+        page(postURL,num);
+    });
+    $('#pager #fpage').delegate('#goto','keyup',function(e){
+        var v = parseInt($(this).val());
+        if(e.which == 13){ if(!isNaN(v)){ page(postURL,v); }  }
+    });
+});
+
+function page(url,i)
+{
+    var page = parseInt(i) || 1; //请求显示哪一页数据，默认为第一页
+    $.post(url,{"page":page},function(r){        
+        var j = $.parseJSON(r);
+        if (j.yes == 1)
+        {
+            $('#pager tbody').html('');
+            $('#pager tbody').html(j.tbody);
+            $('#fpage').html(paging(j).full());
+        }
+    });
+}
+
+function paging(j)
+{
+    var pages = new Object();
+    pages.total = parseInt(j.total) || 0;  //总记录数 程序必须提供的值
+    pages.page = parseInt(j.page) || 1;    //当前页 程序必须提供的值
+    pages.size = parseInt(j.size) || 20;   //分页大小 程序可能提供的值
+    pages.pager = parseInt(j.pager) || 10; //显示的分页个数 程序可能提供的值
+    
+    pages.firstName = j.firstName || '首页'; //首页的显示名称
+    pages.firstId = j.firstId || 'first'; //首页的id 如果用户没有提供就用first 单击事件和样式需要
+    pages.lastName = j.lastName || '上一页'; //上一页的显示名称
+    pages.lastId = j.lastId || 'last';    //上页的id 如果用户没有提供就用last 单击事件和样式需要
+    pages.pageCurrentClass = j.pageCurrentClass || 'current'; //用户选择的当前页的类名
+    pages.pageClass = j.pageCalss || 'page';    //每页的class 如果用户没有提供就用page 单击事件和样式需要
+    pages.nextName = j.nextName || '下一页'; //下一页的显示名称
+    pages.nextId = j.nextId || 'next';    //下页的id 如果用户没有提供就用next 单击事件和样式需要
+    pages.endName = j.endName || '末页';  //末页的显示名称
+    pages.endId = j.endId || 'end';    //末页的id 如果用户没有提供就用end 单击事件和样式需要
+    pages.inputId = j.inputId || 'goto'; //跳转输入框的id 单击事件和样式需要
+    
+    pages.pages = Math.ceil(pages.total / pages.size); //计算页数
+    
+    pages.html = function(arr)
     {
-        $_tmp = array_values($tables[$i]);
-        $tableArr[] = $_tmp[0];   
-    }
+        var html = '';
+        for(var i=0;i<arr.length;i++)
+        {
+            //显示首页
+            if(arr[i] == 'first'){ html += '<a id="' + pages.firstId + '" ' + 'name="1">' + pages.firstName + '</a>'; }
+            var last = (pages.page - 1) >= 1 ? pages.page - 1 : 1; //显示上一页
+            if(arr[i] == 'last'){ html += '<a id="' + pages.lastId + '" ' + 'name="' + last + '">' + pages.lastName + '</a>'; }
+            if(arr[i] == 'page'){ html += pages.all(); } //显示所有页
+            var next = (pages.page + 1) <= pages.pages ? pages.page + 1 : pages.pages; //显示下一页
+            if(arr[i] == 'next'){ html += '<a id="' + pages.nextId + '" ' + 'name="' + next + '">' + pages.nextName + '</a>'; }
+            //显示末页
+            if(arr[i] == 'end'){ html += '<a id="' + pages.endId + '" ' + 'name="' + pages.pages + '">' + pages.endName + '</a>'; }
+            if (arr[i] == 'goto'){ html += '<input id="' + pages.inputId + '" value="' + pages.page + '"/>'; } //显示跳转到第几页的输入框
+        }
+        return html;        
+    };
     
-    if(!in_array($_POST['tname'],$tableArr)){ $back['tip'] = '无效的表名'; echo json_encode($back);exit;  }
-    
-    //获取表的字段及注释
-    $column = DBC::execute('SHOW FULL COLUMNS FROM ' . $_POST['tname']);
-    for($j=0,$l=count($column);$j<$l;$j++)
+    pages.all = function()
     {
-        $back['tbody'] .= '<tr>';
-        $back['tbody'] .= '<td>' . $column[$j]['Field'] . '</td>';
-        $back['tbody'] .= '<td><input value="' . $column[$j]['Comment'] . '"/></td>';
-        $back['tbody'] .= '<td><input value="" /></td>';
-        $back['tbody'] .= '<td colspan="3"><input value="" /></td>';
-        $back['tbody'] .= '</tr>';
-    }
-    $back['yes'] = 1;
-    
-    echo json_encode($back);exit;
-    
+        var s = 1,e = pages.pager;
+        var h = Math.ceil(pages.pager / 2);
+        s = pages.page - h < 1 ? 1 : pages.page - h;
+        e = pages.page + h > pages.pages ? pages.pages : s + (pages.pager - 1);
+        if(e - pages.pager + 1 >= 1){ s = e - s + 1 < pages.pager ? e - pages.pager + 1 : s;}
+        var _pages = '';
+        for(s;s<=e;s++)
+        {
+           var current = (pages.page == s) ? pages.pageCurrentClass : ''; 
+           _pages += '<a class="' + pages.pageClass + ' ' + current + '" ' + 'name="' + s + '">' + s + '</a>';
+        }
+        return _pages;
+    };
+    pages.show = function(){ return pages.html(['first','last','page','next','end']);};
+    pages.only = function(){ return pages.html(['page']); }
+    pages.simple = function(){ return pages.html(['last','page','next']);}
+    pages.full = function(){ return pages.html(['first','last','page','next','end','goto']);}
+    return pages;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
