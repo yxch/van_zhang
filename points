@@ -26,20 +26,18 @@ $(document).ready(function(){
     });
 });
 
-function page(url,i)
-{
-    var page = parseInt(i) || 1; //请求显示哪一页数据，默认为第一页
-    $.post(url,{"page":page},function(r){        
-        var j = $.parseJSON(r);
-        if (j.yes == 1)
-        {
-            $('#pager tbody').html('');
-            $('#pager tbody').html(j.tbody);
-            $('#fpage').html(paging(j).full());
-        }
-    });
-}
 
+=================================paging.js
+
+/**
+ *js分页函数
+ *van_zhang 2016-01-23
+ *参数 j是一个json对象
+ *j.total,j.page,j.size,j.pager
+ *j.firstName,j.lastName,j.nextName,j.endName
+ *j.firstId,j.lastId,j.nextId,j.endId,j.pageClass,j.pageCurrentClass
+ *j.inputId
+ */
 function paging(j)
 {
     var pages = new Object();
@@ -102,4 +100,3 @@ function paging(j)
     pages.full = function(){ return pages.html(['first','last','page','next','end','goto']);}
     return pages;
 }
-
