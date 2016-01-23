@@ -8,6 +8,7 @@ color: #EEEEEE 淡灰色
 
 
 
+
 $(document).ready(function(){
     var postURL = 'pager.ajx.php';
     
@@ -86,14 +87,14 @@ function paging(j)
         var h = Math.ceil(pages.pager / 2);
         s = pages.page - h < 1 ? 1 : pages.page - h;
         e = pages.page + h > pages.pages ? pages.pages : s + (pages.pager - 1);
-        if(e - pages.pager + 1 >= 1){ s = e - s + 1 < pages.pager ? e - pages.pager + 1 : s;}
-        var _pages = '';
+        if(e - pages.pager + 1 >= 1){ s = (e - s + 1) < pages.pager ? e - pages.pager + 1 : s;}
+        var a = '';
         for(s;s<=e;s++)
         {
-           var current = (pages.page == s) ? pages.pageCurrentClass : ''; 
-           _pages += '<a class="' + pages.pageClass + ' ' + current + '" ' + 'name="' + s + '">' + s + '</a>';
+           var current = pages.page == s ? pages.pageCurrentClass : ''; 
+           a += '<a class="' + pages.pageClass + ' ' + current + '" ' + 'name="' + s + '">' + s + '</a>';
         }
-        return _pages;
+        return a;
     };
     pages.show = function(){ return pages.html(['first','last','page','next','end']);};
     pages.only = function(){ return pages.html(['page']); }
@@ -101,40 +102,4 @@ function paging(j)
     pages.full = function(){ return pages.html(['first','last','page','next','end','goto']);}
     return pages;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
 
