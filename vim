@@ -69,6 +69,8 @@ netbeans的配置：
 默认的颜色：173,216,230
 字符串的颜色：32，178，170
 
+http://www.yiibai.com/nodejs/nodejs-quick-start.html
+
 
 
 
