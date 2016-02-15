@@ -65,7 +65,9 @@ color: #EEEEEE 淡灰色
 color: #B0C4DE 亮钢蓝
 color:#F8F8Ff  幽灵白
 
-字体的颜色 #ADD8E6
+netbeans的配置：
+默认的颜色：173,216,230
+字符串的颜色：32，178，170
 
 
 
