@@ -56,19 +56,6 @@ u 撤销。恢复最近一次的文本修改操作，即使已经移动了光标
 U 如果在修改后还没有将光标移出当前行，则可以撤销对当前行进行的所有的文本修改
 
 
-color: #D98200 暗橙色
-color: #FF9900 橙色
-color: #444A54 黑灰色
-color: #797979 浅灰色
-color: #686868 深灰色
-color: #EEEEEE 淡灰色
-color: #B0C4DE 亮钢蓝
-color:#F8F8Ff  幽灵白
-
-netbeans的配置：
-默认的颜色：173,216,230
-字符串的颜色：32，178，170
-
 http://www.yiibai.com/nodejs/nodejs-quick-start.html
 
 
