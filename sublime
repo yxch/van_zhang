@@ -28,18 +28,25 @@ Sublime Text 2 和 Sublime Text 3都支持
 
 把生成的文件放到安装目录的:Data\Packages\Color Scheme - Default文件夹下就可以了.
 
-submline设置：
+我的submline设置：
+
 {
-	"color_scheme": "Packages/User/SublimeLinter/van_zhang (SL).tmTheme",
+	"color_scheme": "Packages/User/SublimeLinter/van_zhang.tmTheme",
 	"font_face": "Simplified Arabic Fixed",
-	"font_size": 11.0,
+	"font_face": "Microsoft YaHei",
+	"font_size": 12,
 	"ignored_packages":
 	[
 	],
 	"update_check": false,
 	"word_wrap": "auto",
-	"word_wrap":true,
-	"wrap_width":80
+	"fade_fold_buttons": false,
+	"show_encoding": true,
+	"trim_trailing_white_space_on_save": true,
+	"show_full_path": true,
+	"bold_folder_labels": true,
+	"line_padding_bottom": 2,
+	"line_padding_top": 2
 }
 
 快捷键
