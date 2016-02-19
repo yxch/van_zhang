@@ -57,6 +57,7 @@ U 如果在修改后还没有将光标移出当前行，则可以撤销对当前
 
 
 http://www.yiibai.com/nodejs/nodejs-quick-start.html
+http://www.yiibai.com/postgresql/
 
 
 
