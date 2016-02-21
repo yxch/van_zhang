@@ -325,3 +325,183 @@ class STR
   }
 }
 
+
+<?php
+/**
+ * 修改php.ini的一些设置 
+ * 修改session的存储方式及相关参数 此设置需要在session_start之前处理否则无效
+ */
+ini_set('session.name','multimall');
+ini_set('session.save_handler','user');		//本需求使用数据库存储session
+
+//通用的启用方式
+SSN::start(DBC::PDO());
+
+class SSN
+{
+	private static $handler = null;
+	private static $ip = '';
+	private static $lifetime = 0;
+	private static $time = 0;
+
+	/**
+	 *初始化方法 
+	 * @param object $handler 数据库连接PDO对象
+	 */
+	private static function construct($handler)
+	{
+		self::$handler = $handler;
+		self::$ip = $_SERVER['REMOTE_ADDR'] ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
+		self::$lifetime = ini_get('session.gc_maxlifetime');
+		self::$time = time();
+	}
+
+	/**
+	 * 启动session
+	 * 使用回调函数的方式
+	 */
+	public static function start(PDO $pdo)
+	{
+		self::construct($pdo);
+		session_set_save_handler(array(__CLASS__,'open'), 
+								 array(__CLASS__,'close'),
+								 array(__CLASS__,'read'),
+								 array(__CLASS__,'write'),
+								 array(__CLASS__,'destroy'),
+								 array(__CLASS__,'gc')		);
+		session_start();
+	}
+	
+	/**
+	 * @param type $path  使用数据库存储session无须提供此参数的值
+	 * @param type $name 使用数据库存储session无须提供此参数的值
+	 * @return boolean  使用数据库存储session 直接返回真值
+	 */
+	public static function open($path,$name){	return true; }
+	
+	/**
+	 * 关闭session 使用数据库存储session时直接返回真
+	 * @return boolean
+	 */
+	public static function close()	{	return true;	}
+
+	/**
+	 *读取session表中当前用户的信息 
+	 * @param string $PHPSESSID  session id  PHP自动处理无须传递
+	 * @return string   返回有效的session id文本段
+	 */
+	public static function read($PHPSESSID)
+	{
+		$SQL = 'SELECT mme,cip,txt FROM mall_system_session WHERE sid=?';
+		$stmt = self::$handler->prepare($SQL);
+		$stmt->execute(array($PHPSESSID)); //参数绑定并执行SQL
+		//如果没有获取到此 session id的相关记录，则返回空
+		if( !$row = $stmt->fetch(PDO::FETCH_ASSOC)) {	return '';	 }
+		if( self::$ip != $row['cip']) //判断当前客户端的ip是否与记录的ip相同，如果不同则销毁它 客户端可能更改了ip
+		{ 
+			self::destroy($PHPSESSID); 
+			return ''; //返回空值
+		}
+		//当前session id的修改时间加上生存时间是否大于当前时间，如果大于当前时间则销毁此记录并返回空值
+		if($row['mme'] + self::$lifetime < self::$time) 
+		{
+			self::destroy($PHPSESSID);
+			return '';
+		}
+		return $row['txt'];
+	}
+
+	/**
+	 * 写入session到数据表中
+	 * @param type $PHPSESSID  写入的 session id
+	 * @param type $data  写入的自定义内容 
+	 */
+	public static function write($PHPSESSID,$data)
+	{
+		$SQL = 'SELECT mme,cip,txt FROM mall_system_session WHERE sid=?';
+		$stmt = self::$handler->prepare($SQL);
+		$stmt->execute(array($PHPSESSID)); //执行此SQL
+		//以关联数组的形式返回获取的结果为真时
+		if($row = $stmt->fetch(PDO::FETCH_ASSOC))
+		{
+			//用户写入的自定义内容有变化或者在规定的时间间隔内比如30秒就修改此session id的更新时间
+			if($row['txt'] != $data || self::$time > ($row['mme'] + 30))
+			{
+				$updateSQL = 'UPDATE mall_system_session SET mme=?,txt=? WHERE sid=?';
+				$stmt = self::$handler->prepare($updateSQL);
+				$stmt->execute(array(self::$time,$data,$PHPSESSID));
+			}
+		//以关联数组的形式返回获取的结果为假时
+		}else
+		{
+			if(!empty($data)) //如果用户提供了写入的内容时插入一条相关记录
+			{ 
+				$insertSQL = 'INSERT INTO mall_system_session(sid,mme,cip,txt,cme)VALUES(?,?,?,?,?)';
+				$stmt = self::$handler->prepare($insertSQL);
+				$stmt->execute(array($PHPSESSID,self::$time,self::$ip,$data,time()));
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 *  销毁session 
+	 * @param string $PHPSESSID 
+	 * @return boolean 
+	 */
+	public static function destroy($PHPSESSID)
+	{
+		$SQL = 'DELETE FROM mall_system_session WHERE sid = ?';
+		$stmt = self::$handler->prepare($SQL);
+		return $stmt->execute(array($PHPSESSID)) ? TRUE : FALSE;
+	}
+	
+	/**
+	 * 回收session的相关记录即过期的session记录
+	 * @param  int $lifetime
+	 * @return boolean
+	 */
+	public static function gc($lifetime)
+	{	
+		$SQL = 'DELETE FROM mall_system_session WHERE mme < ?';
+		$stmt = self::$handler->prepare($SQL);
+		return $stmt->execute(array(self::$time - $lifetime)) ? TRUE : FALSE;
+	}
+}
+
+<?php
+	//header("Content-type:text/html;charset=utf-8");		//设置编码 可能无效
+	date_default_timezone_set('Asia/Urumqi');  //设置时区
+
+	define('RPH' , rtrim($_SERVER['DOCUMENT_ROOT'],'/') . '/');   //定义根路径  
+	define('CPH' , 'multimall/');	 //定义当前路径
+	define('SPH' , RPH . CPH);	 //程序起始路径
+	define('SLIB' , RPH . 'bases/');	 //通用类所在目录
+	define('PLIB' , SPH . 'classes/');	//项目类所在目录
+	define('SYS' , RPH . 'etc/site.ini');	//配置文件所在目录
+	define('SVR' , SLIB . 'etc/servers.ini'); //服务器配置信息文件
+	
+	define('DEMO',FALSE); //是否是演示程序
+	define('TEST' , TRUE);	//是否是测试环境
+	define('PHOST' , TEST ? 'http://v.zhang.com' : 'http://v.zhang.com' ); //定义基本的访问路径和前缀
+	define('BASIC' , PHOST . '/' . CPH);
+	define('_SESSION',SLIB . 'SSN.class.php');  //将session写入数据的自定义函数文件
+	
+	//如果是演示程序或测试环境，打开全部错误提示否则关闭
+	error_reporting( DEMO || TEST ? E_ALL : 0);
+
+	spl_autoload_register('loader'); //注册系统类
+	function loader($class)
+	{
+		//使基目录下的公共类可用
+		if(defined('SLIB') && file_exists(SLIB.$class.'.class.php'))
+		{ 
+			include_once SLIB.$class.'.class.php'; 
+		}
+		//使项目目录下的项目类可用 
+		if(defined('PLIB') && file_exists(PLIB.$class.'.class.php'))
+		{ 
+			include_once PLIB.$class.'.class.php'; 
+		}
+	}
+
