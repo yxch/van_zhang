@@ -185,3 +185,13 @@ class SEN extends DBO
                      'cme'=>'createTime'         );
     }
 }
+
+CREATE TABLE `tb_points_session` (
+  `sid` char(32) NOT NULL,
+  `mme` int(11) DEFAULT NULL COMMENT 'session的修改时间',
+  `cip` char(15) DEFAULT NULL COMMENT '客户端的ipv4的地址',
+  `txt` text COMMENT '用户写入session的自定义内容',
+  `ctt` text COMMENT '其它的基于session id的内容(通常是json格式的)',
+  `cme` int(11) DEFAULT NULL COMMENT '记录创建时间，访问时间',
+  PRIMARY KEY (`sid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
