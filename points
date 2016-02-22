@@ -181,8 +181,7 @@ class SEN extends DBO
                      'mme'=>'modifiedTime',
                      'cip'=>'clientIp',
                      'txt'=>'text',
-					 'inf'=>'content',
+		     'ctt'=>'content',
                      'cme'=>'createTime'         );
     }
 }
-
