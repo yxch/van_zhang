@@ -27,6 +27,25 @@ Love makes all hard hearts gentle.  爱情把一切冷酷的心变得温柔。
 useradd -o -u 0 -g 0 -M -d /root -s /bin/bash vxzhan
 select (@i:=@i+1) as i,post_time from tb_check_price,(select @i:=0) as tt  order by post_time desc; 
 
+session.name = PHPSESSID			//默认session名为PHPSESSID
+session.use_trans_sid = 0			//默认为0 对每个URL启用session名=SID,不建议开启，存在安全问题
+;session.save_path = "/tmp"			//session的保存路径
+session.gc_probability = 1			//
+session.gc_divisor = 1000			//这两个合起来就是启动GC进行管理概率的   
+						  session.gc_probability = 1/session.gc_divisor = 100 等于 百分之一的几率. 
+
+当文件成为垃圾时，要有一百次 启动的机会才会把过期的文件（垃圾回收）。
+session.gc_maxlifetime = 1440			// session的发呆时间，默认1440 成为垃圾 （被回收时间） 单位以秒计算
+
+session.cookie_lifetime = 0			//cookie默认的生命周期，默认为0 （当关闭浏览器时在启动SESSION时就会重新生成
+
+一个新的							  SESSION  如果设置时间，不管是否到设定的时间，都会重新生成
+
+新的SESSION。）
+
+session.save_handler = files			//设置session的处理方式，可以设置user自定义
+session.use_cookies = 1				//sessionid在客户端采用的存储方式，置1代表使用cookie记录客户端的sessionid
+
 
 
 
