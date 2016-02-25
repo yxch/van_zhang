@@ -41,6 +41,13 @@ session.cookie_lifetime = 0			//cookie默认的生命周期，默认为0 （当�
 session.save_handler = files			//设置session的处理方式，可以设置user自定义
 session.use_cookies = 1				//sessionid在客户端采用的存储方式，置1代表使用cookie记录客户端的sessionid
 
+//javascript 的sort用法
+var v = [0,1,5,10,15];
+v.sort(function(v1,v2){
+		return v1 > v2 ? -1 : (v1 == v2 ? 0 : 1);
+});
+console.log(v);
+
 
 
 
