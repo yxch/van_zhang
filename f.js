@@ -1,22 +1,3 @@
-2015-09-18 9:42
-
- <script type="text/javascript">
-        window.onbeforeunload = closed;
-        function closed()
-        {
-            if(document.all){
-                if(event.clientY<0)
-                {
-                    $.post('index.php',{"username":'aaa'},function(r){console.log(r);});
-                    return '';
-                }
-            }else
-            {
-                $.post('index.php',{"username":'aaa'},function(r){console.log(r);});
-                return '';                
-            }
-        }
-</script>
 
 ===============================验证IDC==================================================
 
