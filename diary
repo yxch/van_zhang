@@ -61,6 +61,19 @@ every(),filter(),forEach(),map(),some()是ECMAScript 5为数组添加的迭代�
 reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
 
 
+public static function selected($SQL,$arr,array $opt=[])
+	{
+		$cursor = isset($opt['cursor']) ? $opt['cursor'] : [PDO::ATTR_CURSOR=>PDO::CURSOR_FWDONLY];
+		$fetch = isset($opt['fetch']) ? $opt['fetch'] : PDO::FETCH_ASSOC;
+		$stmt = self::PDO(isset($opt['dbname']) ? $opt['dbname'] : '')->prepare($SQL,$cursor);
+		$dbc = $stmt->execute($arr);
+		if($dbc !== FALSE)
+		{
+			if(isset($opt['one'])){ return $stmt->fetch($fetch); }
+			return $stmt->fetchAll($fetch);
+		}else{ exit( STR::error(implode(' ',$stmt->errorInfo())) ); }
+	}
+
 
 
 
