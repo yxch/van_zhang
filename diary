@@ -44,9 +44,15 @@ session.use_cookies = 1				//sessionid在客户端采用的存储方式，置1�
 //javascript 的sort用法
 var v = [0,1,5,10,15];
 v.sort(function(v1,v2){
-		return v1 > v2 ? -1 : (v1 == v2 ? 0 : 1);
+	return v1 > v2 ? -1 : (v1 == v2 ? 0 : 1);
 });
 console.log(v);
+数组的操作方法：
+concat
+var colors = ['red','green','blue'];
+var colors2 = colors.concat('yellow',['black','brown']);   ===> red,green,blue,yellow,black,brown
+
+
 
 
 
