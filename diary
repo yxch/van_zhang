@@ -55,6 +55,8 @@ var colors2 = colors.concat('yellow',['black','brown']);   ===> red,green,blue,y
 slice 方法
 splice方法
 
+indexOf()和 lastIndexOf()是ECMAScript 5为数组添加的两个方法
+
 
 
 
