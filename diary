@@ -61,6 +61,17 @@ every(),filter(),forEach(),map(),some()是ECMAScript 5为数组添加的迭代�
 reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
 
 
+ //error提示
+  public static function error($error)
+  {
+	  return '<div style="width:80%;height:80px;border:2px solid red;text-align:center;margin:10% auto;">
+			<p style="">
+			<img src="/points/usr/local/images/error.png" style="vertical-align:middle;"  />
+			<label style="vertical-align:middle;font-size:22px;color:red;margin-left:2%;font-weight:bold;">ERROR</label>
+			</p><p>' . $error . '</p></div>';
+  }
+
+
 
 
 
