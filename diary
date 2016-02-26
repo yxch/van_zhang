@@ -61,15 +61,149 @@ every(),filter(),forEach(),map(),some()是ECMAScript 5为数组添加的迭代�
 reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
 
 
- //error提示
+  //error提示
   public static function error($error)
   {
-	  return '<div style="width:80%;height:80px;border:2px solid red;text-align:center;margin:10% auto;">
+	  return '<div style="width:80%;height:auto;border:2px solid red;text-align:center;margin:10% auto;">
 			<p style="">
 			<img src="/points/usr/local/images/error.png" style="vertical-align:middle;"  />
 			<label style="vertical-align:middle;font-size:22px;color:red;margin-left:2%;font-weight:bold;">ERROR</label>
 			</p><p>' . $error . '</p></div>';
   }
+  
+  
+  /**
+	 * 执行一条查询语句 
+	 * @param string $SQL  请在SQL中使用参数替代方式来尽量避免SQL注入行为
+	 * @param array $arr 可以是关联数组，如array(':name'=>'ben').  也可是 索引数组，但请注意参数的顺序 
+	 * @param array $opt 可选项 只能是关联数组 
+	 * cursor键对指定指针移动方向	
+	 * fetch键对指定返回结果的方式如关联数组 对象等  
+	 * dbname键对指定使用的数据库通常使用默认值,除非是连接另外的数据库
+	 * one键对指定仅获取结果集中一个
+	 * @return 布尔值或者指定的返回类型如关联数组 对象等
+	 */
+	public static function selected($SQL,array $arr,array $opt=[])
+	{
+		$cursor = isset($opt['cursor']) ? $opt['cursor'] : [PDO::ATTR_CURSOR=>PDO::CURSOR_FWDONLY];
+		$fetch = isset($opt['fetch']) ? $opt['fetch'] : PDO::FETCH_ASSOC;
+		$stmt = self::PDO(isset($opt['dbname']) ? $opt['dbname'] : '')->prepare($SQL,$cursor);
+		$dbc = $stmt->execute($arr);
+		if($dbc !== FALSE)
+		{
+			if(isset($opt['one'])){ return $stmt->fetch($fetch); }
+			return $stmt->fetchAll($fetch);
+		}else{ 
+			if(defined('TEST') && TEST)
+			{
+				//在测试环境输入错误消息
+				exit( STR::error(implode(' ',$stmt->errorInfo())) );
+			}else{  //在生产环境返回假值
+				return FALSE;
+			}
+		}
+	}
+
+	/**
+	 * 执行一条影响行数的SQL语句,但不包括insert操作，insert操作请使用inserted方法
+	 * @param string $SQL  请在SQL中使用参数替代方式来尽量避免SQL注入行为
+	 * @param array $arr 可以是关联数组，如array(':name'=>'ben').  也可是 索引数组，但请注意参数的顺序
+	 * @param array $opt 可选项 只能是关联数组 
+	 * dbname键对指定使用的数据库通常使用默认值,除非是连接另外的数据库
+	 * @return 布尔值或者整型数据
+	 */
+	public static function modified($SQL,array $arr,array $opt=[])
+	{
+		if(stripos($SQL,'update') !== FALSE || stripos($SQL,'delete') !== FALSE)
+		{
+			$stmt = self::PDO(isset($opt['dbname']) ? $opt['dbname'] : '')->prepare($SQL);
+			$dbc = $stmt->execute($arr);
+			if($dbc !== FALSE)
+			{
+				return $stmt->rowCount();
+			}else{ $error = implode(' ',$stmt->errorInfo());}
+			
+		}else{ $error = ' ONLY ALLOW  UPDATE OR DELETE OPERATION TO BE EXECUTED '; }
+		if(defined('TEST') && TEST)
+		{
+			exit( STR::error($error)); //在测试环境输出错误消息
+		}else{	return FALSE; }
+	}
+
+	/**
+	 * 执行一条插入语句。
+	 * @param string $SQL  请在SQL中使用参数替代方式来尽量避免SQL注入行为
+	 * @param array $arr 可以是关联数组，如array(':name'=>'ben').  也可是 索引数组，但请注意参数的顺序
+	 * @param array $opt 可选项 只能是关联数组 
+	 * dbname键对指定使用的数据库通常使用默认值,除非是连接另外的数据库
+	 * LID键对指定是否获取最后插入的自动增长的序列值
+	 * @return 布尔值或整型数值 
+	 */
+	public static function inserted($SQL,array $arr,array $opt=[])
+	{
+		if(stripos($SQL,'insert into') !== FALSE)
+		{
+			$DBLink = self::PDO(isset($opt['dbname']) ? $opt['dbname'] : '');
+			$stmt = $DBLink -> prepare($SQL);
+			$dbc = $stmt->execute($arr);
+			if($dbc !== FALSE)
+			{
+				return isset($opt['LID']) && $opt['LID'] ? $DBLink->lastInsertId( '_id_seq' ) : $stmt->rowCount();
+			}else{ $error = implode(' ',$stmt->errorInfo());}
+			
+		}else{ $error = 'ONLY ALLOW  INSERT OPERATION TO BE EXECUTED'; }
+		if(defined('TEST') && TEST)
+		{
+			exit( STR::error($error)); //在测试环境输出错误消息
+		}else{	return FALSE; }
+	}
+
+	/**
+	 * 执行一条插入多行的SQL语句
+	 * @param string $SQL  请在SQL中使用参数替代方式来尽量避免SQL注入行为
+	 * @param array $arr 关联数组，如array(':name'=>'ben')
+	 * @param array $opt 可选项 只能是关联数组
+	 * dbname键对指定使用的数据库通常使用默认值,除非是连接另外的数据库
+	 * LID键对指定是否获取最后插入的自动增长的序列值 
+	 * @return 布尔值或整型数值 
+	 */
+	public static function insertsed($SQL,array $arr,array $opt=[])
+	{
+		if(stripos($SQL,'insert into') !== FALSE)
+		{
+			$DBLink = self::PDO(isset($opt['dbname']) ? $opt['dbname'] : '');
+			//组成SQL语句并绑定参数
+			$val = array(); //临时数组用于将多个数组连接成字符串
+			$arrLen = count($arr);
+			$strBindParam = ''; //组成绑定字符串，多个插入
+			for($i=0;$i<$arrLen;$i++)
+			{
+				$strBindParam .= '(';
+				$tmpAr = array();
+				foreach($arr[$i] as $k=>$v)
+				{ 
+					$tmpAr[] = $k . '_' . $i; 
+					$val[$k . '_' . $i] = $v;
+				}
+				$strBindParam .= implode(',',$tmpAr);
+				$strBindParam .= ($i == ($arrLen - 1)) ? ')' : '),';
+			}
+			$stmt = $DBLink->prepare($SQL . $strBindParam); //预处理SQL
+			foreach($val as $x=>$y){ $stmt->bindValue($x,$y); } //参数和值绑定
+			$dbc = $stmt->execute();
+			if($dbc !== FALSE)
+			{
+				return isset($opt['LID']) && $opt['LID'] ? 
+					   $DBLink->lastInsertId( '_id_seq' ) + ($arrLen - 1) : 
+					   $stmt->rowCount();
+			}else{ $error = implode(' ',$stmt->errorInfo()); } 
+				
+		}else{ $error = 'ONLY ALLOW  INSERT OPERATION TO BE EXECUTED'; }
+		if(defined('TEST') && TEST)
+		{
+			exit( STR::error($error)); //在测试环境输出错误消息
+		}else{	return FALSE; }	
+	}
 
 
 
