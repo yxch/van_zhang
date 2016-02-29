@@ -83,6 +83,9 @@ POSTGRESQL下标：如果一个表达式生成一个数组类型的数值，那�
 	(arrayfunction(a,b))[42]
 
 
+POSTGRESQL排序规则表达式，标量子查询，数组构造器，行构造器，。
+
+
   
   
   
