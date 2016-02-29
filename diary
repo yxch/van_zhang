@@ -67,6 +67,22 @@ every(),filter(),forEach(),map(),some()是ECMAScript 5为数组添加的迭代�
 reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
 
 
+POSTGRESQL位置参数：
+
+CREATE FUNCTION dept(text) RETRURNS dept 
+	AS $$ SELECT * FROM dept WHERE name = $1 $$
+	LANGUAGE SQL;
+在函数被调用的时候这里的$1将引用第一个参数
+
+POSTGRESQL下标：如果一个表达式生成一个数组类型的数值，那么我们可以通过下面这样的表达式来提取数组中的元素 
+	expression[subscript]
+	expression[lower_subscript:upper_subscript] 多个相邻的元素（‘数组片断’）
+	mytable.arraycolumn[4]
+	mytable.two_d_column[17][34]
+	$1[10:42]
+	(arrayfunction(a,b))[42]
+
+
   
   
   
