@@ -8,7 +8,7 @@ postgreSQL参考：http://www.postgresql.org/docs/9.5/interactive/index.html
 ************************************************************************************************************
 www.multimall.cn
 
-卖家（vendor）  商品(product)   订单(order)   买家（buyer）  
+卖家（vendor）  商品(wares)   订单(order)   买家（buyer）  
 
 
 
