@@ -93,4 +93,133 @@ POSTGRESQL下标：如果一个表达式生成一个数组类型的数值，那�
 
 POSTGRESQL排序规则表达式，标量子查询，数组构造器，行构造器，。
 
+POSTGRESQL第四章
+常用的数据类型有：用于整数的integer、用于可能为分数的numeric、用于字符串的text、用于日期的date、用于时间的time、用于时间戳的timestamp。
+
+创建表
+CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric
+);
+提示: 如果你创建了许多相互关联的表，那么最好为表和字段选择一致的命名模式。比如，表名字可以统一选择单数或者复数，两种选择都有这样那样的理论家支持。
+DROP TABLE products;  删除一个表,可以使用DROP TABLE IF EXISTS来避免错误消息，不过这并不符合 SQL 标准
+创建缺省值的示例
+CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric DEFAULT 9.99
+);
+CREATE TABLE products (
+    product_no integer DEFAULT nextval('products_product_no_seq'),
+);
+CREATE TABLE products (
+    product_no SERIAL,
+);
+检查约束
+CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric CHECK (price > 0)
+);
+或者给约束定一个名字
+CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric CONSTRAINT positive_price CHECK (price > 0)
+);
+多个检查约束的示例
+CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric CHECK (price > 0),  --字段约束
+    discounted_price numeric CHECK (discounted_price > 0), --字段约束
+    CHECK (price > discounted_price) 或者命名 CONSTRAINT valid_discount CHECK (price > discounted_price)    --表约束
+);
+非空约束
+CREATE TABLE products (
+    product_no integer NOT NULL,
+    name text NOT NULL,
+    price numeric
+);
+一个非空约束总是写成一个字段约束。非空约束在功能上等效于创建一个检查约束 CHECK (column_name IS NOT NULL)，但在PostgreSQL里，创建一个明确的非空约束效率更高。缺点是你不能给它一个明确的名字。
+提示: 在大多数数据库设计里，主要的字段都应该标记为非空。
+
+唯一约束
+CREATE TABLE products (
+    product_no integer UNIQUE,
+    name text,
+    price numeric
+);
+或者
+CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric,
+    UNIQUE (product_no)
+);
+或者多个字段组成唯一约束
+CREATE TABLE example (
+    a integer,
+    b integer,
+    c integer,
+    UNIQUE (a, c)
+);
+可以给唯一约束赋予一个自己定义的名字：（添加一个唯一约束通常会自动在约束中使用的列或一组列上创建一个唯一btree索引。）
+CREATE TABLE products (
+    product_no integer CONSTRAINT must_be_different UNIQUE,
+    name text,
+    price numeric
+);
+通常，如果包含在唯一约束中的那几个字段在表中有多个相同的行，就违反了唯一约束。但是在这种比较中，NULL 被认为是不相等的。这就意味着，在多字段唯一约束的情况下，如果在至少一个字段上出现 NULL ，那么我们还是可以存储同样的这种数据行。这种行为遵循 SQL 标准，但是我们听说其它 SQL 数据库可能不遵循这个标准。因此如果你要开发可移植的程序，那么最好仔细些。
+
+主键约束
+从技术上讲，主键约束只是唯一约束和非空约束的组合。所以，下面两个表定义是等价的： 
+CREATE TABLE products (
+    product_no integer UNIQUE NOT NULL,
+    name text,
+    price numeric
+);
+等价于
+CREATE TABLE products (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+创建多个字段的主键约束示例：
+CREATE TABLE example (
+    a integer,
+    b integer,
+    c integer,
+    PRIMARY KEY (a, c)
+);
+主键表示一个或多个字段的组合可以用于唯一标识表中的数据行。这是定义一个主键的直接结果。请注意：一个唯一约束实际上并不能提供一个唯一标识，因为它不排除 NULL 。这个功能对文档目的和客户应用都很有用。比如，一个可以修改行数值的 GUI 应用可能需要知道一个表的主键才能唯一地标识每一行。
+添加一个主键将会在主键使用的列或一组列中自动创建一个唯一btree索引。
+一个表最多可以有一个主键(但是它可以有多个唯一和非空约束)。关系型数据库理论告诉我们，每个表都必须有一个主键。PostgreSQL并不强制这个规则，但我们最好还是遵循它。
+
+外键约束
+外键约束声明一个字段(或者一组字段)的数值必须匹配另外一个表中出现的数值。我们把这个行为称为两个相关表之间的参照完整性。
+CREATE TABLE products (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+CREATE TABLE orders (
+    order_id integer PRIMARY KEY,
+    product_no integer REFERENCES products (product_no),
+    quantity integer
+);
+也可以写成：
+CREATE TABLE orders (
+    order_id integer PRIMARY KEY,
+    product_no integer REFERENCES products,
+    quantity integer
+); 因为如果缺少字段列表的话，就会引用被引用表的主键。
+
+
+
+
+
+
+
 
