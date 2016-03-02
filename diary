@@ -216,6 +216,7 @@ CREATE TABLE orders (
     quantity integer
 ); 因为如果缺少字段列表的话，就会引用被引用表的主键。
 
+javascript中函数声明和函数表达式有什么不同？
 
 
 
