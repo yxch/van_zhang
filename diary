@@ -68,6 +68,7 @@ curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookie.txt');
 curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 $result = curl_exec($ch);
 
+2.通过fsockopen. 
 
 $URL=‘http://xxx.xxx.xxx.xx/xx/xxx/top.php';
 $post_data['clientname'] = "test08";
