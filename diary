@@ -9,6 +9,115 @@ http://test.cignacmb.com/campaign/lby/images/png.zip
 
 postgreSQL参考：http://www.postgresql.org/docs/9.5/interactive/index.html
 
+
+要: fsockopen()函数的作用是可以用来打开一个socket连接，另一个函数pfsockopen()也有相似的功能，只不过后者是一个“持续”(persistent)的fsockopen()函数，它在脚本运行完之后并不立即断开。
+
+一、
+第一步 
+找到php.ini文件，用记事本打开，查找 allow_url_fopen = 看看后面是 off  还on， 如果是on，直接看下一步，如果是off 那就修改成on，需要注意完整的是allow_url_fopen = on等号的左右有空格。
+allow_url_fopen = on
+第二步
+继续在php.ini文件中，查找，查找extension=php_openssl.dll  找到以后大家注意，extension=php_openssl.dll这段代码前面会有个 ; 号，只要把这个 ; 号删除，然后保存。 
+extension=php_openssl.dll
+第三步
+如果是IIS 就重启IIS
+如果是apache 就重启apache
+
+二、
+fsockopen()函数以Socket模拟HTTP协议(POST) 
+可以进行类似真实的http操作，可用于采集，群发论坛发帖等等。。。
+ 
+ 
+fsockopen()函数的作用是可以用来打开一个socket连接，另一个函数pfsockopen()也有相似的功能，只不过后者是一个“持续”(persistent)的fsockopen()函数，它在脚本运行完之后并不立即断开。
+fsockopen()函数存在着比较大的安全问题，比如曾经就被黑客用来进行PHPDDOS攻击，因此很多主机提供商禁用了这个函数。
+那么如何知道自己的主机提供商有没有禁用这个函数呢？
+我们可以在任意一个网站目录下新建一个.php文件，在其中输入如下代码：
+<?php
+echo phpinfo();
+?>
+保存之后再在浏览器中访问该页面，可看到页面中呈现的是当前PHP的配置信息，按Ctrl+F搜索allow_url_fopen或disable_functions，可以看到如下图所示：
+
+在allow_url_fopen那一栏中，如果值为On，并且disable_functions这个禁用函数列表中没有fsockopen函数时，则表明fsockopen()函数是可以使用的，否则fsockopen()函数可能就被禁用了。
+那如何才能启用或禁用这个函数呢？
+我们需要找到php.ini这个PHP配置文件，如果需要禁用，则需在其中进行如下修改：
+1.将allow_url_fopen=On修改成allow_url_fopen=Off
+2.在disable_functions=后添加fsockopen
+如果需要启用，则只需进行相反操作。
+
+php 模拟POST提交的2种方法 
+1.通过curl函数 
+ 
+ 
+$post_data = array();
+$post_data['clientname'] = "test08";
+$post_data['clientpasswd'] = "test08";
+$post_data['submit'] = "submit";
+$url='http://xxx.xxx.xxx.xx/xx/xxx/top.php';
+$o="";
+foreach ($post_data as $k=>$v)
+{
+    $o.= "$k=".urlencode($v)."&";
+}
+$post_data=substr($o,0,-1);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_HEADER, 0);
+curl_setopt($ch, CURLOPT_URL,$url);
+//为了支持cookie
+curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookie.txt');
+curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+$result = curl_exec($ch);
+
+
+$URL=‘http://xxx.xxx.xxx.xx/xx/xxx/top.php';
+$post_data['clientname'] = "test08";
+$post_data['clientpasswd'] = "test08";
+$post_data['submit'] = "ログイン";
+$referrer="";
+// parsing the given URL
+$URL_Info=parse_url($URL);
+// Building referrer
+if($referrer=="") // if not given use this script as referrer
+$referrer=$_SERVER["SCRIPT_URI"];
+ 
+// making string from $data
+foreach($post_data as $key=>$value)
+$values[]="$key=".urlencode($value);
+ 
+$data_string=implode("&",$values);
+// Find out which port is needed - if not given use standard (=80)
+if(!isset($URL_Info["port"]))
+$URL_Info["port"]=80;
+// building POST-request:
+$request.="POST ".$URL_Info["path"]." HTTP/1.1\n";
+$request.="Host: ".$URL_Info["host"]."\n";
+$request.="Referer: $referrer\n";
+$request.="Content-type: application/x-www-form-urlencoded\n";
+$request.="Content-length: ".strlen($data_string)."\n";
+$request.="Connection: close\n";
+$request.="\n";
+$request.=$data_string."\n";
+$fp = fsockopen($URL_Info["host"],$URL_Info["port"]);
+fputs($fp, $request);
+while(!feof($fp)) {
+    $result .= fgets($fp, 128);
+}
+fclose($fp);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ************************************************************************************************************
 www.multimall.cn
 
