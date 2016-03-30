@@ -1,9 +1,63 @@
 
 ============================================================sublime==================================================
 
+2015-09-18
+
+sublime text
+1.emmet
+2.jquery
+3.sublime prefixer
+4.JS Format
+5.SublimeLinter
+6.sublime codeIntel (这个安装时间会很长 或者不要安装)
+7.bracket Highlighter
+8.phpcs
+9.alignment     (触发快捷：ctrl + alt + a)
+10. sublimeREPL
+11.DocBlockr
+12.FTPSync(可选项)
+13.colorpicker  ctrl+shift+c
+14.sidebarenhancements
+
+15. WebInspector
+在 JavaScript调试方面，这是一个令人惊讶的工具，Sublime上的完整的代码检查工具。
+功能：使用绝对路径储存在用户设置中的项目断点，控制台，分步和断点调试器，栈追踪。
+这些都能够很棒的工作！而且Mozilla还提供了一个插件Fireplay让你连接到Firefox 开发工具和最简单的调试器JSHint
 
 
+自定义颜色
+生成自定义颜色的地址是:  http://tmtheme-editor.herokuapp.com/    生成好之后可以保存下来.
+Sublime Text 2 和 Sublime Text 3都支持
 
+把生成的文件放到安装目录的:Data\Packages\Color Scheme - Default文件夹下就可以了.
+
+我的submline设置：
+
+{
+	"color_scheme": "Packages/User/SublimeLinter/van_zhang.tmTheme",
+	"font_face": "Simplified Arabic Fixed",
+	"font_face": "Microsoft YaHei",
+	"font_size": 12,
+	"ignored_packages":
+	[
+	],
+	"update_check": false,
+	"word_wrap": "auto",
+	"fade_fold_buttons": false,
+	"show_encoding": true,
+	"trim_trailing_white_space_on_save": true,
+	"show_full_path": true,
+	"bold_folder_labels": true,
+	"line_padding_bottom": 2,
+	"line_padding_top": 2
+}
+
+快捷键
+convertToUTF8和ColorPicker快捷键会产生冲突，convertoUTF8的默认转换GBK的快捷键 和 ColorPicker打开调色板的快捷键都是ctrl+shift+c 。
+如果两个插件都安装了的话，就需要进行自定义了.
+解决方法：打开Sublime Text --> Preferences --> Browse Packages，找到ConvertToUTF8文件夹并进入，
+找到对应操作系统的Default.sublime-keymap文件，
+直接修改成 [ { "keys": ["ctrl+shift++alt+c"], "command": "convert_to_utf8", "args": {"encoding": "GBK", "stamp": "0" } } 
 
 ============================================================vi======================================================
 vi filename 
