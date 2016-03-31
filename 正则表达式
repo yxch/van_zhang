@@ -1,0 +1,23 @@
+
+//正则表达式匹配img标签
+/<img[^>]*?>.*?<\/>/si
+/<img(.*)src=\"([^\"]+)\"[^>]+>/isU
+
+//手机号码匹配正则表达式  推荐使用函数处理
+var regx = /^(13[0-9]|147|145|15[0-9]|17[0-9]|18[0-9])\d{8}$/;  
+return regx.test($('#mobile').val());
+
+str.replace(/^\s*/g,"");  //去除str左侧空格
+str.replace(/\s*$/g,"");  //去除str右侧空格
+str.replace(/(^\s*)|(\s*$)/g, "");  //去除两端的空格
+str.replace(/\s/g,'');  //去除中间的空格
+
+var reg=/^[0-9]*$/; return reg.test(str); //匹配整数  推荐使用函数处理
+var reg=/^(-|\+)?\d+$/;  return reg.test(str); //验证是否为整数，包括正负数；
+var reg=/^\d+$/;  return reg.test(str); //是大于0的整数
+var reg=/^-\d+$/; return reg.test(str); //负整数的验证
+var check_float =new RegExp("^[1-9][0-9]*\.[0-9]+$"); return check_float.exec(str); //为浮点数（正数）
+var reg=/^[0-9]{3,4}\-\d{7,8}(\(\d{1,6}\))?$/; return reg.test(str); //是否为固定电话，区号3到4位，号码7到8位,区号和号码用"－"分割开，转接号码为1到6位，用小括号括起来紧跟在号码后面
+var reg=/^[\u0391-\uFFE5]+$/; return reg.test(str); //验证是否为中文
+var reg=/^[1-9]\d{4,9}$/; return reg.test(str); //验证是否为qq号码，长度为5－10位
+var reg=/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/; return reg.test(str); //验证邮件地址
