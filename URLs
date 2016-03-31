@@ -3,7 +3,8 @@
 	
 	http://layer.layui.com/api.html  layer文档
 	
-	http://www.expressjs.com.cn/4x/api.html   nodejs express 4.x中文手册
+	http://www.expressjs.com.cn/4x/api.html 			   nodejs express 4.x中文手册
+	https://nodejs.org/dist/latest-v5.x/docs/api/documentation.html    nodejs 5.x API
         
         
         json在线解析   http://json.parser.online.fr/
