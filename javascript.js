@@ -266,10 +266,8 @@ String.prototype.trim = String.prototype.trim || function(){
  String.prototype.empty = function(){
     return this == '' || this == ' ' || typeof(this) == 'undefined';
  };
- /**
-  * 解释url
-  * 以对象的形式返回
-  * /
+
+// 解释url 以对象的形式返回
 String.prototype.parseURL = function()
 {
 	if(this.empty()){ return null; }
