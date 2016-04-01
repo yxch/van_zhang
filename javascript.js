@@ -259,9 +259,30 @@ String.prototype.trim = String.prototype.trim || function(){
     if(!this) return this;  //空字符串不做处理
     return this.replace(/^\s+|\s+$/g,''); //使用正则表达式进行空空格替换
 };
+
  String.prototype.empty = function(){
     return this == '' || this == ' ' || typeof(this) == 'undefined';
  };
+ /**
+  * 解释url
+  * 以对象的形式返回
+  * /
+String.prototype.parseURL = function()
+{
+	if(this.empty()){ return null; }
+	var o = new Object();
+	if(this.indexOf('?') != -1)
+	{
+		var splits = this.split('?'); 
+		o.href = splits[0];
+		var ar = splits[1].split('&');
+		for(var i=0; i<ar.length; i++) 
+		{ 
+			o[ar[i].split("=")[0]] = decodeURIComponent(ar[i].split("=")[1]);
+		}
+	}
+	return o;
+};
 
 //检查字符串是否全为中文
 function isChinese(str){  var reg=/^[\u0391-\uFFE5]+$/;   return reg.test(str);  };
