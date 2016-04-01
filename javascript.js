@@ -285,6 +285,46 @@ String.prototype.parseURL = function()
 	return o;
 };
 
+//验证身 份 证
+String.prototype.IDC = function()
+{
+	var O = {"status":0,"province":'',"age":0,"days":0,"birthday":'',"gender":''};
+	if(this == '' || this == ' '){ return O; }
+	var ar = this.split('');
+	if(ar.length != 18) { return O; } //第二代身份证长度为18位
+	//检查第18位 第18位要么是数字要么是x|X
+	var bits = ['0','1','2','3','4','5','6','7','8','9','x','X'];
+	var bit18 = 0;
+	for(var i=0,len=bits.length;i<len;i++){ if(ar[17] == bits[i]){ bit18 = 1; }}
+	if (bit18 == 0) { return O; }
+	//检查身份证所在区域是否合法
+	var cities = {11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",
+                  23:"黑龙江",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",
+                  37:"山东",41:"河南",42:"湖北",43:"湖南",44:"广东",45:"广西",46:"海南",
+                  50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏",61:"陕西",62:"甘肃",
+                  63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外"		};
+	var region = parseInt(this.substr(0,2),10); 
+	O.province = cities[region];
+	if (O.province == null || O.province == 'undefined') { return O; }
+	//检查出生日期
+	var birthday = Number(this.substr(6,4)) + "/" + Number(this.substr(10,2)) + "/" + Number(this.substr(12,2));
+	var d = new Date(birthday);
+	if(birthday != (d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate())){ O.province = '';	return O;	}
+	O.birthday = birthday;
+	//校验规则 如果第18位是X|x则替换成a
+	var iSum = 0,id = this;
+	if (ar[17] == 'x' || ar[17] == 'X' ){ id = id.substr(0,17) + 'a'; }
+	for(var i=17;i>=0;i--){ iSum += (Math.pow(2,i) % 11) * parseInt(id.charAt(17 - i),11); }
+	if(iSum % 11 != 1){	O.province = '';	O.birthday = '';	return O; }
+	O.status = 1;
+	O.gender = ar[16] % 2 == 0 ? '女' : '男';
+	O.age = parseInt(new Date().getFullYear()) - parseInt(d.getFullYear());  //计算年龄 非精确
+	//计算出生日期距离现在的天数
+	O.days = parseInt(((parseInt(new Date().getTime() / 1000)) - (parseInt(new Date(birthday).getTime() / 1000))) / (24 * 60 * 60));
+	return O;//返回结果集				
+};
+//示 例：console.log('22010120050801215X'.IDC());
+
 //检查字符串是否全为中文
 function isChinese(str){  var reg=/^[\u0391-\uFFE5]+$/;   return reg.test(str);  };
 
@@ -403,62 +443,3 @@ function delCookie(name)
 	if(cval){ document.cookie = name + "=" + cval +";expires="+exp.toGMTString(); }
 }
 =========================================================操作cookie结束==================================================
-
-=========================================================验证身份证开始==================================================
-//定义身份证验证及相关信息获取的函数
-function IDC(id)
-{
-    var ck = 1;
-    if (!id){ ck = 0; }  //如果没有提供id
-    var cities = {11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",
-                  23:"黑龙江",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",
-                  37:"山东",41:"河南",42:"湖北",43:"湖南",44:"广东",45:"广西",46:"海南",
-                  50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏",61:"陕西",62:"甘肃",
-                  63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外"		};
-    var ar = id.split('');
-    if (ar.length != 18) { ck = 0; } //第二代身份证长度为18位
-    //检查第18位 第18位要么是数字要么是x|X
-    var bits = ['0','1','2','3','4','5','6','7','8','9','x','X'];
-    var isInBits = false;
-    for(var i=0,len=bits.length;i<len;i++){ if(ar[17] == bits[i]){ isInBits = true; }}
-    if (!isInBits) { ck = 0; }
-    //检查身份证所在区域是否合法
-    var region = parseInt(id.substr(0,2),10); 
-    if (cities[region] == null || cities[region] == 'undefined') { ck = 0; }
-    //检查出生日期
-    var sBirthday = id.substr(6,4)+"/" + Number(id.substr(10,2)) + "/" + Number(id.substr(12,2));
-    var d = new Date(sBirthday);
-    if(sBirthday != (d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate())){ ck = 0; }
-    //校验规则 如果第18位是X|x则替换成a
-    var iSum = 0;
-    if (ar[17] == 'x' || ar[17] == 'X' ){ id = id.substr(0,17) + 'a'; }
-    for(var i=17;i>=0;i--){ iSum += (Math.pow(2,i) % 11) * parseInt(id.charAt(17 - i),11); }
-    if(iSum % 11 != 1){ ck = 0; }
-    
-    //返回结果
-    var obj = new Object();
-    //校验是否通过 返回真或者假
-    obj.verified = function (){ return ck == 1; }
-    //返回出生日期
-    obj.birthday = function(){ return ck == 1 ? sBirthday : null;}
-    //获取性别 返回 F(女) 或者M(男) (第二代身份证的倒数第二位数表示性别，单数为男性，双数为女性。)
-    obj.gender = function(){  if(ck ==1){ return ar[16] % 2 == 0 ? 'F' : 'M'; }else{ return null; } }
-    //返回省份名称
-    obj.province = function(){ return ck ==1 ? cities[region] : null; }
-    //返回年龄 非精确
-    obj.ages = function(){ return ck == 1 ? parseInt(new Date().getFullYear()) - parseInt(d.getFullYear()) : null; }
-    //返回出生日期距离现在的天数
-    obj.days = function()
-    {
-        if (ck == 1)
-        {
-            var time = parseInt(new Date().getTime() / 1000);
-            var iTime = parseInt(new Date(sBirthday).getTime() / 1000);
-            return parseInt((time - iTime) / (24 * 60 * 60));
-        
-        }else{ return null; }        
-    }
-    return obj;
-}
-=========================================================验证身份证结束==================================================
-
