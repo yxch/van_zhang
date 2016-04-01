@@ -1,37 +1,6 @@
 
-===============================验证IDC==================================================
 
-//检验身份证
-    function isIdCard(idnumber)
-    {
-        var isRight = 0;
-        if (idnumber == "" || idnumber == "undefined")
-        {
-            isRight = 1;
-        }else
-        { 
-            var flag=true;
-            var iSum=0 ;
-            var aCity={11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外"};
-            if(!/^\d{17}(\d|x)$/i.test(idnumber)) flag=false; 
-            idnumber=idnumber.replace(/x$/i,"a"); 
-            if(aCity[parseInt(idnumber.substr(0,2),10)]==null) flag=false; 
-            var sBirthday=idnumber.substr(6,4)+"-"+Number(idnumber.substr(10,2))+"-"+Number(idnumber.substr(12,2)); 
-            var d=new Date(sBirthday.replace(/-/g,"/")) ;
-            if(sBirthday!=(d.getFullYear()+"-"+ (d.getMonth()+1) + "-" + d.getDate()))flag=false; 
-            for(var i = 17;i>=0;i --) iSum += (Math.pow(2,i) % 11) * parseInt(idnumber.charAt(17 - i),11) ;
-            if(iSum%11!=1) flag=false; 
-            if(!flag){
-                isRight = 2;
-            }
-        }
-        return isRight;
-    }
-
-===============================验证IDC==================================================
-
- 
- ===============================时间对象==================================================  
+=========================================================时间对象开始====================================================
     
     /**
     * 时间对象的格式化;
@@ -88,7 +57,7 @@
         return parseInt((eTime.getTime() - sTime.getTime()) / parseInt(divNum));
     }
     
-  ===============================时间对象==================================================     
+=========================================================时间对象结束====================================================  
 
 //javascript中定义类的步骤
 1.先定义一个构造函数，并设置初始化新对象的实例属性。
@@ -239,7 +208,7 @@ isNaN()    如果参数是NaN或者是一个非数字值（比如字符串和对
 isFinite() 参数不是NaN Infinity 或 -Infinity的时候返回true
 
 
-/*--------------------可选函数----------------------------*/
+=========================================================常用函数开始====================================================
 
 //定义并调用一个函数来确定当前脚本运行时是否为严格模式
 <script>
@@ -263,9 +232,6 @@ function isFunction(f){ return Object.prototype.toString.call(x) === "[object Fu
 
 //返回数组的一部分或全部
 function sliceArr(a,n){ return Array.prototype.slice.call(a,n||0); }
-
-/*--------------------f.js文件的全部内容------------------*/
-
 
 //判断是否为空的函数
 function empty(x)
@@ -336,17 +302,10 @@ function isMobile(str)
 }
 
 //在数据中查找指定值的索引
-Array.prototype.indexOf = function(val)
-{
-    for(var i=0;i<this.length;i++){ if(this[i] == val) return i;}
-};
+Array.prototype.indexOf = function(val){ for(var i=0;i<this.length;i++){ if(this[i] == val) return i;} };
 
 //移除数组中指定值的元素并重复生成索引
-Array.prototype.remove = function(val)
-{
-    var index = this.indexOf(val);
-    if (index > -1) { this.splice(index,1);}
-};
+Array.prototype.remove = function(val){ var index = this.indexOf(val); if (index > -1) { this.splice(index,1);} };
 
 //定义去除数组重复值的函数
 function unique(ar)
@@ -378,104 +337,67 @@ function random(min,max)
 
 Array.prototype.random = function(start)
 {
-   var min = parseInt(start) || 0;
-   if (min > this.length - 1) { return ''; }
-   var max = this.length - 1;
+   var min = parseInt(start) || 0, max = this.length - 1;
+   if (min > max) { return ''; }
    return this[parseInt(Math.random() * (max - min + 1) + min)];
 }
 
-//由name操作属性
-function byName(name,tag)
+/使用对象的方式获取URL参数的值返回一个对象
+function myURL()
 {
-    //得到对象 结果为对象数组(兼容ie5之后的版本)
-    var r = document.getElementsByName(name);
-    var my = [];
-    if (r.length > 0)
+    var obj = new Object();
+    obj.search = window.location.search; //查询（参数）部分
+    if (obj.search.indexOf("?") != -1)
     {
-        for (var i = 0; i < r.length; i++){  my[my.length] = r[i]; } 
-    }else
-    {
-        var r = document.getElementsByTagName(tag);
-        if (r.length > 0){ for (var i = 0; i < r.length; i++){  if(r[i].getAttribute("name") == name){  my[my.length] = r[i]; }  } }
+        var str = obj.search.substr(1);
+        strs = str.split("&");
+        for(var i=0; i<strs.length; i++) { obj[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]); }
     }
-    var o = new Object();
-    
-    //得到对象 某一个对象list(i)或者全部对象数组all
-    o.list = function(i){ return parseInt(i) < r.length ? my[i] : new Object(); }
-    o.all = function (){ return my;}
-    
-    //获取值 返回的是数组。注意对结果的处理
-    o.val = function(attribute)
-    {
-        var ar = [];
-        var attr = attribute || 'value';
-        for(var j=0;j<my.length;j++)
-        {
-            if(my[j].type && (my[j].type == 'radio' || my[j].type == 'checkbox')){  if(my[j].checked) ar.push(my[j][attr]);}
-            else if(my[j].type && my[j].type == 'text'){ ar.push(my[j][attr]);}
-            else{ if(my[j].getAttribute(attr)) ar.push(my[j].getAttribute(attr));}
-        }
-        return  my.length == 1 ? ar[0] : ar;
-    };
-    
-    //设置值
-    o.set = function(value,attribute,index)
-    {
-        var attr = attribute || 'value';
-        for(var j=0;j<my.length;j++)
-        {
-            if(my[j].getAttribute(attr))
-            {
-                var i = index && parseInt(index) ? parseInt(index) : 0;
-                if(i < r.length){ if(i == j) my[j].setAttribute(attr,value); }else{ my[j].setAttribute(attr,value); }
-            }
-        }
-    };
-    
-    //设置选中
-    o.checked = function(i){ for(var j=0;j<my.length;j++){ if((my[j].type && my[j].type == 'radio' || my[i].type == 'checkbox') && j == i && !my[j].checked) my[j].checked = true; } };
-    
-    //checkbox的状态
-    o.checkedAll = function(){for(var j=0;j<my.length;j++){ if(my[j].type && my[j].type == 'checkbox' && !my[j].checked) my[j].checked = true; } };
-    o.checkedNot = function(){for(var j=0;j<my.length;j++){ if(my[j].type && my[j].type == 'checkbox' && my[j].checked) my[j].checked = false; } };
-    o.checkedTog = function(){for(var j=0;j<my.length;j++){ if(my[j].type && my[j].type == 'checkbox') my[j].checked ? my[j].checked = false : my[j].checked = true; } };
-    return o;
+    return obj;
 }
 
-//操作cookie 设置cookie
-function setCookie(name,value,days)
+
+
+=========================================================常用函数结束====================================================
+
+=========================================================操作cookie开始==================================================
+//设置cookie
+function setCookie(c_name, value, expiredays,path)
 {
-    var date = new Date();
-	var d = days || 1;
-    date.setDate(date.getDate() + d);
-    document.cookie = name + "=" + escape(value) + "; expires=" + date.toGMTString();// + "; path="+location.pathname
+ 	var exdate=new Date();
+　　exdate.setDate(exdate.getDate() + expiredays);
+	var p = path || '/';
+　　document.cookie = c_name + "=" + escape(value) + ((expiredays==null) ? "" : ";expires=" + exdate.toGMTString()) + ';path=' + p; 　　
+}
+//按照天数来设置cookie的有效时间，如果想以其他单位（如：小时）来设置，改变第三行代码即可
+exdate.setHours(exdate.getHours() + expiredays);
+
+//路径能解决在同一个域下访问 cookie 的问题
+//"www.qq.com" 与 "sports.qq.com" 公用一个关联的域名"qq.com"，
+//如果想让 "sports.qq.com" 下的cookie被 "www.qq.com" 访问，就需要用到 cookie 的domain属性，并且需要把path属性设置为 "/"
+document.cookie = "name=value;path=path;domain=domain"
+document.cookie = "username=Darren;path=/;domain=qq.com"
+
+//读取cookie
+function getCookie(name)
+{
+	var reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+	if(arr=document.cookie.match(reg)){
+		return unescape(arr[2]);
+	}else{return null;	}
 }
 
 //删除cookie
-function delCookie (name){  document.cookie = name + "=;expires=" + (new Date(0)).toGMTString(); }
-
-//获取cookie的值
-function getCookie(name)
+function delCookie(name)
 {
-    var value = '';
-    var search = name + '=';
-    if (document.cookie.length > 0)
-    {
-       offset = document.cookie.indexOf(search);
-       if (offset != -1)
-       {
-            offset += search.length;
-            end = document.cookie.indexOf(';',offset);
-            if (end == -1) { end = document.cookie.length;}
-            value = unescape(document.cookie.substring(offset,end))
-       }
-    }
-    return value;
-    //另外一种方法
-    //ar cookieArray = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
-    //return cookieArray != null ? unescape(cookieArray[2]) : null;
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval = getCookie(name);
+	if(cval){ document.cookie = name + "=" + cval +";expires="+exp.toGMTString(); }
 }
+=========================================================操作cookie结束==================================================
 
+=========================================================验证身份证开始==================================================
 //定义身份证验证及相关信息获取的函数
 function IDC(id)
 {
@@ -527,27 +449,5 @@ function IDC(id)
     }
     return obj;
 }
+=========================================================验证身份证结束==================================================
 
-//使用对象的方式获取URL参数的值返回一个对象
-var href = (function()
-{
-    var obj = new Object();
-    obj.search = window.location.search; //查询（参数）部分
-    var pathname = window.location.pathname.substring(1); 
-    //取得短路径
-    var pathAr = pathname.split('/'); pathAr.length =  pathAr.length - 1;
-    obj.dir = pathAr.join('/'); 
-    //取得文件名
-    obj.filename = obj.dir ? pathname.substring(obj.dir.length + 1) : pathname;
-    //主机名称包括协议部分
-    obj.phost = window.location.protocol + '//' + window.location.host + '/';
-    //路径部分
-    obj.path = obj.phost + (obj.dir ? obj.dir + '/' : '');       
-    if (obj.search.indexOf("?") != -1)
-    {
-      var str = obj.search.substr(1);
-      strs = str.split("&");
-      for(var i=0; i<strs.length; i++) { obj[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]); }
-    }
-    return obj;
-})();
