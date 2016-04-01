@@ -365,22 +365,6 @@ Array.prototype.random = function(start)
    return this[parseInt(Math.random() * (max - min + 1) + min)];
 }
 
-/使用对象的方式获取URL参数的值返回一个对象
-function myURL()
-{
-    var obj = new Object();
-    obj.search = window.location.search; //查询（参数）部分
-    if (obj.search.indexOf("?") != -1)
-    {
-        var str = obj.search.substr(1);
-        strs = str.split("&");
-        for(var i=0; i<strs.length; i++) { obj[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]); }
-    }
-    return obj;
-}
-
-
-
 =========================================================常用函数结束====================================================
 
 =========================================================操作cookie开始==================================================
