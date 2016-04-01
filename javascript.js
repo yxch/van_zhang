@@ -260,7 +260,7 @@ String.prototype.trim = String.prototype.trim || function(){
     return this.replace(/^\s+|\s+$/g,''); //使用正则表达式进行空空格替换
 };
  String.prototype.empty = function(){
-    return this == '' || this == ' ' || typeof(this) == 'undefined';
+    return this == '' || this == ' ' || this == null || typeof(this) == 'undefined';
  };
 
 //检查字符串是否全为中文
