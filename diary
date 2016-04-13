@@ -76,6 +76,11 @@ concat
 var colors = ['red','green','blue'];
 var colors2 = colors.concat('yellow',['black','brown']);   ===> red,green,blue,yellow,black,brown
 
+document.forms  //html文档中全forms节点
+document.images  //html文档中全img节点
+document.getElementById('').getElementByTagName('img')   //获得文档中某个区域的img节点集合
+
+
 slice 方法
 splice方法
 
