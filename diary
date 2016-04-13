@@ -1,15 +1,46 @@
 
 ************************************************************************************************************
-http://test.cignacmb.com/campaign/lby/share/points
-http://test.cignacmb.com/campaign/lby/share/ext
-
-
 
 任务正理：PostgreSQL  PHP模式   EA11
 
 postgreSQL参考：http://www.postgresql.org/docs/9.5/interactive/index.html
 
 http://www.jb51.net/books/387538.html
+
+//javascript 的sort用法
+var v = [0,1,5,10,15];
+v.sort(function(v1,v2){
+	return v1 > v2 ? -1 : (v1 == v2 ? 0 : 1);
+});
+console.log(v);
+数组的操作方法：
+concat
+var colors = ['red','green','blue'];
+var colors2 = colors.concat('yellow',['black','brown']);   ===> red,green,blue,yellow,black,brown
+
+document.forms  //html文档中全forms节点
+document.images  //html文档中全img节点
+document.getElementById('').getElementByTagName('img')   //获得文档中某个区域的img节点集合
+
+
+slice 方法
+splice方法
+
+indexOf()和 lastIndexOf()是ECMAScript 5为数组添加的两个方法
+every(),filter(),forEach(),map(),some()是ECMAScript 5为数组添加的迭代方法
+reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
+
+用a模拟打开新窗口的方法：
+
+<input type="button" id="submit" value="点我有惊喜" />
+<a id="viewer" href="" style="display:none;" target="_blank"><span id="simulate"></span></a>
+	
+<script>
+	$('#submit').click(function(){
+		document.getElementById('viewer').href='http://www.baidu.com/';
+		document.getElementById('simulate').click();
+	});
+</script>
 
 
 
@@ -64,29 +95,6 @@ session.cookie_lifetime = 0			//cookie默认的生命周期，默认为0 （当�
 session.save_handler = files			//设置session的处理方式，可以设置user自定义
 session.use_cookies = 1				//sessionid在客户端采用的存储方式，置1代表使用cookie记录客户端的sessionid
 
-
-//javascript 的sort用法
-var v = [0,1,5,10,15];
-v.sort(function(v1,v2){
-	return v1 > v2 ? -1 : (v1 == v2 ? 0 : 1);
-});
-console.log(v);
-数组的操作方法：
-concat
-var colors = ['red','green','blue'];
-var colors2 = colors.concat('yellow',['black','brown']);   ===> red,green,blue,yellow,black,brown
-
-document.forms  //html文档中全forms节点
-document.images  //html文档中全img节点
-document.getElementById('').getElementByTagName('img')   //获得文档中某个区域的img节点集合
-
-
-slice 方法
-splice方法
-
-indexOf()和 lastIndexOf()是ECMAScript 5为数组添加的两个方法
-every(),filter(),forEach(),map(),some()是ECMAScript 5为数组添加的迭代方法
-reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
 
 
 POSTGRESQL位置参数：
