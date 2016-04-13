@@ -48,11 +48,15 @@ reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
 ************************************************************************************************************
 www.multimall.cn
 
-卖家（vendor）  商品(wares)   订单(order)   买家（buyer）  
+卖家（vendor）  商品(wares)   订单(order)   买家（buyer） 
+
+
+//drupal操作数据库
 
 define('DRUPAL_ROOT', $_SERVER['DOCUMENT_ROOT']);
 require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
+db_set_active('activity');
 
 
 
