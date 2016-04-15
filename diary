@@ -5,6 +5,13 @@
 
 postgreSQL参考：http://www.postgresql.org/docs/9.5/interactive/index.html
 
+"CREATE USER is the same as CREATE ROLE except that it implies LOGIN."
+CREATE USER除了默认具有LOGIN权限之外，其他与CREATE ROLE是完全相同的。
+可以为角色增加登录权限来达到与用户相同的用处
+
+
+
+
 
 
 
