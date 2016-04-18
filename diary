@@ -26,6 +26,112 @@ string.split(正则表达式);  //记住这种用法
 
 
 
+=========================
+修改列[modife 列名]
+=========================
+alter table 表名 modify 列名 新类型 新参数【修改列类型】
+    例：alter table test modify gender char(4) not null default '';
+alter table 表名 change 旧列名 新列名 新类型 新参数【修改列名和列类型】
+    例：alter table test change pid uid int unsigned not null default 0;
+
+
+
+UNIX时间戳转换为日期用函数： FROM_UNIXTIME()		select FROM_UNIXTIME(1156219870);
+
+日期转换为UNIX时间戳用函数： UNIX_TIMESTAMP()		Select UNIX_TIMESTAMP(’2006-11-04 12:23:00′);
+
+例：mysql查询当天的记录数：
+SELECT * FROM message 
+WHERE DATE_FORMAT(FROM_UNIXTIME(chattime),’%Y-%m-%d’) = DATE_FORMAT(NOW(),’%Y-%m-%d’) 
+ORDER BY id desc”;
+
+优化数据类型提高性能的主要在于以下几个方面： 
+1. 通过选用更“小”的数据类型减少存储空间，使查询相同数据需要的IO 资源降低； 
+2. 通过合适的数据类型加速数据的比较
+
+1.添加PRIMARY KEY（主键索引） 
+ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` ) 
+
+2.添加UNIQUE(唯一索引) 
+ALTER TABLE `table_name` ADD UNIQUE ( `column` ) 
+
+3.添加INDEX(普通索引) 
+ALTER TABLE `table_name` ADD INDEX index_name ( `column` ) 
+
+4.添加FULLTEXT(全文索引)  
+ALTER TABLE `table_name` ADD FULLTEXT ( `column`) 
+
+5.添加多列索引  
+ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+
+查看索引  
+SHOW INDEX FROM tblname; 
+SHOW KEYS FROM tblname;
+
+删除索引
+
+可利用ALTER TABLE或DROP INDEX语句来删除索引。类似于CREATE INDEX语句，DROP INDEX可以在ALTER TABLE内部作为一条语句处理，语法如
+
+下。
+
+DROP INDEX index_name ON talbe_name
+
+ALTER TABLE table_name DROP INDEX index_name
+
+ALTER TABLE table_name DROP PRIMARY KEY
+
+其中，前两条语句是等价的，删除掉table_name中的索引index_name。
+第3条语句只在删除PRIMARY KEY索引时使用，因为一个表只可能有一个PRIMARY KEY索引，因此不需要指定索引名。
+如果没有创建PRIMARY KEY索引，但表具有一个或多个UNIQUE索引，则MySQL将删除第一个UNIQUE索引。
+如果从表中删除了某列，则索引会受到影响。对于多列组合的索引，如果删除其中的某列，则该列也会从索引中删除。
+如果删除组成索引的所有列，则整个索引将被删除。
+
+ALTER TABLE table_name AUTO_INCREMENT=n
+
+
+函数：FROM_UNIXTIME
+作用：将MYSQL中以INT(11)存储的时间以"YYYY-MM-DD"格式来显示。
+语法：FROM_UNIXTIME(unix_timestamp,format) 
+返回表示 Unix 时间标记的一个字符串，根据format字符串格式化。format可以包含与DATE_FORMAT()函数列出的条目同样的修饰符。 
+根据format字符串格式化date值。
+下列修饰符可以被用在format字符串中： 
+%M 月名字(January……December)
+%W 星期名字(Sunday……Saturday)
+%D 有英语前缀的月份的日期(1st, 2nd, 3rd, 等等。）
+%Y 年, 数字, 4 位
+%y 年, 数字, 2 位
+%a 缩写的星期名字(Sun……Sat)
+%d 月份中的天数, 数字(00……31)
+%e 月份中的天数, 数字(0……31)
+%m 月, 数字(01……12)
+%c 月, 数字(1……12)
+%b 缩写的月份名字(Jan……Dec)
+%j 一年中的天数(001……366)
+%H 小时(00……23)
+%k 小时(0……23)
+%h 小时(01……12)
+%I 小时(01……12)
+%l 小时(1……12)
+%i 分钟, 数字(00……59)
+%r 时间,12 小时(hh:mm:ss [AP]M)
+%T 时间,24 小时(hh:mm:ss)
+%S 秒(00……59)
+%s 秒(00……59)
+%p AM或PM
+%w 一个星期中的天数(0=Sunday ……6=Saturday ）
+%U 星期(0……52), 这里星期天是星期的第一天
+%u 星期(0……52), 这里星期一是星期的第一天
+%% 一个文字“%”。
+ 
+例子：
+SELECT FROM_UNIXTIME(1234567890, '%Y-%m-%d %H:%i:%S') 
+SELECT *,FROM_UNIXTIME(created, '%Y-%m-%d') as riqi FROM `rc_ms_users`
+
+
+
+
+
+
 
 
 
