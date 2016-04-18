@@ -19,6 +19,8 @@ document.createElement(),document.createTextNode();
 在技术上，打字时，完整的回车包含一行换行符（另起一行）和一个回车符（将回车移动到最左边）。虽然JavaScript字符串将换行(\n)作为完整的回车符
 ，但要组合一个字符串以返回给服务器上的cgi脚本 ，应用使用\r\n,其格式取决于cgi程序的字符串解析能力
 
+string.split(正则表达式);  //记住这种用法
+
 
 
 
