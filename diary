@@ -9,6 +9,17 @@ postgreSQL参考：http://www.postgresql.org/docs/9.5/interactive/index.html
 CREATE USER除了默认具有LOGIN权限之外，其他与CREATE ROLE是完全相同的。
 可以为角色增加登录权限来达到与用户相同的用处
 
+function byId(id){	return document.getElementById(id);	}
+byId('link').className = 'light';  //这种写法是可行的
+document.createElement(),document.createTextNode();
+
+注意：过度使用加值操作符，会大大降低大量文本的处理效率。在组合大字符串是时，如果性能很低，可将字符串段放到数组项中，然后使用数组的join()
+方法生成最终的大字符串值。
+
+在技术上，打字时，完整的回车包含一行换行符（另起一行）和一个回车符（将回车移动到最左边）。虽然JavaScript字符串将换行(\n)作为完整的回车符
+，但要组合一个字符串以返回给服务器上的cgi脚本 ，应用使用\r\n,其格式取决于cgi程序的字符串解析能力
+
+
 
 
 
