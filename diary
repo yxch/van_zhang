@@ -3,25 +3,7 @@
 
 任务正理：PostgreSQL  PHP模式   EA11
 
-创建SASS工程
-创建定制化的compass工程（在命令行切换到需要创建工程的目录后执行命令）
-compass create--bare -sass-dir "sass" -css-dir "css" -javascript-dir "js" -images-dir "images"
-引号内就是你要创建工程的目录名称，如果你要创建默认工程，只需要切换到指定目录后执行如下命令: compass create
-对config.rb文件进行修改后，特别是修改了输出风格后，需要在效果更改前清理.sass-cache。可以手动删除，也可以使用命令:
-copass clean
-如果使用命令行来监控工程的变化，必须运行命令再次启用监控：compass watch
-创建和使用模块文件
-1.在工程的Sass文件夹下，创建一个名为partials文件夹。在此文件夹下创建一个_normalize.scss文件，注意一定要有下划线开头.如果没有下划线sass和compass会认为该文件在保存时需要编译。
-2.找到一些标准化下样式，http://necolas.github.com/normalize.css 或者 https://github.com/kristerkari/normalize.scss	
-使用标准化的好处有很多，可以轻松关闭对IE等旧版本浏览的支持功能等 。将内容粘贴到partials/_normalize.scss文件下并保存就可以了
-3.在要使用模块文件的前面加上：
-   @import "compass";
-   @import "partials/normalize";
-4.如果要使用变量,可以使用变量模块文件来统一定义变量，创建partials/_variables.scss
-   @import "compass";
-   @import "partials/variables";
-   @import "partials/normalize";
-注意：路径可能会出现问题，建议把模块文件写在sass目录下。
+
 
 嵌套语法
 
