@@ -3,6 +3,8 @@
 
 任务正理：PostgreSQL  PHP模式   EA11  Sass Javascript 7
 
+注意： [].every();返回真,因为它没有遇到测试结果为false的值
+
 
 嵌套语法
 
