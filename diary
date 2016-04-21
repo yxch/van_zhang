@@ -4,6 +4,9 @@
 任务正理：PostgreSQL  PHP模式   EA11  Sass Javascript 7
 
 注意： [].every();返回真,因为它没有遇到测试结果为false的值
+       var opt = new Optio n("文本","值",true,true)  后面两个true分别表示默认被选中和有效(IE9以上版本才支持)
+       对于dom对象中的select而言，其中每一个选项或者条目叫做一个option，new Option就是创建一个条目对象
+
 
 
 嵌套语法
