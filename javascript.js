@@ -325,17 +325,17 @@ String.prototype.IDC = function()
 };
 //示 例：console.log('22010120050801215X'.IDC());
 
-//检查字符串是否全为中文
+//检查字符串是否全为中文 world.js
 function isChinese(str){  var reg=/^[\u0391-\uFFE5]+$/;   return reg.test(str);  };
 
-//通用函数 判定是否是一个数组
+//通用函数 判定是否是一个数组 world.js
 function isArray(o)
 {
     if (typeof(o) == 'undefined') { return false; }
     return Function.isArray ? isArray(o) : typeof o === 'object' && Object.prototype.toString.call(o) === '[object Array]';
 }
 
-//检查数组中是否存在某个元素并返回在数组中出现的位置索引数组
+//检查数组中是否存在某个元素并返回在数组中出现的位置索引数组 world.js
 function inArray(e,ar)
 {
     var r = [];
@@ -344,10 +344,10 @@ function inArray(e,ar)
     return r;
 }
 
-//有限正整数
+//有限正整数 world.js
 function positive(n) { return isFinite(n) && n > 0 && n == Math.round(n); }
 
-//用非正则表达式的方式定义检查手机号码的格式是否正确的函数
+//用非正则表达式的方式定义检查手机号码的格式是否正确的函数 world.js
 function isMobile(str)
 {
     var ar = str.split('');
@@ -364,10 +364,10 @@ function isMobile(str)
     return true;
 }
 
-//在数据中查找指定值的索引
+//在数据中查找指定值的索引 world.js增强
 Array.prototype.indexOf = function(val){ for(var i=0;i<this.length;i++){ if(this[i] == val) return i;} };
 
-//移除数组中指定值的元素并重复生成索引
+//移除数组中指定值的元素并重复生成索引 wrold.js
 Array.prototype.remove = function(val){ var index = this.indexOf(val); if (index > -1) { this.splice(index,1);} };
 
 //定义去除数组重复值的函数
