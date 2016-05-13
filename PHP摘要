@@ -51,3 +51,42 @@ session.save_handler = files
 session.use_cookies = 1				
 // sessionid在客户端采用的存储方式，置1代表使用cookie记录客户端的sessionid
 
+
+/**
+	 * 遍历目录下指定类型的文件
+	 * @param string $dir
+	 * @param string $suffix
+	 * @return array
+	 */
+	function traverse($dir,$suffix='.js')
+	{
+		// 处理windows路径D:\svn\cignacmb-app 成 D:/svn/cignacmb-app/
+		$dir = rtrim(strtr($dir,['\\'=>'/']),'/') . '/';  
+		$arr = [];
+		foreach (glob($dir.'*') as $v) 
+		{
+			if(is_file($v) && stripos($v,$suffix) !== FALSE){  $arr[] = $v;  }
+			if(is_dir($v)){	$arr = array_merge($arr, traverse($v));	}
+		}
+		return $arr;
+	}
+	
+	/**
+	 * 遍历所的目录
+	 * @staticvar array $arr
+	 * @param string $dir
+	 * @return array
+	 */
+	function directory($dir)
+	{
+		// 处理windows路径D:\svn\cignacmb-app 成 D:/svn/cignacmb-app/ 
+		$dir = rtrim(strtr($dir,['\\'=>'/']),'/') . '/'; 
+		static $arr = [];
+		foreach (glob($dir . '*', GLOB_ONLYDIR) as $dir)
+		{ 
+			$arr[] = $dir; 
+			directory($dir);
+		}
+		return $arr;
+	}
+
