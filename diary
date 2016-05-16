@@ -38,7 +38,7 @@ select (@i:=@i+1) as i,post_time from tb_check_price,(select @i:=0) as tt  order
 
 ************************************************************************************************************
 
-
+http://sz.58.com/zufang/26003251752526x.shtml?adtype=1&entinfo=26003251752526_0&psid=141242899191811687436163665&iuType=q_2&ClickID=2&version=A&PGTID=0d300008-0180-7b76-4c11-c0da65a5ad52
 
 
 
