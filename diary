@@ -43,253 +43,51 @@ http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece7631046893b4c4380146d9686
 http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece7631046893b4c4380146d96864968d4e414c42246090137bdf127201306ce963c215afe170bf7a6613464587ef686cc8241d9ba932c3bcd7a742613da14498f53b8ca3632b027872defb86fe3ad813384afa2899912118b&p=882a9645d0af33fc57eff827495d97&newp=8063c64ad48711a05bed926d554ccc231610db2151d4db1e6b82c825d7331b001c3bbfb423221a04d1c17e650ba94c5de0f73673340225a3dda5c91d9fb4c57479cc&user=baidu&fm=sc&query=nginx%C5%E4%D6%C3https&qid=80d4a5780013f27a&p1=5
 
 
+
+******************loader.inc.php****************************************************************************
 <?php
-/**
- * @author:van zhang
- * 数据库单一实例连接类
- * 提供了基本的数据库操作方法
- */
-class DBC
-{
-	private static $instance = null;
-	private static $handle = null;
-	private static $prefix = '';
-	private static $db = '';
+	// session_start(); //开启session
+	// header("Content-type:text/html;charset=utf-8");
+	date_default_timezone_set('Asia/Urumqi');  //设置时区
 
-	private function __construct()
+	define('RPH',rtrim($_SERVER['DOCUMENT_ROOT'],'/') . '/');//定义根路径
+
+	$CPH = strtr(strtr(__DIR__,['\\'=>'/']).'/',[RPH=>'']);
+	if(!empty($CPH)){ $CPH .= '/'; }
+	define('CPH',$CPH); 		//定义当前目录路径 注意本文件所在位置
+	define('SPH',RPH . CPH);	//程序起始路径
+
+	define('BASES',SPH . 'bases/');		//通用类所在目录
+	define('LOCAL',SPH . '');			//项目类所在目录
+	define('SYSINI',BASES . 'etc/');	//配置文件所在目录
+
+	spl_autoload_register(function($class) 				//注册系统类
 	{
-		$servers = parse_ini_file(SYSINI . 'servers.ini',true);  //读取数据库配置内容
-		//必须在servers.ini配置DBTYPE字段
-		if(!isset($servers['DBTYPE'])){ exit(self::error('Server configuration file error!')); }
-
-		$arr = $servers[$servers['DBTYPE']]; //配置信息
-		$dbType = strtolower($servers['DBTYPE']); //数据库类型
-		$host = $arr['HOST']; //主机地址
-		$port = $arr['PORT']; //端口
-		$charset = $arr['CHARSET']; //字符集
-		self::$prefix = $arr['PREFIX'];  //前缀
-
-		if( empty(self::$db) ){ self::$db = $arr['DBNAME']; }
-
-		$strDSN = $dbType . ':host=' . $host . ';dbname=' . self::$db . ';port=' . $port;
-		if($servers['DBTYPE'] == 'MYSQL'){ $strDSN .= ';charset=' . $charset; }
-
-		//尝试连接数据库
-		try{  self::$handle = new PDO($strDSN,$arr['USERNAME'],$arr['PASSWORD']);
-		}catch(Exception $e){  exit(self::error($e->getMessage())); }
-	}
-
-	/**
-	 * 切换数据库
-	 * @param  string $dbname 数据库名
-	 * @return string
-	 */
-	public static function active($dbname='')
-	{
-		if(!(self::$instance instanceof self))
+		if(file_exists(BASES.$class.'.class.php')) 		//使基目录下的公共类可用
 		{
-			self::$db = $dbname;
-			self::$instance = new self;
-			return self::$db;
-		}else
+			include_once BASES.$class.'.class.php';
+		}else if(file_exists(LOCAL.$class.'.class.php')) //使项目目录下的项目类可用
 		{
-			if(self::$db != $dbname)
-			{
-				self::$handle = null;
-				self::$instance = null;
-				self::$db = $dbname;
-				self::$instance = new self;
-				return self::$db;
-			}
+			include_once LOCAL.$class.'.class.php';
 		}
-		return self::$db;
-	}
+	});
 
-	//返回单一实例
-	public static function PDO() //单一实例
-	{
-		if(!(self::$instance instanceof self)){ self::$instance = new self;}
-		return self::$handle;
-	}
+	//是否是测试环境 以下判断仅适用于招商信诺
+	define('TEST',FALSE);
+	//定义基本的访问路径和前缀
+	define('PHOST', TEST ? 'http://www.sample.cn' : 'http://www.sample.cn' );
+	define('BASIC',  PHOST . '/' . CPH);
 
-	//返回设定的表前缀
-	public static function prefix()
-	{
-		if(!(self::$_instance instanceof self)){ self::$instance = new self;}
-		return self::$prefix;
-	}
+	$demonstration = FALSE;
+	define('DEMO',$demonstration); //是否是演示程序
 
-	/**
-	 * 执行一条查询语句
-	 * @param string $SQL  请在SQL中使用参数替代方式来尽量避免SQL注入行为
-	 * @param array $arr 可以是关联数组，如array(':name'=>'ben').  也可是 索引数组，但请注意参数的顺序
-	 * @param array $opt 可选项 只能是关联数组
-	 * cursor键对指定指针移动方向
-	 * fetch键对指定返回结果的方式如关联数组 对象等
-	 * one键对指定仅获取结果集中一个
-	 * debug键对指定是否处于调试状态
-	 * @return 布尔值或者指定的返回类型如关联数组 对象等
-	 */
-	public static function selected($SQL,array $arr,array $opt=[])
-	{
-		$cursor = isset($opt['cursor']) ? $opt['cursor'] : [PDO::ATTR_CURSOR=>PDO::CURSOR_FWDONLY];
-		$fetch = isset($opt['fetch']) ? $opt['fetch'] : PDO::FETCH_ASSOC;
-		$stmt = self::PDO()->prepare($SQL,$cursor);
-		foreach($arr AS $k=>$v)
-		{
-			if(is_int($v)){  $stmt->bindParam($k , $arr[$k],PDO::PARAM_INT);
-			}else{			 $stmt->bindParam($k , $arr[$k],PDO::PARAM_STR);	}
-		}
-		$dbc = $stmt->execute();
-		if($dbc !== FALSE)
-		{
-			if(isset($opt['one'])){ return $stmt->fetch($fetch); }
-			return $stmt->fetchAll($fetch);
-		}else
-		{
-			// 在调试状态下显示错误消息 否则返回假值
-			if(isset($opt['debug']) && $opt['debug'] === TRUE){	exit( self::error(implode(' ',$stmt->errorInfo())) );
-			}else{ return FALSE; }
-		}
-	}
+	// 随机产生一个序列来更新js和css的版本 仅在测试演示环境下随机产生
+	define('VERSION',(TEST || DEMO) ? mt_rand(10000,99999) : 100000);
+	define('ISDEBUG',(TEST || DEMO) ? TRUE : FALSE); // 是否打开系统调试
 
-	/**
-	 * 执行一条IN 查询语句 本类对IN查询支持较弱且结构固定，如果是复杂的IN查询请改用相关查询
-	 * @param string $SQL  请在SQL中使用参数替代方式来尽量避免SQL注入行为
-	 * 注意：SELECT ... IN( :limit ) .... 这是$SQL的结构，不属于此结构的SQL将可能无法执行
-	 * @param array $arr 必须是 索引数组
-	 * @param array $opt 可选项 只能是关联数组
-	 * cursor键对指定指针移动方向
-	 * fetch键对指定返回结果的方式如关联数组 对象等
-	 * debug键对指定是否处于调试状态
-	 * one键对指定仅获取结果集中一个
-	 * @return 布尔值或者指定的返回类型如关联数组 对象等
-	 */
-	public static function limited($SQL,array $arr,array $opt=[])
-	{
-		$cursor = isset($opt['cursor']) ? $opt['cursor'] : [PDO::ATTR_CURSOR=>PDO::CURSOR_FWDONLY];
-		$fetch = isset($opt['fetch']) ? $opt['fetch'] : PDO::FETCH_ASSOC;
-		$arrLen = count($arr);
-		$limited = [];
-		for($i=0;$i<$arrLen;$i++){	$limited[':limited_' . $i] = $arr[$i];	}
-		$strSQL = strtr($SQL,array(':limit'=>implode(',',array_keys($limited))));
-		$stmt = self::PDO(isset($opt['dbname']) ? $opt['dbname'] : '')->prepare($strSQL,$cursor);
-		foreach($limited as $x=>$y){ $stmt->bindValue($x,$y); } //参数和值绑定
-		$dbc = $stmt->execute();
-		if($dbc !== FAlse)
-		{
-			if(isset($opt['one'])){ return $stmt->fetch($fetch); }
-			return $stmt->fetchAll($fetch);
-		}else
-		{
-			// 在调试状态下显示错误消息 否则返回假值
-			if(isset($opt['debug']) && $opt['debug'] === TRUE){ exit( self::error(implode(' ',$stmt->errorInfo())) );
-			}else{ return FALSE;}
-		}
-	}
+	//如果是演示程序或测试环境，打开全部错误提示否则关闭
+	error_reporting( DEMO || TEST ? E_ALL : 0);
 
-	/**
-	 * 多次执行一条影响行数的SQL语句
-	 * @param string $SQL  请在SQL中使用参数替代方式来尽量避免SQL注入行为
-	 * @param array $arr  如果是索引数组则必须是一个二维数组且每一个单元必须是关联数组，否则是一个一维的关联数组
-	 * @param array $opt 可选项 只能是关联数组
-	 * LID键对指定是否获取最后插入的自动增长的序列值  INSERT操作有效
-	 * debug键对指定是否处于调试状态
-	 * @return 布尔值或者整型数据
-	 */
-	public static function modified($SQL,array $arr,array $opt=[])
-	{
-		$DBLink = self::PDO(isset($opt['dbname']) ? $opt['dbname'] : '');
-		$stmt = $DBLink -> prepare($SQL);
-		//$arr的每一个单元要么全是数组要么全部不是数组，否则返回假
-		$len = count($arr); $isArray = 0; $isNotArray = 0;
-		for($i=0;$i<$len;$i++)
-		{
-			if(@is_array($arr[$i])){ $isArray += 1; }else{ $isNotArray += 1; }
-		}
-		if($isArray == $len ) //每一个数组单元全部是数组  关联数组
-		{
-			$result = 0;
-			for($j=0;$j<$len;$j++) //循环执行数组的每个单元
-			{
-				$dbc = $stmt->execute($arr[$j]);
-				if($dbc !== FALSE) //如果执行成功
-				{
-					//是否返回最后插入的序列值 注意表的设计及仅在INSERT句法下有效 否则返回影响的行数
-					if(isset($opt['LID']) && $opt['LID']){$result = $DBLink -> lastInsertId( '_id_seq' );
-					}else{ $result += $stmt->rowCount(); }
-				}else
-				{
-					// 在调试状态下显示错误消息 否则返回假值
-					if(isset($opt['debug']) && $opt['debug'] === TRUE){	exit( self::error(implode(' ',$stmt->errorInfo())) );
-					}else{ return 0; }
-				}
-			}
-			return $result;
-		}elseif($isNotArray == $len) //每一个数组单元全部不是数组 关联数组
-		{
-			$dbc = $stmt->execute($arr);
-			if($dbc !== FALSE)
-			{
-				if(isset($opt['LID']) && $opt['LID']){ return $DBLink -> lastInsertId( '_id_seq' );
-				}else{ return $stmt->rowCount(); }
-			}else
-			{
-				// 在调试状态下显示错误消息 否则返回假值
-				if(isset($opt['debug']) && $opt['debug'] === TRUE){ exit( self::error(implode(' ',$stmt->errorInfo())) );
-				}else{ return 0; }
-			}
-		}else{ return 0; }
-	}
-
-	//error提示
-	private static function error($error)
-	{
-		return '<div style="width:80%;height:auto;border:2px solid red;text-align:center;margin:10% auto;">
-			  <p style="vertical-align:middle;font-size:22px;color:red;margin-left:2%;font-weight:bold;">ERROR
-			  </p><p>' . $error . '</p></div>';
-	}
-}
-
-
-命令： show processlist; 
-如果是root帐号，你能看到所有用户的当前连接。如果是其它普通帐号，只能看到自己占用的连接。 
-show processlist;只列出前100条，如果想全列出请使用show full processlist; 
-mysql> show processlist; 
-命令： show status; 
-命令：show status like '%下面变量%'; 
-Aborted_clients 由于客户没有正确关闭连接已经死掉，已经放弃的连接数量。 
-Aborted_connects 尝试已经失败的MySQL服务器的连接的次数。 
-Connections 试图连接MySQL服务器的次数。 
-Created_tmp_tables 当执行语句时，已经被创造了的隐含临时表的数量。 
-Delayed_insert_threads 正在使用的延迟插入处理器线程的数量。 
-Delayed_writes 用INSERT DELAYED写入的行数。 
-Delayed_errors 用INSERT DELAYED写入的发生某些错误(可能重复键值)的行数。 
-Flush_commands 执行FLUSH命令的次数。 
-Handler_delete 请求从一张表中删除行的次数。 
-Handler_read_first 请求读入表中第一行的次数。 
-Handler_read_key 请求数字基于键读行。 
-Handler_read_next 请求读入基于一个键的一行的次数。 
-Handler_read_rnd 请求读入基于一个固定位置的一行的次数。 
-Handler_update 请求更新表中一行的次数。 
-Handler_write 请求向表中插入一行的次数。 
-Key_blocks_used 用于关键字缓存的块的数量。 
-Key_read_requests 请求从缓存读入一个键值的次数。 
-Key_reads 从磁盘物理读入一个键值的次数。 
-Key_write_requests 请求将一个关键字块写入缓存次数。 
-Key_writes 将一个键值块物理写入磁盘的次数。 
-Max_used_connections 同时使用的连接的最大数目。 
-Not_flushed_key_blocks 在键缓存中已经改变但是还没被清空到磁盘上的键块。 
-Not_flushed_delayed_rows 在INSERT DELAY队列中等待写入的行的数量。 
-Open_tables 打开表的数量。 
-Open_files 打开文件的数量。 
-Open_streams 打开流的数量(主要用于日志记载） 
-Opened_tables 已经打开的表的数量。 
-Questions 发往服务器的查询的数量。 
-Slow_queries 要花超过long_query_time时间的查询数量。 
-Threads_connected 当前打开的连接的数量。 
-Threads_running 不在睡眠的线程数量。 
-Uptime 服务器工作了多少秒。
 
 
 
