@@ -87,7 +87,22 @@ http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece7631046893b4c4380146d9686
 
 	//如果是演示程序或测试环境，打开全部错误提示否则关闭
 	error_reporting( DEMO || TEST ? E_ALL : 0);
-
+	
+	
+模拟表单的等宽功能：
+<div id="vtable">
+	<div class="rows">
+		<span><a>AAAAA</a></span>
+		<span><a>CCCCC</a></span>
+		<span><a>DDDDD</a></span>
+	</div>
+</div>
+<style>
+	#vtable{display:table;table-layout:fixed;width:100%;height:1.5em;}
+	#vtable .rows{display:table-row;text-align: center;}
+	#vtable div span{display:table-cell;}
+	#vtable .rows span a{display:inline-block;width:96%;background-color:blue;color:white;}
+</style>
 
 
 
