@@ -104,6 +104,106 @@ http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece7631046893b4c4380146d9686
 	#vtable .rows span a{display:inline-block;width:96%;background-color:blue;color:white;}
 </style>
 
+rem特点 
+rem是CSS3新增的一个相对单位（root em，根em）区别在于使用rem为元素设定字体大小时，仍然是相对大小，但相对的只是HTML根元素。
+这个单位可谓集相对大小和绝对大小的优点于一身，通过它既可以做到只修改根元素就成比例地调整所有字体大小，又可以避免字体大小逐层复合的连锁反应。
+目前，除了IE8及更早版本外，所有浏览器均已支持rem。
+对于不支持它的浏览器，应对方法也很简单，就是多写一个绝对单位的声明。这些浏览器会忽略用rem设定的字体大小。
+
+
+// 检测滚动条距离顶部百分比
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=utf-8 />
+	<title>jQuery检测滚动条距离顶部百分比 </title>
+	<style>
+	*{font-family: microsoft yahei;padding:0;margin:0;list-style:none;}
+	#navigation {
+		position: fixed;
+		top: -66px;
+		left: 0;right: 0;
+		width: 100%; height: 60px;
+		background-color: #006699;
+		-webkit-box-shadow: 0px 3px 3px 0px rgba(21, 21, 21, 0.1);
+		box-shadow: 0px 3px 3px 0px rgba(21, 21, 21, 0.1);
+		-webkit-transition: top .25s ease .5s;
+		transition: top .25s ease .5s;
+	}
+	#navigation p {
+		text-align: center;
+		color: #fff;
+		line-height:60px;
+	}
+	#percentageCounter {
+		position: fixed;
+		bottom: 10px;
+		right: 10px;
+	}
+	h1 {font-size: +2em;}
+	.content
+	{
+		width: 40%;
+		margin:50px auto;
+		padding:25px;
+		color:#fff;
+		background-color:#0082c3;
+		border-radius:5px;
+	}
+	p {margin-bottom: 1em;text-indent:2em;line-height:2;font-family:microsoft yahei;}
+	</style>
+</head>
+<body>
+<div id="navigation">
+  <p>脚本之家 - www.jb51.net</p>
+</div>
+<div id="percentageCounter"><h1>0%</h1></div>
+<div class="content">
+  <p>脚本之家是一家大型综合设计类素材网站，提供高清图片素材、PSD素材、PPT模板、网页模板、脚本下载、设计字体、精美表情、矢量素材、桌面壁纸、酷站欣赏、Flash动画等设计素材，免费安全快速下载。</p>
+  <p>经过一年多的经验累积和创新发展，网站与2013年11月正式更名为脚本之家网，并启用了新的域名。与此同时，网站还进一步明确脚本之家网是一个致力于提供优质免费素材浏览与下载的交流和学习平台，网站专注于为各类用户提供PSD素材，矢量素材，图标素材，图片素材，字体素材等各类素材，旨在让每一位素材需求者都能够轻松找到自己想要的素材。</p>
+  <p>了自身的功能定位，逐渐以提供各类免费网页素材为网站的发展方向，致力于打造成为素材最全、最干净、最让大家信赖的免费网页素材下载网站。</p>
+  <p>在今后的发展过程中，网站将始终立足于自己的建站宗旨，牢牢把握自己的发展方向，踏实发展，努力学习和完善，继续为广大网友提供各类免费的网页素材。</p>
+  <p>武汉国光劳保用品厂是一家生产和加工劳保产品性质的劳动密集型企业，位于素有“劳保用品之乡”之称的武汉市蔡甸区。企业始创于2001年，直至今日，已经有十多年的发展历史了。企业成立初期，主要以生产和加工劳保用帆布手套为主，在生产经营过程中，取得了良好的经济效益，并积累了十分丰富的劳保行业经验。</p>
+  <p>武汉国光劳保用品厂一直本着“质量至上，用户第一”的生产经营理念，致力于为广大消费者提供质地优良的产品。从原料采集到生产加工再到出厂销售，整个生产过程中都严把质量关,杜绝任何以次充好、违背诚信的现象</p>
+  <p>企业立足现实,面向未来专注发展,我们热忱欢迎广大劳保产品消费者前来向我们进行各种形式的咨询,殷切希望能与劳保用品经销商建立密切的合作关系,从而达到互利共赢！另外，我们也盼望广大从事劳保用品生产的同类企业能加强交流，给予我们您宝贵的经验，让我们在交流中共同发展，诚挚的期待与你们的交流合作!</p>
+  <p>素材，指的是作者从现实生活中搜集到的、未经整理加工的、感性的、分散的原始材料。这些材料并不能都写入文章之中。但是，这种生活“素材”，如果经过作者的集中、提炼、加工和改造，并写入作品之后，即成为“题材”了。</p>
+  <p>淘宝素材就是为初学网上开店铺装修、建店者完全免费提供的教程、图片等资料，是在网络电子商务发展到今天产生的必然产物，是针对在网上开店的朋友提供淘宝素材及店铺装修的教程，包括淘宝、易趣、拍拍、淘教网、淘宝教材网等网上开店的店铺（也就是网店）装修介绍，以及网页三剑客的教程和网站源程序的下载内容。</p>
+  <p>意境素材是指活跃着生命律动的韵味无穷的诗意空间的装饰素材，一般会以图片、头像等方式呈现出来，可以给博客、空间等区域增加一个活性的点缀，有着很高的欣赏意义。数学素材</p>
+  <p>空间素材是用于空间装扮的图片，flash，音乐，文字等等。也用于空间皮肤、百度空间等装扮，随着QQ空间的慢慢走红，素材也变得极其重要，素材就像是整个空间的灵魂，没有好的素材，再好的空间也出不来。空间素材包括 图片类、文字类、音频类、Flash类 、 Photoshop自定义类等 各种各样使自己的个人空间更加完美的唯美素材。</p>
+  <p>婚庆素材的搜集有很多方法，最容易的方法是去看别人的婚礼。在我们的身边时不时的有朋友、亲人结婚办喜事，自己不妨提前去，可以跟主家交谈一番，交流一下婚礼素材的种类，购买时要注意的事项等等。条件一般的家庭的婚礼场面都差不多，所以参加个三五场婚礼下来，我们就会知道不少关于婚庆素材的事情。</p>
+  <p>口碑素材Brand Public Praise Material，是指品牌信息中具备口碑传播条件的内容。它的表现形式有故事、题材、新闻、消息、传说、评论、描述等，通常包括产品服务应用消息、企业荣誉、企业公民行为、负品牌现象</p>
+  <p>教学素材指数学课本上的文本、图片、物体及其数量等一切可以利用来为教学服务的材料，是静态的，客观的，尚未形成数学思维的材料。例如，如2只猫，8条小金鱼，飞走6只小鸟等等。它与数学思维是一对正反的教学理念，教学中要做到有效，必须把数学素材形成数学思维。</p>
+</div>
+<script src='js/jquery-1.8.3.min.js'></script>
+<script>
+   $(window).scroll(function(){
+		var targetPercentage = 70;
+		var navBarHeight = 66;
+		var scrollTo = $(window).scrollTop(), // 滚动的高度
+		docHeight = $(document).height(), // 文档的高度
+		windowHeight = $(window).height(); // 当前窗口的高度
+		scrollPercent = (scrollTo / (docHeight-windowHeight)) * 100; // 百分数
+		scrollPercent = scrollPercent.toFixed(1); // 四舍五入
+		$('#percentageCounter h1').text(scrollPercent+"%"); // 显示当前的滚动百分比
+		// 如果滚动值大于 70出现 navigation
+		if(scrollPercent > targetPercentage)
+		{
+			$('#navigation').css({top:'0'});
+		}else // 如果滚动值小于 70 隐藏 navigation即使navigation的top值为负的它的高度值
+		{
+			$('#navigation').css({ top: '-' + navBarHeight + 'px'});
+		}
+	}).trigger('scroll');
+</script>
+
+<div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+<p>适用浏览器：IE8、360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗.</p>
+
+</div>
+</body>
+</html>
+
+
 
 
 
