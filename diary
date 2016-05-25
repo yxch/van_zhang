@@ -48,7 +48,12 @@ http://cache.baiducontent.com/c?m=9d78d513d99b00b8589cc0255341c0676914d7306a8090
 
 
 
-
+创建定制化的compass工程（在命令行切换到需要创建工程的目录后执行命令）
+compass create--bare -sass-dir "sass" -css-dir "css" -javascript-dir "js" -images-dir "images"
+引号内就是你要创建工程的目录名称，如果你要创建默认工程，只需要切换到指定目录后执行如下命令: compass create
+对config.rb文件进行修改后，特别是修改了输出风格后，需要在效果更改前清理.sass-cache。可以手动删除，也可以使用命令:
+copass clean
+如果使用命令行来监控工程的变化，必须运行命令再次启用监控：compass watch
 
 
 
