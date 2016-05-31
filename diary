@@ -55,32 +55,40 @@ compass create--bare -sass-dir "sass" -css-dir "css" -javascript-dir "js" -image
 copass clean
 如果使用命令行来监控工程的变化，必须运行命令再次启用监控：compass watch
 
-
+<?php
 	//header("Content-type:text/html;charset=utf-8");
 	date_default_timezone_set('Asia/Urumqi');  //设置时区
 	
-	// 类 配置文件 所在目录
+	// 起始路径 特别注意这个文件的位置，否则不要这样定义这个常量    
+	define('CPH',strpos(__DIR__,"\\") !== FALSE  
+		  ? strtr(strtr(__DIR__,["\\"=>'/']),[rtrim($_SERVER['DOCUMENT_ROOT'],'/')=>''])
+		  : strtr(__DIR__,[rtrim($_SERVER['DOCUMENT_ROOT'],'/')=>'']) );
+	
+	// 设置包含路径
 	$includes = [
 		$_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'bases',
-		$_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'local',
-		$_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'bases' . DIRECTORY_SEPARATOR . 'etc'
+		$_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'bases' . DIRECTORY_SEPARATOR . 'etc',
+		$_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'local'		
 	];
 	// 设置包含路径
 	set_include_path(get_include_path() . PATH_SEPARATOR . implode(PATH_SEPARATOR,$includes));
 
 	// 自动载入
 	spl_autoload_register(function($class){ 
-
-		if(file_exists($class.'.class.php'))
-		{
-			include $class.'.class.php';
-		}else
-		{
-			throw new Exception($class . '.class.php file not exists'); 
-		}
-	
+		if(!(include $class . '.class.php')){	throw new Exception($class . '.class.php file not exists'); 	}
 	});
 
+	define('DEMO',FALSE); //是否是演示程序
+	
+	//是否是测试环境 以下判断仅适用于招商信诺
+	define('TEST',stripos($_SERVER['HTTP_HOST'],'.cigna') === FALSE ||
+				stripos($_SERVER['HTTP_HOST'],'test.cigna') !== FALSE);
+	
+	//如果是演示程序或测试环境，打开全部错误提示否则关闭
+	error_reporting( DEMO || TEST ? E_ALL : 0);
+	
+	//定义基本的访问路径
+	define('PHOST', TEST ? 'http://www.multimall' : 'http://www.multimall' ); 
 
 
 
