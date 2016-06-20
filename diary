@@ -92,6 +92,18 @@ http://cache.baiducontent.com/c?m=9d78d513d99b00b8589cc0255341c0676914d7306a8090
 	// 如果是演示程序或测试环境，打开错误提示否则关闭
 	ini_set('display_errors', ( TEST || DEMO ) ? 1 : 0);
 	error_reporting( ( DEMO || TEST ) ? E_ALL : 0);
+	
+	
+	
+	
+<link rel="stylesheet" href="/wx/cross/m_css_index.css" />
+<div class="tou"><a id="close">×</a>|<span>东莞莱蒙商业中心</span></div>
+<script>  $('#close').click(function(){ $(this).parent('.tou').hide();  }); </script>
+
+
+
+
+
 
 
 
