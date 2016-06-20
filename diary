@@ -96,7 +96,8 @@ http://cache.baiducontent.com/c?m=9d78d513d99b00b8589cc0255341c0676914d7306a8090
 	
 	
 	
-<link rel="stylesheet" href="/wx/cross/m_css_index.css" />
+<link rel="stylesheet" href="/wx/cross/m_css_common.css" />
+<link rel="stylesheet" href="/wx/cross/m_css_media_query.css" />
 <div class="tou"><a id="close">×</a>|<span>东莞莱蒙商业中心</span></div>
 <script>  $('#close').click(function(){ $(this).parent('.tou').hide();  }); </script>
 
