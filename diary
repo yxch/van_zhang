@@ -48,6 +48,12 @@ http://cache.baiducontent.com/c?m=9d78d513d99b00b8589cc0255341c0676914d7306a8090
 
 
 
+=================================================================================================================
+公用顶部内容
+<link rel="stylesheet" href="/wx/cross/m_css_common.css" />
+<link rel="stylesheet" href="/wx/cross/m_css_media_query.css" />
+<div class="tou"><a id="close">×</a>|<span>东莞莱蒙商业中心</span></div>
+<script>  $('#close').click(function(){ $(this).parent('.tou').hide();  }); </script>
 
 
 
@@ -68,7 +74,7 @@ http://www.multimall.cn/wx/mobile.php?act=module&name=shopping&do=shoplist&weid=
 
 
 
-
+=========================================================================================================
 微点餐：
 http://wx.topspring.com/wx/mobile.php?act=module&do=wapindex&name=idish&weid=1&from_user=
 http://www.multimall.cn/wx/mobile.php?act=module&do=wapindex&name=idish&weid=1&from_user=
@@ -87,6 +93,7 @@ D:\van_zhang\mine\multimall\wx\source\modules\idish\site.php
 
 
 
+==========================================================================================================
 
 潮mall
 http://wx.topspring.com/wx/mobile.php
@@ -131,9 +138,9 @@ $from_uid = '17';
 
 
 
+
+==========================================================================================
 template.func.php
-
-
 mock：	account.class.php
 mock： 	D:\website\multimall\wx\source\modules\shopping\mobile\myorder.php
 mock：	D:\website\multimall\wx\source\modules\shopping\mobile\mycart.php
