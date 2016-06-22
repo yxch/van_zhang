@@ -128,9 +128,16 @@ $_W['fans']['from_uid'] = '17'; // mock here
 
 路径函数： D:\van_zhang\mine\multimall\wx\source\function\template.func.php
 
-
 修改模板：D:/van_zhang/mine/multimall/wx/themes/mobile/default/mycollect.html
 
+
+05:修改个人信息.html
+
+调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function:   doMobileupdateCards
+// mock here
+// checkauth(true,true,false);
+
+修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/ucard.tpl.php
 
 
 
