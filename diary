@@ -126,8 +126,7 @@ $from_uid = '17';
 
 03:积分兑换.html
 
-调整代码：
-D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php   doMobilewapdh
+调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php   doMobilewapdh
 // mock here
 //checkauth(true,false,false);
 
@@ -135,6 +134,22 @@ $from_uid = '17';
 
 修改模板: D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_dh.tpl.php
 注：table样式无法修改，来自于数据库的动态显示
+
+
+
+04:商家收藏.html
+
+调整代码：D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php
+在这个位置 elseif ($name == 'mycollect')：
+// mock here
+// checkauth(true,true) ;
+$_W['fans']['from_uid'] = '17'; // mock here
+
+路径函数： D:\van_zhang\mine\multimall\wx\source\function\template.func.php
+
+
+修改模板：D:/van_zhang/mine/multimall/wx/themes/mobile/default/mycollect.html
+
 
 
 
