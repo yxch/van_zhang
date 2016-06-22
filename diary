@@ -134,6 +134,7 @@ D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php   doMobilewapdh
 $from_uid = '17';
 
 修改模板: D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_dh.tpl.php
+注：table样式无法修改，来自于数据库的动态显示
 
 
 
