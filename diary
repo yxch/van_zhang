@@ -148,7 +148,8 @@ $_W['fans']['from_uid'] = '17'; // mock here
 // $this -> ishave_user($weid, $from_user, false);
 
 修改模板： D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_announce.tpl.php
-
+注释掉：D:\van_zhang\mine\multimall\wx\source\modules\icard\template\css\card.css 1166 行的 
+/*background:url(../themes/2/power0.png) no-repeat left 50%;*/
 
 
 
