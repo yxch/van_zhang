@@ -159,6 +159,8 @@ $_W['fans']['from_uid'] = '17'; // mock here
 // $this -> ishave_user($weid, $from_user, false);
 
 修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_sign.tpl.php
+修改样式：D:\van_zhang\mine\multimall\wx\source\modules\icard\template\css\card.css
+1223行的背景图片：background:url(../../../../../cross/images/qdrl.png) no-repeat left 50%;
 
 
 
