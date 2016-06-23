@@ -163,7 +163,7 @@ $_W['fans']['from_uid'] = '17'; // mock here
 1223行的背景图片：background:url(../../../../../cross/images/qdrl.png) no-repeat left 50%;
 
 
-08： 积分排行.html 【访问路径：我的会员 -> 会员卡 ->  积分排行榜】
+08： 积分排行.html 【访问路径：我的会员 -> 会员卡 ->  积分排行榜】  注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobilejssort
 
