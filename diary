@@ -140,8 +140,7 @@ $_W['fans']['from_uid'] = '17'; // mock here
 修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/ucard.tpl.php
 
 
-06:最新通知.html
-访问路径：我的会员 -> 会员卡 ->  最新通知
+06:最新通知.html  【访问路径：我的会员 -> 会员卡 ->  最新通知】
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapAnnounce
 // mock here
@@ -151,6 +150,20 @@ $_W['fans']['from_uid'] = '17'; // mock here
 注释掉：D:\van_zhang\mine\multimall\wx\source\modules\icard\template\css\card.css 1166 行的 
 /*background:url(../themes/2/power0.png) no-repeat left 50%;*/
 注：已处理
+
+
+07：签到.html  【访问路径：我的会员 -> 会员卡 ->  签到赚积分】
+
+调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapSign
+// mock here
+// $this -> ishave_user($weid, $from_user, false);
+
+修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_sign.tpl.php
+
+
+
+
+
 
 
 ==========================================================================================
