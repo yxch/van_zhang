@@ -140,6 +140,14 @@ $_W['fans']['from_uid'] = '17'; // mock here
 修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/ucard.tpl.php
 
 
+06:最新通知.html
+
+调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapAnnounce
+// mock here
+// $this -> ishave_user($weid, $from_user, false);
+
+修改模板： D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_announce.tpl.php
+
 
 
 
