@@ -141,6 +141,7 @@ $_W['fans']['from_uid'] = '17'; // mock here
 
 
 06:最新通知.html
+访问路径：我的会员 -> 会员卡 ->  最新通知
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapAnnounce
 // mock here
