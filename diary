@@ -116,14 +116,14 @@ D:\van_zhang\mine\multimall\wx\source\function\template.func.php
 模板文件位置： D:/van_zhang/mine/multimall/wx/themes/mobile/default/business_detail.html
 
 
-04： 微社区
+05： 微社区
 
 http://buluo.qq.com/p/barindex.html?bid=134033&from=wsqjump
 
 备注： 未处理  访问路径未知
 
 
-05: 我的会员.html   【访问路径：首页 我的会员 】  注：已处理
+06: 我的会员.html   【访问路径：首页 我的会员 】  注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php  doMobileWapHome
 // mock here
@@ -137,7 +137,13 @@ $from_uid = '17';
 527: 	.ico_jfph{ background:url(../../../../cross/images/jfph.png) no-repeat 16px 10px; background-size:auto 39px;}
 
 
-02: 会员卡.html   注：已处理
+
+07: 我的站内信  【访问路径：首页 我的会员主页 我的站内信  】  注：未处理
+
+备注：未找到相关设计稿
+
+
+08: 会员卡.html  【访问路径：首页 我的会员主页 会员卡  】  注：已处理
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php  doMobileWapIndex
 // mock here
 //checkauth(true,false,false);
@@ -146,8 +152,7 @@ $from_uid = '17';
 修改模板: D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_index.tpl.php
 
 
-
-03:积分兑换.html    注：已处理
+09:积分兑换.html  【访问路径：首页 我的会员主页 积分兑换  】  注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php   doMobilewapdh
 // mock here
@@ -158,9 +163,7 @@ $from_uid = '17';
 修改模板: D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_dh.tpl.php
 注：table样式无法修改，来自于数据库的动态显示
 
-
-
-04:商家收藏.html
+09:商家收藏.html  【访问路径：首页 我的会员主页 商家收藏  】  注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php
 在这个位置 elseif ($name == 'mycollect')：
@@ -173,7 +176,12 @@ $_W['fans']['from_uid'] = '17'; // mock here
 修改模板：D:/van_zhang/mine/multimall/wx/themes/mobile/default/mycollect.html
 
 
-05:修改个人信息.html
+10： 优惠券 【访问路径：首页 我的会员主页  优惠券 】 注：未处理
+
+备注：未找到相关设计图稿
+
+
+11:修改个人信息.html  【访问路径：首页 我的会员主页  点击banner进入】 注：正在处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function:   doMobileupdateCards
 // mock here
@@ -182,7 +190,7 @@ $_W['fans']['from_uid'] = '17'; // mock here
 修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/ucard.tpl.php
 
 
-06:最新通知.html  【访问路径：我的会员 -> 会员卡 ->  最新通知】  注：已处理
+12: 最新通知.html  【访问路径：我的会员  会员卡 最新通知】  注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapAnnounce
 // mock here
@@ -194,7 +202,7 @@ $_W['fans']['from_uid'] = '17'; // mock here
 
 
 
-07：签到.html  【访问路径：我的会员 -> 会员卡 ->  签到赚积分】 注：已处理
+13：签到 赚积分.html  【访问路径：我的会员 -> 会员卡 ->  签到赚积分】 注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapSign
 // mock here
@@ -205,7 +213,7 @@ $_W['fans']['from_uid'] = '17'; // mock here
 1223行的背景图片：background:url(../../../../../cross/images/qdrl.png) no-repeat left 50%;
 
 
-08： 积分排行.html 【访问路径：我的会员 -> 会员卡 ->  积分排行榜】  注：已处理
+14： 积分排行.html 【访问路径：我的会员  会员卡   积分排行榜】  注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobilejssort
 
