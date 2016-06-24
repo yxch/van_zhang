@@ -81,7 +81,49 @@ http://wx.topspring.com/wx/mobile.php
 http://www.multimall.cn/wx/mobile.php
 
 
-01: 我的会员.html   注：已处理
+01:潮MALL-首页.html  【访问路径：首页】  注：已处理
+
+相关文件：
+D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'index'
+D:\van_zhang\mine\multimall\wx\source\function\template.func.php    
+
+模板文件位置：D:/van_zhang/mine/multimall/wx/themes/mobile/default/index.html
+
+
+02：潮MALL-品牌.html  【访问路径：首页 广告点击 】  注：已处理
+
+相关文件：
+D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'business'
+D:\van_zhang\mine\multimall\wx\source\function\template.func.php   
+
+模板文件位置： D:/van_zhang/mine/multimall/wx/themes/mobile/default/business.html
+
+03： 地图.html  【访问路径：首页 广告点击 地图 】  注：已处理
+
+相关文件：
+D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'business_map'
+D:\van_zhang\mine\multimall\wx\source\function\template.func.php   
+
+模板文件位置： D:/van_zhang/mine/multimall/wx/themes/mobile/default/business_map.html
+
+
+04: 商家详情.html 【访问路径：首页 广告点击 地图 点击广告 】  注：已处理
+
+相关文件：
+D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'business_detail'
+D:\van_zhang\mine\multimall\wx\source\function\template.func.php 
+
+模板文件位置： D:/van_zhang/mine/multimall/wx/themes/mobile/default/business_detail.html
+
+
+04： 微社区
+
+http://buluo.qq.com/p/barindex.html?bid=134033&from=wsqjump
+
+备注： 未处理  访问路径未知
+
+
+05: 我的会员.html   【访问路径：首页 我的会员 】  注：已处理
 
 调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php  doMobileWapHome
 // mock here
