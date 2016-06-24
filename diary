@@ -220,6 +220,16 @@ $_W['fans']['from_uid'] = '17'; // mock here
 修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/jfsort.tpl.php
 
 
+15：客服中心  【访问路径：主页 客服中心 】  注：已处理
+
+相关文件：
+D:/van_zhang/mine/multimall/wx/source/controller/mobile/channel.ctrl.php  $name == 'kf'
+D:\van_zhang\mine\multimall\wx\source\function\template.func.php 
+
+
+修改模板： D:/van_zhang/mine/multimall/wx/themes/mobile/default/kf.html
+
+
 
 
 ==========================================================================================
