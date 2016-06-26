@@ -8,20 +8,13 @@ PostgreSQL  PHP模式   EA11  Sass Javascript 7
 面向对象应该牢记：保持对象小型化，模块化，非耦合以及流线型 。
 
 =================================================================================================================
-www.multimall.cn
-
-卖家（vendor）  商品(wares)   订单(order)   买家（buyer） 
-
+www.multimall.cn  卖家（vendor）  商品(wares)   订单(order)   买家（buyer） 
 
 useradd -o -u 0 -g 0 -M -d /root -s /bin/bash vxzhan
 select (@i:=@i+1) as i,post_time from tb_check_price,(select @i:=0) as tt  order by post_time desc; 
 
-
 http://auto.sohu.com/20160607/n453446539.shtml  驾驶证到期还去车管所？你真是out了
-
 =================================================================================================================
-
-
 
 http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece7631046893b4c4380146d96864968d4e414c4224600003ab3e66c351770d3c77b651cfc091ab1a168252a5577f1c893d60bc0bc902e2e8926307108c31c528516fc8915749b77875b99b868e0ad873484d8d6c4ae5544cb235f3cc6b2ca&p=882a9645d7d212a05aa6c931445598&newp=8d7bcd299e9e12a05abd9b7d0d1788231610db2151d4d1146b82c825d7331b001c3bbfb423221a07d2c4786304ad4e5fe9fb31753c072ba3dda5c91d9fb4c57479&user=baidu&fm=sc&query=apache%C5%E4%D6%C3https&qid=ebceea2f0015d590&p1=11
 http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece7631046893b4c4380146d96864968d4e414c42246090137bdf127201306ce963c215afe170bf7a6613464587ef686cc8241d9ba932c3bcd7a742613da14498f53b8ca3632b027872defb86fe3ad813384afa2899912118b&p=882a9645d0af33fc57eff827495d97&newp=8063c64ad48711a05bed926d554ccc231610db2151d4db1e6b82c825d7331b001c3bbfb423221a04d1c17e650ba94c5de0f73673340225a3dda5c91d9fb4c57479cc&user=baidu&fm=sc&query=nginx%C5%E4%D6%C3https&qid=80d4a5780013f27a&p1=5
@@ -39,206 +32,108 @@ http://cache.baiducontent.com/c?m=9d78d513d99b00b8589cc0255341c0676914d7306a8090
 style="background-color:#FFF;background-image:none;"
 
 
-微商城：
+==================================================================================================================
 
-http://www.multimall.cn/wx/mobile.php?act=module&do=wapindex&name=idish&weid=1&from_user=
+微商城：http://www.multimall.cn/wx/mobile.php?act=module&name=shopping&do=shoplist&weid=1&wxref=mp.weixin.qq.com
 
-http://www.multimall.cn/wx/mobile.php?act=module&name=shopping&do=shoplist&weid=1&wxref=mp.weixin.qq.com
-1. D:/website/multimall/wx/data/tpl/mobile/modules/shopping/shop_list.tpl.php
+01: 首页     【访问路径：首页】  注：已处理
+
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php		func: doMobileshoplist
+模板文件位置： D:/website/multimall/wx/data/tpl/mobile/modules/shopping/shop_list.tpl.php
+
+
+02:产品列表1.html  【访问路径：首页 点击广告 】  注：已处理
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php		func: doMobilelist2  ===> $this-> __comm  ====> mobile/list2.php
+===> D:/website/multimall/wx/source/modules/shopping/mobile/list2.php
+
+模板文件位置：  D:/website/multimall/wx/data/tpl/mobile/modules/shopping/list2.tpl.php
+
+
+03: 我的订单  【访问路径：商城首页 我的订单 】  注：已处理
+
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php		func: doMobilemyorder  ===> $this-> __comm  ====>
+D:/website/multimall/wx/source/modules/shopping/mobile/myorder.php
+// mock here
+//$this->checkAuth();
+模板文件位置： D:/website/multimall/wx/data/tpl/mobile/modules/shopping/order.tpl.php
+
+
+04:订单详情   【访问路径：商城首页 我的订单 订单详情 】  注：未处理
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php	doMobilemyorder ===> $this-> __comm  ====>
+D:/website/multimall/wx/source/modules/shopping/mobile/myorder.php   ====> $op = detail
+// mock here
+//$this->checkAuth();
+
+模板文件位置： D:/website/multimall/wx/data/tpl/mobile/modules/shopping/order_detail.tpl.php     订单详情.html
+
+
+05: 购物车  【访问路径：商城首页 购物车 】  注：已处理
+
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php	doMobilemycart   ===> $this-> __comm  ====>
+D:/website/multimall/wx/source/modules/shopping/mobile/mycart.php ====>
+// mock here
+// $this->checkAuth();
+
+模板文件位置： D:/website/multimall/wx/data/tpl/mobile/modules/shopping/cart.tpl.php
+
+
+06: 结算  【访问路径：商城首页 购物车 结算 】  注：未处理
+
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php	doMobileConfirm   ===> $this-> __comm  ====>
+D:/website/multimall/wx/source/modules/shopping/mobile/confirm.php ====>
+// mock here
+// $this->checkAuth();
+出现错误无法处理
+
+
+07: 我的收藏  【访问路径：商城首页 我的收藏 】  注：未处理
+
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php	doMobilefavorite  ===> $this-> __comm  ====>
+D:/website/multimall/wx/source/modules/shopping/mobile/favorite.php   $op == 'display'
+// mock here
+// $this->checkAuth();
+
+模板文件位置：  D:/website/multimall/wx/data/tpl/mobile/modules/shopping/favorite.tpl.php    收藏.html
+
+
+08: 产品详细页.html  【访问路径：广告列表页 商城首页 产品详细页  】  注：已处理
+
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php	  doMobiledetail  ===> $this-> __comm  ====>
+D:/website/multimall/wx/source/modules/shopping/mobilemobile/detail.php
+
+模板文件位置： D:/website/multimall/wx/data/tpl/mobile/modules/shopping/detail.tpl.php
+
+09: 立即购买  【访问路径：广告列表页 商城首页 产品详细页 立即购买 】 注：未处理  即将处理
+
+相关文件：
+D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
+D:/website/multimall/wx/source/modules/shopping/site.php  doMobileconfirm  ===> $this-> __comm  ====>
+D:/website/multimall/wx/source/modules/shopping/mobile/confirm.php ====>
+// mock here
+// $this->checkAuth();
+
+模板文件位置： D:/website/multimall/wx/data/tpl/mobile/modules/shopping/confirm.tpl.php  购物车2.html  购物车3（空）.html
+
+
 2. D:/website/multimall/wx/source/modules/shopping/template/mobile/list2.html
-3. D:\website\multimall\wx\data\tpl\mobile\modules\shopping\footerbar.tpl.php
-4. D:\website\multimall\wx\data\tpl\mobile\modules\shopping\order.tpl.php
-5. D:\website\multimall\wx\data\tpl\mobile\modules\shopping\detail.tpl.php
-7. D:/website/multimall/wx/data/tpl/mobile/modules/shopping/order_detail.tpl.php
-8. D:/website/multimall/wx/data/tpl/mobile/modules/shopping/cart.tpl.php
+3. D:/website/multimall/wx/data/tpl/mobile/modules/shopping/footerbar.tpl.php
 
-
-
-
-=========================================================================================================
-微点餐：
-http://wx.topspring.com/wx/mobile.php?act=module&do=wapindex&name=idish&weid=1&from_user=
-http://www.multimall.cn/wx/mobile.php?act=module&do=wapindex&name=idish&weid=1&from_user=
-
-mock here:
-D:\van_zhang\mine\multimall\wx\source\modules\idish\site.php
-
-修改：
-01. D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/idish/dish_rest_list.tpl.php
-02. D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/idish/dish_list.tpl.ph
-03.	D:/van_zhang/mine/multimall/wx/source/modules/idish/template/css/1/wei_canyin_v1.8.4.css?v=1.2
-04. D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/idish/dish_order_list.tpl.php
-05. D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/idish/dish_menu.tpl.php
-
-
-
-
-
-==========================================================================================================
-
-潮mall
-http://wx.topspring.com/wx/mobile.php
-http://www.multimall.cn/wx/mobile.php
-
-
-01:潮MALL-首页.html  【访问路径：首页】  注：已处理
-
-相关文件：
-D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'index'
-D:\van_zhang\mine\multimall\wx\source\function\template.func.php    
-
-模板文件位置：D:/van_zhang/mine/multimall/wx/themes/mobile/default/index.html
-
-
-02：潮MALL-品牌.html  【访问路径：首页 广告点击 】  注：已处理
-
-相关文件：
-D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'business'
-D:\van_zhang\mine\multimall\wx\source\function\template.func.php   
-
-模板文件位置： D:/van_zhang/mine/multimall/wx/themes/mobile/default/business.html
-
-03： 地图.html  【访问路径：首页 广告点击 地图 】  注：已处理
-
-相关文件：
-D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'business_map'
-D:\van_zhang\mine\multimall\wx\source\function\template.func.php   
-
-模板文件位置： D:/van_zhang/mine/multimall/wx/themes/mobile/default/business_map.html
-
-
-04: 商家详情.html 【访问路径：首页 广告点击 地图 点击广告 】  注：已处理
-
-相关文件：
-D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php    $name == 'business_detail'
-D:\van_zhang\mine\multimall\wx\source\function\template.func.php 
-
-模板文件位置： D:/van_zhang/mine/multimall/wx/themes/mobile/default/business_detail.html
-
-
-05： 微社区
-
-http://buluo.qq.com/p/barindex.html?bid=134033&from=wsqjump
-
-备注： 未处理  访问路径未知
-
-
-06: 我的会员.html   【访问路径：首页 我的会员 】  注：已处理
-
-调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php  doMobileWapHome
-// mock here
-// checkauth(true,false,false);
-// mock here
-$from_uid = '17';
-
-修改模板 D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_home.tpl.php
-修改样式：D:\van_zhang\mine\multimall\wx\themes\mobile\default\css\style.css
-525:	.ico_jf{ background:url(../../../../cross/images/jf.png) no-repeat 16px 10px; background-size:auto 39px;}
-527: 	.ico_jfph{ background:url(../../../../cross/images/jfph.png) no-repeat 16px 10px; background-size:auto 39px;}
-
-
-
-07: 我的站内信  【访问路径：首页 我的会员主页 我的站内信  】  注：未处理
-
-备注：未找到相关设计稿
-
-
-08: 会员卡.html  【访问路径：首页 我的会员主页 会员卡  】  注：已处理
-调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php  doMobileWapIndex
-// mock here
-//checkauth(true,false,false);
-
-$from_uid = '17';
-修改模板: D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_index.tpl.php
-
-
-09:积分兑换.html  【访问路径：首页 我的会员主页 积分兑换  】  注：已处理
-
-调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php   doMobilewapdh
-// mock here
-//checkauth(true,false,false);
-
-$from_uid = '17';
-
-修改模板: D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_dh.tpl.php
-注：table样式无法修改，来自于数据库的动态显示
-
-09:商家收藏.html  【访问路径：首页 我的会员主页 商家收藏  】  注：已处理
-
-调整代码：D:\van_zhang\mine\multimall\wx\source\controller\mobile\channel.ctrl.php
-在这个位置 elseif ($name == 'mycollect')：
-// mock here
-// checkauth(true,true) ;
-$_W['fans']['from_uid'] = '17'; // mock here
-
-路径函数： D:\van_zhang\mine\multimall\wx\source\function\template.func.php
-
-修改模板：D:/van_zhang/mine/multimall/wx/themes/mobile/default/mycollect.html
-
-
-10： 优惠券 【访问路径：首页 我的会员主页  优惠券 】 注：未处理
-
-备注：未找到相关设计图稿
-
-
-11:修改个人信息.html  【访问路径：首页 我的会员主页  点击banner进入】 注：正在处理
-
-调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function:   doMobileupdateCards
-// mock here
-// checkauth(true,true,false);
-
-修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/ucard.tpl.php
-
-
-12: 最新通知.html  【访问路径：我的会员  会员卡 最新通知】  注：已处理
-
-调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapAnnounce
-// mock here
-// $this -> ishave_user($weid, $from_user, false);
-
-修改模板： D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_announce.tpl.php
-注释掉：D:\van_zhang\mine\multimall\wx\source\modules\icard\template\css\card.css 1166 行的 
-/*background:url(../themes/2/power0.png) no-repeat left 50%;*/
-
-
-
-13：签到 赚积分.html  【访问路径：我的会员  会员卡   签到赚积分】 注：已处理
-
-调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobileWapSign
-// mock here
-// $this -> ishave_user($weid, $from_user, false);
-
-修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/wap_sign.tpl.php
-修改样式：D:\van_zhang\mine\multimall\wx\source\modules\icard\template\css\card.css
-1223行的背景图片：background:url(../../../../../cross/images/qdrl.png) no-repeat left 50%;
-
-
-14： 积分排行.html 【访问路径：我的会员  会员卡   积分排行榜】  注：已处理
-
-调整代码：D:\van_zhang\mine\multimall\wx\source\modules\icard\site.php    function: doMobilejssort
-
-修改模板：D:/van_zhang/mine/multimall/wx/data/tpl/mobile/modules/icard/jfsort.tpl.php
-
-
-15：客服中心  【访问路径：主页 客服中心 】  注：已处理
-
-相关文件：
-D:/van_zhang/mine/multimall/wx/source/controller/mobile/channel.ctrl.php  $name == 'kf'
-D:\van_zhang\mine\multimall\wx\source\function\template.func.php 
-
-
-修改模板： D:/van_zhang/mine/multimall/wx/themes/mobile/default/kf.html
-
-
-
-
-==========================================================================================
-template.func.php
-mock：	account.class.php
-mock： 	D:\website\multimall\wx\source\modules\shopping\mobile\myorder.php
-mock：	D:\website\multimall\wx\source\modules\shopping\mobile\mycart.php
-mock:	D:\website\multimall\wx\source\modules\shopping\mobile\confirm.php
-
+==================================================================================================================
 
 
 
