@@ -55,72 +55,64 @@ samples.doc.css
 
 body{line-height: 1.5em;}
 h1{width:100%;height:48px;line-height:48px;font-size:1.5em;text-align: center;background-color:lavender;}
-h2{width:96%;margin:1.5em auto;}
-h2 a{text-decoration: none;}
-div{width:96%;margin:1.5em auto;display:none;}
-div > dl{box-shadow: 1px 1px 8px #808080;padding-bottom: 16px;margin-top:0.125em;padding-top:0.75em;}
-div > dl > dt{text-indent:2%;margin-bottom: 0.75em;}
-div > dl > dd {display:none;width:96%;margin:auto;border-bottom: 1px solid #DCDCDC;}
-div > dl i{font-size:0.75em;color:#FA8072;}
-div > dl > dt > a {color:#800000;text-decoration: none;}
-h2 > a > img,div > dl > dt > a > img{width:20px;height:15px;vertical-align: middle;margin-left:5%;}
+h2{width:96%;margin:1.5em auto;cursor: pointer;}
+.section{width:96%;margin:1.5em auto;display:none;}
+h3{width:96%;margin:1.5em auto;margin:0;padding:0;height:24px;line-height: 24px;cursor: pointer;color:#800000;font-style: italic;font-size:0.75em;}
+.section > div{display:none;width:96%;margin:1.5em auto;box-shadow: 1px 1px 8px #808080;padding:0.625em;font-size:0.625em;}
+.section > div > p{border-bottom: 1px solid #DCDCDC;}
 
 samples.doc.js
 $(document).ready(function(){
 	var src={"up":'/cross/image/arrow-up.jpg',"down":'/cross/image/arrow-down.jpg'};
-	$('h2 a').on('click',function(){
-		var dl = $(this).parent().next('div');
-		if($(this).hasClass('off'))
-		{
-			$(this).removeClass('off');
-			$(this).children('img').attr("src",src.down);
-			dl.show();
-		}else
-		{
-			$(this).addClass('off');
-			$(this).children('img').attr("src",src.up);
-			dl.hide();
-		}
-	});
-	$('dt a').on('click',function(){
+	$('h2').on('click',function(){
 		if($(this).hasClass('on'))
 		{
 			$(this).removeClass('on');
-			$(this).parent().siblings('dd').hide();
-			$(this).children('img').attr("src",src.up);
+			$(this).next('div').hide();
+			$(this).next('div').children('h3').removeClass('on');
+			$(this).next('div').children('div').hide();
+
+		}else{	$(this).addClass('on');	$(this).next('div').show();	}
+	});
+
+	$('h3').on('click',function(){
+		if($(this).hasClass('on'))
+		{
+			$(this).removeClass('on');
+			$(this).next('div').hide();
 		}else
 		{
 			$(this).addClass('on');
-			$(this).parent().siblings('dd').show();
-			$(this).children('img').attr("src",src.down);
+			$(this).next('div').show();
 		}
 	});
 });
 
 samples.doc.html
+
 <!DOCTYPE html>
 <html>
-	<head>
-		<title></title>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="/cross/css/reset.css" />
-		<link rel="stylesheet" href="/cross/css/samples.doc.css" />
-		<script src="/cross/js/jquery-3.min.js"></script>
-		<script src="/cross/js/samples.doc.js"></script>
-	</head>
-	<body>
-		<h1>索引</h1>
-		<h2><a class="off" href="javascript:void(0);"><img src="/cross/image/arrow-up.jpg" alt="" /></a></h2>
+<head>
+	<title>MySQL NOTEBOOK</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/cross/css/reset.css" />
+	<link rel="stylesheet" href="/cross/css/samples.doc.css" />
+	<script src="/cross/js/jquery-3.min.js"></script>
+	<script src="/cross/js/samples.doc.js"></script>
+</head>
+<body>
+	<h1></h1>
+	<h2>化</h2>
+	<div class="section">
+		<h3></h3>
 		<div>
-			<dl>
-				<dt><a href="javascript:void(0);"><i></i><img src="/cross/image/arrow-up.jpg" alt="" /></a></dt>
-				<dd></dd>
-				<dd></dd>
-			</dl>
+			<p></p>
 		</div>
-	</body>
+	</div>
+</body>
 </html>
+
 ===================================================================================================================================
 
 
