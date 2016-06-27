@@ -1,0 +1,126 @@
+
+
+===================================================================================================================================
+
+	http://www.easyicon.net/iconsearch/Folder/     一些常用的图标下载地址
+	
+	http://layer.layui.com/api.html  layer文档
+	
+	http://www.expressjs.com.cn/4x/api.html 			   nodejs express 4.x中文手册
+	https://nodejs.org/dist/latest-v5.x/docs/api/documentation.html    nodejs 5.x API
+	
+	http://cache.baiducontent.com/c?m=9d78d513d99c1cf30db0c22e1a17a7716f51971739c0d16568a4e35fe3174c31417194bf30236013a3c06b1376b8382bfd843565367337c69fdffc4fc9fcd27620d26172320b87320fce4ffc8d15759261c74de9d81ee4ebb66f84aea582820b4e9913436780f2885b021fd769f31733e6a28e48620556e5&p=882a9645d58b15e60be2963d570e85&newp=8a3bcf5b9c934eac58eec92d02149f231610db2151d4d71622&user=baidu&fm=sc&query=Mongodb%D7%F7%BB%BA%B4%E6%B7%FE%CE%F1%C6%F7&qid=9e7a190a0003ebdb&p1=9
+        
+        http://www.jb51.net/jiaoben   一些jQuery和CSS3特效
+        
+        json在线解析   http://json.parser.online.fr/
+        http://www.greenxf.com/soft/50957.html  
+
+	
+	http://www.phper.org.cn/ 				PHP技术交流网络应用开发
+	
+	http://www.php.net/manual/zh/ 				PHP:PHP手册-Manual
+
+	http://alexeyrybak.com/blitz/blitz_en.html  		PHP Blitz templates模版
+	
+	http://www.golaravel.com/				PHP框架　laravel
+	
+	http://bbs.chinaunix.net/thread-3762438-1-1.html	Blitz smarty php
+	
+	http://www.yiibai.com/html/postgresql/2013/080435.html  postgresql 指导教程
+
+	http://www.highgo.com.cn/docs/docs90cn/index.html	postgresql 指导教程
+	
+
+	http://www.phpx.com/man/dhtmlcn/			DHTML参考手册
+
+	http://www.w3.org/TR/CSS21/sample.html			CSS 3默认值参考
+
+	http://www.w3cplus.com/tools/emmet-cheat-sheet.html	EMMENT前端代码集成工具
+
+	
+	http://www.linuxidc.com/Linux/2006-11/1046.htm? ? ?	FreeBSD下Web服务器安全设置
+
+	http://www.verydemo.com/demo_c453_i10814.html? ?	FreeBSD下Web服务器安全设置
+
+	http://doc.chinaunix.net/aix/201212/2521456.shtml???	FreeBSD安全配置手册
+
+	http://www.osyunwei.com/archives/3007.html		FreeBSD的防火墙设置
+
+	http://www.openke.net/					公开课
+
+
+===================================================================================================================================	
+samples.doc.css
+
+body{line-height: 1.5em;}
+h1{width:100%;height:48px;line-height:48px;font-size:1.5em;text-align: center;background-color:lavender;}
+h2{width:96%;margin:1.5em auto;}
+h2 a{text-decoration: none;}
+div{width:96%;margin:1.5em auto;display:none;}
+div > dl{box-shadow: 1px 1px 8px #808080;padding-bottom: 16px;margin-top:0.125em;padding-top:0.75em;}
+div > dl > dt{text-indent:2%;margin-bottom: 0.75em;}
+div > dl > dd {display:none;width:96%;margin:auto;border-bottom: 1px solid #DCDCDC;}
+div > dl i{font-size:0.75em;color:#FA8072;}
+div > dl > dt > a {color:#800000;text-decoration: none;}
+h2 > a > img,div > dl > dt > a > img{width:20px;height:15px;vertical-align: middle;margin-left:5%;}
+
+samples.doc.js
+$(document).ready(function(){
+	var src={"up":'/cross/image/arrow-up.jpg',"down":'/cross/image/arrow-down.jpg'};
+	$('h2 a').on('click',function(){
+		var dl = $(this).parent().next('div');
+		if($(this).hasClass('off'))
+		{
+			$(this).removeClass('off');
+			$(this).children('img').attr("src",src.down);
+			dl.show();
+		}else
+		{
+			$(this).addClass('off');
+			$(this).children('img').attr("src",src.up);
+			dl.hide();
+		}
+	});
+	$('dt a').on('click',function(){
+		if($(this).hasClass('on'))
+		{
+			$(this).removeClass('on');
+			$(this).parent().siblings('dd').hide();
+			$(this).children('img').attr("src",src.up);
+		}else
+		{
+			$(this).addClass('on');
+			$(this).parent().siblings('dd').show();
+			$(this).children('img').attr("src",src.down);
+		}
+	});
+});
+
+samples.doc.html
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/cross/css/reset.css" />
+		<link rel="stylesheet" href="/cross/css/samples.doc.css" />
+		<script src="/cross/js/jquery-3.min.js"></script>
+		<script src="/cross/js/samples.doc.js"></script>
+	</head>
+	<body>
+		<h1>索引</h1>
+		<h2><a class="off" href="javascript:void(0);"><img src="/cross/image/arrow-up.jpg" alt="" /></a></h2>
+		<div>
+			<dl>
+				<dt><a href="javascript:void(0);"><i></i><img src="/cross/image/arrow-up.jpg" alt="" /></a></dt>
+				<dd></dd>
+				<dd></dd>
+			</dl>
+		</div>
+	</body>
+</html>
+===================================================================================================================================
+
+
