@@ -53,17 +53,49 @@
 ===================================================================================================================================	
 samples.doc.css
 
-body{line-height: 1.5em;}
-h1{width:100%;height:48px;line-height:48px;font-size:1.5em;text-align: center;background-color:lavender;}
-h2{width:96%;margin:1.5em auto;cursor: pointer;}
-.section{width:96%;margin:1.5em auto;display:none;}
-h3{width:96%;margin:1.5em auto;margin:0;padding:0;height:24px;line-height: 24px;cursor: pointer;color:#800000;font-style: italic;font-size:0.75em;}
-.section > div{display:none;width:96%;margin:1.5em auto;box-shadow: 1px 1px 8px #808080;padding:0.625em;font-size:0.625em;}
-.section > div > p{border-bottom: 1px solid #DCDCDC;}
+h1
+{
+	width:100%;height:48px;
+	line-height:48px;
+	font-size:1.5em;
+	text-align: center;
+	background-color:lavender;
+}
+h2
+{
+	width:96%;
+	margin:0.75em auto;
+	cursor: pointer;
+	font-weight:bold;
+	font-family: 'Simplified Arabic Fixed','微软雅黑','Arial';
+}
+.section{width:96%;margin: 0 auto;display:none;}
+h3
+{
+	width:96%;
+	margin:2px auto;
+	padding-left:0.625em;padding-right:0.625em;
+	height:22px;
+	line-height: 22px;
+	cursor: pointer;
+	color:#FFF;
+	font-style: italic;
+	font-size:0.75em;
+	background-color:#D2B48C;
+}
+.section > div
+{
+	display:none;
+	width:96%;
+	margin:1em auto;
+	box-shadow: 1px 1px 8px #808080;
+	padding:0.625em;
+	font-size:0.625em;
+}
+.section > div > p{ border-bottom: 1px solid #DCDCDC;line-height: 2em; }
 
 samples.doc.js
 $(document).ready(function(){
-	var src={"up":'/cross/image/arrow-up.jpg',"down":'/cross/image/arrow-down.jpg'};
 	$('h2').on('click',function(){
 		if($(this).hasClass('on'))
 		{
@@ -103,7 +135,7 @@ samples.doc.html
 </head>
 <body>
 	<h1></h1>
-	<h2>化</h2>
+	<h2></h2>
 	<div class="section">
 		<h3></h3>
 		<div>
