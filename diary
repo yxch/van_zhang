@@ -69,7 +69,7 @@ D:/website/multimall/wx/source/modules/shopping/mobile/myorder.php
 模板文件位置： D:/website/multimall/wx/data/tpl/mobile/modules/shopping/order.tpl.php
 
 
-04:订单详情   【访问路径：商城首页 我的订单 订单详情 】  注：未处理
+04:订单详情   【访问路径：商城首页 我的订单 订单详情 】  注：已处理
 D:/website/multimall/wx/source/controller/mobile/module.ctrl.php
 D:/website/multimall/wx/source/modules/shopping/site.php	doMobilemyorder ===> $this-> __comm  ====>
 D:/website/multimall/wx/source/modules/shopping/mobile/myorder.php   ====> $op = detail
@@ -139,4 +139,3 @@ D:/website/multimall/wx/source/modules/shopping/mobile/confirm.php ====>
 3. D:/website/multimall/wx/data/tpl/mobile/modules/shopping/footerbar.tpl.php
 
 ==================================================================================================================
-
