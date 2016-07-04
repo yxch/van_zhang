@@ -1,42 +1,6 @@
 
-居中的第二种写法
-div{
-			position:fixed;
-			margin:auto;
-			left:0;
-			right:0;
-			top:0;
-			bottom:0;
-			width:200px;
-			height:150px;
-			background: red;
-		}
-		<div>我是在窗口正中央的，呵呵！</div>
+
 		
 
-	要对相同的文字在不同浏览器中显示不同的颜色可以使用：
-	color:brown !important;		用于Opera、Firefox2、Firefox3等现代浏览器
-	>color:green !important;    IE7、IE8可以识别该规则，因此它覆盖掉了上一条规则
-	color:red;  所有浏览器都可以识别，但是以上两条规则有!important，所以这条规则被忽视；只有IE6认识并覆盖掉上两条规则
-	 _property和*property也是一样的。对于_property来说，只有IE6才能识别，因此可以用于单独对IE6的设置中。
-	不过这里要注意书写的顺序：现在浏览器的写法要写在最前面，IE6的写法要写在最后面用于覆盖，其他浏览器写在中间。
-	注：IE都能识别*标准浏览器(如FF)不能识别*
-	IE6能识别*，但不能识别 !important
-	IE7能识别*，也能识别!important
-	FF不能识别*，但能识别!important
-	区别IE6与FF：           background:orange;*background:blue;
-	区别IE6与IE7：          background:green !important;background:blue;
-	区别IE7与FF：           background:orange; *background:green;
-	区别FF/IE7/IE6：       background:orange;*background:green !important;*background:blue;
-	另外再补充一个，下划线"_",
-	IE6支持下划线，IE7和firefox均不支持下划线。于是还可以这样来区分IE6、IE7、firefox
-	: background:orange;*background:green;_background:blue;
 
-<style>
-.color
-{
-	background-color: #CC00FF; /*所有浏览器都会显示为紫色*/
-	background-color: #FF0000\9; /*IE6、IE7、IE8会显示红色*/
-	*background-color: #0066FF; /*IE6、IE7会变为蓝色*/
-	_background-color: #009933; /*IE6会变为绿色*/
-}
+
