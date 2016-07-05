@@ -139,3 +139,205 @@ D:/website/multimall/wx/source/modules/shopping/mobile/confirm.php ====>
 3. D:/website/multimall/wx/data/tpl/mobile/modules/shopping/footerbar.tpl.php
 
 ==================================================================================================================
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>jQuery插件city picker实现省市区三级联动特效源码</title>
+	<link rel="stylesheet" href="/cross/css/reset.css" />
+	<link rel="stylesheet" href="css/city.picker.css"  />
+	<style>
+		h2{ width:100%;height:4rem;line-height:4rem;text-align: center; }
+
+		#districts{ width:96%;height:32px;text-align: center;margin:auto;font-size:0;}
+		#districts > span{display:inline-block;width:25%;margin-right:5%;height:100%;vertical-align: top;}
+		#districts > span > span:nth-child(1){ display:inline-block;width:100%;height:32px; }
+		#districts > span > span:nth-child(1) > input{width:68%;height:100%;vertical-align: top;border:none;font-size:16px;background-color:#999999;}
+		#districts > span > span:nth-child(1) > i{display:inline-block;width:32%;height:100%;background-color:red;vertical-align: top;}
+		#districts > span > span:nth-child(2){ display:none;width:100%;height:200px;background-color:lavender;overflow: hidden;overflow-y:scroll;}
+		#districts > span > span:nth-child(2) > i{display:inline-block;width:100%;line-height: 20px;font-style:normal;font-size:16px;line-height: 20px;}
+		#districts > span > span:nth-child(2) > i:hover{background-color:royalblue;}
+	</style>
+
+</head>
+<body>
+
+	<h2>city-picker城市选择器插件使用示例</h2>
+	<div style="width:100%;height:5rem;line-height: 5rem; ">
+		<input id="citypicker" readonly type="text" value="江苏省/常州市/溧阳市" data-toggle="city-picker" style="width:15rem;" />
+	</div>
+
+	<h2>城市选择器插件使用示例</h2>
+
+	<div id="districts">
+		<span id="zhp">
+			<span><input id="province" type="text" value="" placeholder="请选择省份" /><i></i></span>
+			<span></span>
+		</span>
+		<span id="zhc">
+			<span><input id="city" type="text" value="" placeholder="请选择" /><i></i></span>
+			<span></span>
+		</span>
+		<span id="zhd">
+			<span><input id="district" type="text" value="" placeholder="请选择" /><i></i></span>
+			<span></span>
+		</span>
+	</div>
+
+
+	<div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+		<p>适用浏览器：360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗. 不支持IE8及以下浏览器。</p>
+	</div>
+
+	<script src="/cross/js/jquery.min.js"></script>
+	<script src="js/city.picker.data.js"></script>
+	<script src="js/city.picker.js"></script>
+	<script>
+		$('#citypicker').citypicker();
+
+		displayDefaultArea('山东','烟台');
+
+		function displayDefaultArea(province,city,district)
+		{
+			if(!province){ throw new Error('arguments are not allowed to be empty'); }
+			var code = '';
+			for(var p in  ChineseDistricts['zh'] )
+			{
+				if(ChineseDistricts['zh'][p].indexOf(province) !== -1)
+				{
+					$('#province').val(province);
+					$('#zhp span:nth-child(2)').append(provinces());
+					$('[data-code="' + p + '"]').css('background-color','royalblue');
+					code = p;
+					break;
+				}
+			}
+			var cityCode = '';
+			if(code)
+			{
+				var cityList = cities(code);
+				if(city)
+				{
+					for(var c in ChineseDistricts[code])
+					{
+						if(ChineseDistricts[code][c].indexOf(city) !== -1)
+						{
+							$('#city').val(ChineseDistricts[code][c]);
+							$('#zhc span:nth-child(2)').append(cityList);
+							$('[data-code="' + c + '"]').css('background-color','royalblue');
+							cityCode = c;
+							break;
+						}
+					}
+				}else
+				{
+					$('#zhc span:nth-child(2)').append(cityList);
+					$('#city').val(ChineseDistricts[code][parseInt(code) + 100]);
+					$('[data-code="' + ( parseInt(code) + 100 )+ '"]').css('background-color','royalblue');
+					cityCode = parseInt(code) + 100;
+				}
+			}
+			if(cityCode)
+			{
+				var districtList = districts(cityCode);
+				if(district)
+				{
+					for(var d in ChineseDistricts[cityCode])
+					{
+						if(ChineseDistricts[cityCode][d].indexOf(district) !== -1)
+						{
+							$('#district').val(ChineseDistricts[cityCode][d]);
+							$('#zhd span:nth-child(2)').append(districtList);
+							$('[data-code="' + d + '"]').css('background-color','royalblue');
+							break;
+						}
+					}
+				}else
+				{
+					$('#zhd span:nth-child(2)').append(districtList);
+					for(var x in ChineseDistricts[cityCode])
+					{
+						if(ChineseDistricts[cityCode][x])
+						{
+							$('#district').val(ChineseDistricts[cityCode][x]);
+							$('[data-code="' + x + '"]').css('background-color','royalblue');
+							break;
+						}
+					}
+				}
+			}
+
+		}
+
+		// 在文档处单击清除下拉框
+		$(document).click(function(){
+			$('#districts span span:nth-child(2)').css('display','none');
+		});
+
+		$(document).on('click','#province,#city,#district',function(ev){
+			ev.stopPropagation();
+		});
+
+		// 下拉按钮
+		$(document).on('click','#districts span span:nth-child(1) i',function(ev){
+			ev.stopPropagation();
+			$('#districts span span:nth-child(2)').css('display','none');
+			$(this).parent().next().css('display','inline-block');
+		});
+
+		// 选择省份 城市 区域
+		$(document).on('click','#districts,span span:nth-child(2) i',function(ev){
+			ev.stopPropagation();
+			var txt = $(this).text();
+			var code = $(this).attr('data-code');
+			var pid = $(this).parent().parent().attr('id');
+			$(this).parent().prev().children('input').val(txt);
+			$(this).parent().css('display','none');
+			if(pid === 'zhp')
+			{
+				// 显示相应的城市
+				$('#zhc span:nth-child(2)').html(cities(code));
+				$('#city').val('');
+			}
+			if(pid === 'zhc')
+			{
+				// 显示相应的城市
+				$('#zhd span:nth-child(2)').html(districts(code));
+				$('#district').val('');
+			}
+		});
+
+		// 得到所有的省包括直辖市港澳台
+		function provinces()
+		{
+			var html = '';
+			for(var p in  ChineseDistricts['zh'] ){	html += '<i data-code="' + p + '">' + ChineseDistricts['zh'][p] + '</i>'; }
+			return html;
+		}
+
+		// 根据省份code得到城市列表
+		function cities(code)
+		{
+			if(!code){ throw new Error("arguments are not allowed to be empty");}
+			var html = '';
+			for(var p in ChineseDistricts[code]){ html += '<i data-code="' + p + '">' + ChineseDistricts[code][p] + '</i>';	}
+			return html;
+		}
+
+		// 根据城市code得到区域列表
+		function districts(code)
+		{
+			if(!code){ throw new Error("arguments are not allowed to be empty");}
+			var html = '';
+			for(var p in ChineseDistricts[code]){ html += '<i data-code="' + p + '">' + ChineseDistricts[code][p] + '</i>';	}
+			return html;
+		}
+
+
+	</script>
+
+</body>
+</html>
+
