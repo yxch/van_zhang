@@ -1,4 +1,7 @@
 
+
+rewrite ^/backer/([_a-zA-Z]+[_a-zA-Z0-9]+)/([_a-zA-Z]+[_a-zA-Z0-9]+)(\/.*\/)?(\?.*)?$ /backer/index.php?c=$1&f=$2&u=$3&$4 last;
+
 https://docs.mongodb.com/manual/core/document/
 
 
