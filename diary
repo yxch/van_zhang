@@ -4,6 +4,8 @@ rewrite ^/backer/([_a-zA-Z]+[_a-zA-Z0-9]+\/)?([_a-zA-Z]+[_a-zA-Z0-9]+\/)?(.*\/)?
 
 https://docs.mongodb.com/manual/core/document/
 
+http://www.helloweba.com/view-blog-224.html
+
 
 优化数据类型提高性能的主要在于以下几个方面： 
 1. 通过选用更“小”的数据类型减少存储空间，使查询相同数据需要的IO 资源降低； 
