@@ -1,6 +1,23 @@
 
 
-rewrite ^/backer(.*)(.php|\/)$ /backer/index.php?f=$1$2 break;
+// 解析url的参数
+String.prototype.parseURL = function()
+{
+	if(!this){ return null; }
+	var o = new Object();
+	if(this.indexOf('?') != -1)
+	{
+		var splits = this.split('?');
+		o.href = splits[0];
+		var hash = window.location.hash;
+		if(hash)
+		{
+			var ar = splits[1].split(hash)[0].split('&');
+		}else{ var ar = splits[1].split('&'); }
+		for(var i=0; i<ar.length; i++){	o[ar[i].split("=")[0]] = decodeURIComponent(ar[i].split("=")[1]); }
+	}
+	return o;
+};
 
 =================================================================================================================
 
