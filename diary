@@ -19,6 +19,23 @@ String.prototype.parseURL = function()
 	return o;
 };
 
+function size(obj,maxWidth,maxHeight)
+		{
+			var img = new Image();
+			img.src = obj.src;
+			var width = img.width,height = img.height,ratio = width / height;
+			
+			if(width < maxWidth)
+			{
+				var len = Math.min(maxWidth,maxHeight);
+				obj.style.width = len + 'px';
+				obj.style.height = len + 'px';
+				
+			}else{	obj.style.width = maxWidth + 'px';}
+	
+		}
+		size(document.getElementById('img'),$('.cnt').width(),$('.cnt').height());
+
 =================================================================================================================
 
 PostgreSQL  PHP模式   EA11  Sass Javascript 7
