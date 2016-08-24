@@ -20,44 +20,37 @@ String.prototype.parseURL = function()
 };
 
 <script>
-		function imgsize(obj,maxWidth,maxHeight)
-		{
-			var img = new Image();
-			img.src = obj.src;
-			var width = img.width,height = img.height,ratio = width / height;
-
-			if(width > maxWidth)
+			function imgsize(obj,sw,sh,stretch)
 			{
-				if(height > maxHeight)
+				var img = new Image();
+				img.src = obj.src;
+				var pw = img.width,ph = img.height;
+				
+				if(pw > sw)
 				{
-					obj.style.width = maxWidth + 'px';
+					if((sw * ph) / pw > sh)	{ obj.style.width = (pw  * sh) / ph + 'px';
+					}else{	obj.style.width = sw + 'px';	obj.style.height = (sw * ph) / pw + 'px'; 	}
+					
 				}else
 				{
-					obj.style.width = maxWidth + 'px';
-					obj.style.height = (maxWidth / ratio) + 'px';
-				}
-
-			}else
-			{
-				if(height > maxHeight)
-				{
-					obj.style.width = maxHeight * ratio + 'px';
-					obj.style.height = maxHeight + 'px';
-				}else
-				{
-					obj.style.width = width + 'px';
-					obj.style.height = height + 'px';
+					if(ph > sh){ obj.style.width = sh * (pw / ph) + 'px'; 	obj.style.height = sh + 'px';
+					}else
+					{
+						if(stretch){ obj.style.width = sw + 'px'; 	obj.style.height = sw /(pw / ph) + 'px';
+						}else{		obj.style.width = pw + 'px';		obj.style.height = ph + 'px';			}
+					}
 				}
 			}
-		}
-		window.onload = function()
-		{
-			var img = document.getElementsByClassName('img');
-			var maxWidth = $('.imgout').width();
-			var maxHeight = $('.imgout').height();
-			for(var i=0;i<img.length;i++){	imgsize(img[i],maxWidth,maxHeight);	}
-		};
-	</script>
+			
+			window.onload = function(){
+				 imgsize(document.getElementById('img'),$('.cnt').width(),$('.cnt').height());
+			};
+
+		</script> 
+		
+		
+		
+		
 =================================================================================================================
 
 PostgreSQL  PHP模式   EA11  Sass Javascript 7
