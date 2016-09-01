@@ -1,6 +1,22 @@
 
 
-http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece763105392230e54f73b6cd0d3027fa3cf1fd5790801013db2e5703f1002d5c47b7001d8131ab5e4732f77552fe4d99bd9108aac92596fdf62742b5ad15612a20edecc5152c737e65efede18&p=c6728d15d9c041a405b6df2d021495&newp=882a9645dd915ffc57efc039115993231610db2151d4db01298ffe0cc4241a1a1a3aecbf26221305d1c2766c00a54d58edf43d77370834f1f689df08d2ecce7e7d96&user=baidu&fm=sc&query=apache+rewrite+%C5%E4%D6%C3&qid=95799475000858b5&p1=1
+	$date = '2014-09-02';
+
+	$unixtime = strtotime($date . ' 00:00:00');
+	$sYear = (int)date('Y',$unixtime);
+
+	$datetime1 = date_create($date);
+	$datetime2 = date_create(date('Y-m-d'));
+	$eYear = (int)date('Y');
+	$interval = date_diff($datetime1, $datetime2);
+	$daysDiff = (int)$interval->format('%R%a');
+
+	// 算闰年
+	for($i = $sYear; $i <= $eYear;$i++){ if($i % 400 == 0 || ($i % 4 == 0 && $i % 100 != 0)){ $daysDiff = $daysDiff - 1; }	}
+	$age = $daysDiff / 365;
+	echo $age;
+	
+	
 
 
 // 解析url的参数
