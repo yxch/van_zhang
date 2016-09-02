@@ -1,24 +1,4 @@
 
-
-	$date = '2014-09-02';
-
-	$unixtime = strtotime($date . ' 00:00:00');
-	$sYear = (int)date('Y',$unixtime);
-
-	$datetime1 = date_create($date);
-	$datetime2 = date_create(date('Y-m-d'));
-	$eYear = (int)date('Y');
-	$interval = date_diff($datetime1, $datetime2);
-	$daysDiff = (int)$interval->format('%R%a');
-
-	// 算闰年
-	for($i = $sYear; $i <= $eYear;$i++){ if($i % 400 == 0 || ($i % 4 == 0 && $i % 100 != 0)){ $daysDiff = $daysDiff - 1; }	}
-	$age = $daysDiff / 365;
-	echo $age;
-	
-	
-
-
 // 解析url的参数
 String.prototype.parseURL = function()
 {
