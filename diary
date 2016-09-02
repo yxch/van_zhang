@@ -1,4 +1,10 @@
 
+
+
+http://www.yiibai.com/nodejs/
+
+
+
 // 解析url的参数
 String.prototype.parseURL = function()
 {
