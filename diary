@@ -1,77 +1,9 @@
 
-
-
-
-
-
-
 http://www.yiibai.com/nodejs/
 
-
-
-// 解析url的参数
-String.prototype.parseURL = function()
-{
-	if(!this){ return null; }
-	var o = new Object();
-	if(this.indexOf('?') != -1)
-	{
-		var splits = this.split('?');
-		o.href = splits[0];
-		var hash = window.location.hash;
-		if(hash)
-		{
-			var ar = splits[1].split(hash)[0].split('&');
-		}else{ var ar = splits[1].split('&'); }
-		for(var i=0; i<ar.length; i++){	o[ar[i].split("=")[0]] = decodeURIComponent(ar[i].split("=")[1]); }
-	}
-	return o;
-};
-
-<script>
-			function imgsize(obj,sw,sh,stretch)
-			{
-				var img = new Image();
-				img.src = obj.src;
-				var pw = img.width,ph = img.height;
-				
-				if(pw > sw)
-				{
-					if((sw * ph) / pw > sh)	{ obj.style.width = (pw  * sh) / ph + 'px';
-					}else{	obj.style.width = sw + 'px';	obj.style.height = (sw * ph) / pw + 'px'; 	}
-					
-				}else
-				{
-					if(ph > sh){ obj.style.width = sh * (pw / ph) + 'px'; 	obj.style.height = sh + 'px';
-					}else
-					{
-						if(stretch){ obj.style.width = sw + 'px'; 	obj.style.height = sw /(pw / ph) + 'px';
-						}else{		obj.style.width = pw + 'px';		obj.style.height = ph + 'px';			}
-					}
-				}
-			}
-			
-			window.onload = function(){
-				 imgsize(document.getElementById('img'),$('.cnt').width(),$('.cnt').height());
-			};
-
-		</script> 
-		
-		
-		
-		
-=================================================================================================================
-
-PostgreSQL  PHP模式   EA11  Sass Javascript 7
-
 面向对象应该牢记：保持对象小型化，模块化，非耦合以及流线型 。
-
-=================================================================================================================
-www.multimall.cn  卖家（vendor）  商品(wares)   订单(order)   买家（buyer） 
 
 useradd -o -u 0 -g 0 -M -d /root -s /bin/bash vxzhan
 select (@i:=@i+1) as i,post_time from tb_check_price,(select @i:=0) as tt  order by post_time desc; 
 
 http://auto.sohu.com/20160607/n453446539.shtml  驾驶证到期还去车管所？你真是out了
-=================================================================================================================
-
