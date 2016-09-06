@@ -5,6 +5,12 @@ https://pecl.php.net/package/mongo/     php_mongo.dll下载地址
 
 https://ngrok.com/download/    内网映射到外网
 
+    1.Start by downloading ngrok.
+    2.Install your authtoken    ./ngrok authtoken 2qv36WkU2nDQ363NtNh2k_4Coy1Q28YcZMJF6Aejw43
+    3.Create your first secure tunnel ./ngrok http 80
+    4.Open the web interface at http://localhost:4040 to inspect and replay requests
+
+
 面向对象应该牢记：保持对象小型化，模块化，非耦合以及流线型 。
 
 useradd -o -u 0 -g 0 -M -d /root -s /bin/bash vxzhan
