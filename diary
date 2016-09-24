@@ -1,4 +1,15 @@
 
+
+// 打印内容
+	public static function pre($data,$vardump=TRUE)
+	{
+		echo '<pre>';
+		$vardump ? exit(var_dump($data)) : exit(print_r($data));
+		echo '</pre>';
+	}
+
+
+
 http://d89b2a84.ngrok.io/
 
 https://d89b2a84.ngrok.io
