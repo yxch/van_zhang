@@ -1,15 +1,5 @@
 
 
-// 打印内容
-	public static function pre($data,$vardump=TRUE)
-	{
-		echo '<pre>';
-		$vardump ? exit(var_dump($data)) : exit(print_r($data));
-		echo '</pre>';
-	}
-
-
-
 http://www.yiibai.com/nodejs/    nodejs中文网站
 
 https://pecl.php.net/package/mongo/     php_mongo.dll下载地址
