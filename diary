@@ -14,6 +14,13 @@ $_REQUEST[]具用$_POST[] $_GET[]的功能,但是$_REQUEST[]比较慢。通过PO
    5. GET安全性非常低，POST安全性较高。
    
    
+AngularJS 表达式 与 JavaScript 表达式
+类似于 JavaScript 表达式，AngularJS 表达式可以包含字母，操作符，变量。
+与 JavaScript 表达式不同，AngularJS 表达式可以写在 HTML 中。
+与 JavaScript 表达式不同，AngularJS 表达式不支持条件判断，循环及异常。
+与 JavaScript 表达式不同，AngularJS 表达式支持过滤器。
+   
+   
 
 http://www.runoob.com/angularjs/angularjs-tutorial.html  auglarjs教程
 
