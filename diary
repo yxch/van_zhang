@@ -1,9 +1,4 @@
 
-
-一、$_REQUEST与$_POST、$_GET的区别和特点
-
-$_REQUEST[]具用$_POST[] $_GET[]的功能,但是$_REQUEST[]比较慢。通过POST和GET方法提交的所有数据都可以通过$_REQUEST数组获得
-
 二、$_POST、$_GET的区别和特点
 
    1. GET是从服务器上获取数据，POST是向服务器传送数据。
@@ -19,6 +14,31 @@ AngularJS 表达式 与 JavaScript 表达式
 与 JavaScript 表达式不同，AngularJS 表达式可以写在 HTML 中。
 与 JavaScript 表达式不同，AngularJS 表达式不支持条件判断，循环及异常。
 与 JavaScript 表达式不同，AngularJS 表达式支持过滤器。
+
+
+5.pkg install jpeg png freetype2 libxml2 libmcrypt libgd curl iconv mhash
+6.编译安装apache(参考Nginx And Apache节)		
+7.pkg install  mysql55-client postgresql94-client-9.4.5
+8.编译安装php7
+./configure --prefix=/usr/local/php/ --with-config-file-path=/usr/local/etc/ --with-apxs2=/usr/local/httpd/bin/apxs --disable-debug --disable-rpath --disable-ipv6 --enable-inline-optimization --enable-mbstring --enable-soap --enable-zip --enable-sockets --enable-shmop --enable-sysvmsg --enable-sysvsem --enable-sysvshm --enable-mbstring --enable-bcmath --enable-soap --enable-fpm --enable-calendar --enable-static --enable-maintainer-zts --enable-opcache=no --enable-pdo --enable-xml --with-mysqli --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-pgsql --with-pdo-pgsql --with-mhash --with-mcrypt --with-freetype-dir --with-png-dir --with-jpeg-dir --with-gd --with-libxml-dir --with-curl --with-zlib --with-iconv-dir --with-bz2 --with-openssl --with-readline --without-sqlite3 --without-pdo-sqlite --with-pear
+make && make install
+环境整合：
+vi /etc/httpd/httpd.conf (第379行）
+AddType application/x-httpd-php .php .phtml
+修改第250行的内容如下:
+<IfModule dir_module>
+        DirectoryIndex index.php index.html
+</IfModule>		
+重启apache
+freeBSD上的错误处理：[Mon Nov 16 03:41:54.125273 2015] [core:warn] [pid 18495:tid 34393318400] (2)No such file or directory: AH00075: Failed to enable the 'httpready' Accept Filter
+# kldload accf_http
+# /usr/local/httpd/bin/apachectl restart //重启apache
+
+
+
+
+
+
 
 http://www.360doc.com/content/14/0722/16/1355383_396310091.shtml  30个最佳免费的CSS HTML登录表单模板
 
