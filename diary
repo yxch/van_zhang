@@ -9,26 +9,83 @@
    5. GET安全性非常低，POST安全性较高。
    
    
-AngularJS 表达式 与 JavaScript 表达式
-类似于 JavaScript 表达式，AngularJS 表达式可以包含字母，操作符，变量。
-与 JavaScript 表达式不同，AngularJS 表达式可以写在 HTML 中。
-与 JavaScript 表达式不同，AngularJS 表达式不支持条件判断，循环及异常。
-与 JavaScript 表达式不同，AngularJS 表达式支持过滤器。
+<?php
+$arr = array("ret"=>0,"data"=>array('a' => 1, 'b' => '2', 'c' => 3, 'd' => 4, 'e' => 5));
+$json = json_encode($arr);
+/**
+* Formats a JSON string for pretty printing
+*
+* @param string $json The JSON to make pretty
+* @param bool $html Insert nonbreaking spaces and <br />s for tabs and linebreaks
+* @return string The prettified output
+*/
+function _format_json($json, $html = false) {
+ $tabcount = 0;
+ $result = '';
+ $inquote = false;
+ $ignorenext = false;
+ if ($html) {
+  $tab = "   ";
+  $newline = "<br/>";
+ } else {
+  $tab = "\t";
+  $newline = "\n";
+ }
+ for($i = 0; $i < strlen($json); $i++) {
+  $char = $json[$i];
+  if ($ignorenext) {
+  $result .= $char;
+  $ignorenext = false;
+  } else {
+  switch($char) {
+   case '{':
+   $tabcount++;
+   $result .= $char . $newline . str_repeat($tab, $tabcount);
+   break;
+   case '}':
+   $tabcount--;
+   $result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char;
+   break;
+   case ',':
+   $result .= $char . $newline . str_repeat($tab, $tabcount);
+   break;
+   case '"':
+   $inquote = !$inquote;
+   $result .= $char;
+   break;
+   case '\\':
+   if ($inquote) $ignorenext = true;
+   $result .= $char;
+   break;
+   default:
+   $result .= $char;
+  }
+  }
+ }
+ return $result;
+}
+echo _format_json($json);
+/*
+{
+ "ret": 0,
+ "data": {
+ "a": 1,
+ "b": 2,
+ "c": 3,
+ "d": 4,
+ "e": 5
+ }
+}
+**/
 
 
-http://www.360doc.com/content/14/0722/16/1355383_396310091.shtml  30个最佳免费的CSS HTML登录表单模板
 http://www.thinkphp.cn/code/651.html
 
 http://blog.knowsky.com/195916.htm  postgresql常用命令
 https://code.angularjs.org/latest/docs/api  angular.js
 http://www.cnblogs.com/ys-ys/p/5092760.html   CSS 巧用 :before和:after
 
-
-
-
-http://www.runoob.com/w3cnote/php-ajax-cross-border.html PHP Ajax 跨域问题最佳解决方案
-   
-   
+http://www.runoob.com/w3cnote/php-ajax-cross-border.html PHP Ajax 跨域问题最佳解决方案   
 
 http://www.runoob.com/angularjs/angularjs-tutorial.html  auglarjs教程
 http://www.daqianduan.com/tag/css3-explain    css 3详解 大前端
@@ -46,13 +103,6 @@ http://www.bootcdn.cn/crypto-js/
 http://www.yiibai.com/nodejs/    nodejs中文网站
 
 https://pecl.php.net/package/mongo/     php_mongo.dll下载地址
-
-https://ngrok.com/download/    内网映射到外网
-
-    1.Start by downloading ngrok.
-    2.Install your authtoken    ./ngrok authtoken 2qv36WkU2nDQ363NtNh2k_4Coy1Q28YcZMJF6Aejw43
-    3.Create your first secure tunnel ./ngrok http 80
-    4.Open the web interface at http://localhost:4040 to inspect and replay requests
 
 
 面向对象应该牢记：保持对象小型化，模块化，非耦合以及流线型 。
