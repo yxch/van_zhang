@@ -6,78 +6,7 @@
       POST是通过HTTP POST机制，将表单内各个字段与其内容放置在HTML HEADER内一起传送到ACTION属性所指的URL地址。用户看不到这个过程。
    3. 对于GET方式，服务器端用Request.QueryString获取变量的值，对于POST方式，服务器端用Request.Form获取提交的数据。
    4. GET传送的数据量较小，不能大于2KB。POST传送的数据量较大，一般被默认为不受限制。但理论上，IIS4中最大量为80KB，IIS5中为100KB。
-   5. GET安全性非常低，POST安全性较高。
-   
-   
-<?php
-$arr = array("ret"=>0,"data"=>array('a' => 1, 'b' => '2', 'c' => 3, 'd' => 4, 'e' => 5));
-$json = json_encode($arr);
-/**
-* Formats a JSON string for pretty printing
-*
-* @param string $json The JSON to make pretty
-* @param bool $html Insert nonbreaking spaces and <br />s for tabs and linebreaks
-* @return string The prettified output
-*/
-function _format_json($json, $html = false) {
- $tabcount = 0;
- $result = '';
- $inquote = false;
- $ignorenext = false;
- if ($html) {
-  $tab = "   ";
-  $newline = "<br/>";
- } else {
-  $tab = "\t";
-  $newline = "\n";
- }
- for($i = 0; $i < strlen($json); $i++) {
-  $char = $json[$i];
-  if ($ignorenext) {
-  $result .= $char;
-  $ignorenext = false;
-  } else {
-  switch($char) {
-   case '{':
-   $tabcount++;
-   $result .= $char . $newline . str_repeat($tab, $tabcount);
-   break;
-   case '}':
-   $tabcount--;
-   $result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char;
-   break;
-   case ',':
-   $result .= $char . $newline . str_repeat($tab, $tabcount);
-   break;
-   case '"':
-   $inquote = !$inquote;
-   $result .= $char;
-   break;
-   case '\\':
-   if ($inquote) $ignorenext = true;
-   $result .= $char;
-   break;
-   default:
-   $result .= $char;
-  }
-  }
- }
- return $result;
-}
-echo _format_json($json);
-/*
-{
- "ret": 0,
- "data": {
- "a": 1,
- "b": 2,
- "c": 3,
- "d": 4,
- "e": 5
- }
-}
-**/
-
+   5. GET安全性非常低，POST安全性较高。   
 
 http://www.thinkphp.cn/code/651.html
 
