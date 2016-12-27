@@ -1,3 +1,5 @@
+php 中文不转码
+json_encode($data, JSON_UNESCAPED_UNICODE);
 
 二、$_POST、$_GET的区别和特点
 
