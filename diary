@@ -1,6 +1,3 @@
-php 中文不转码
-json_encode($data, JSON_UNESCAPED_UNICODE);
-
 二、$_POST、$_GET的区别和特点
 
    1. GET是从服务器上获取数据，POST是向服务器传送数据。
