@@ -3,3 +3,4 @@ D:\website\abc\source\modules\icard\site.php
 $weid = 1; // mock here
 $from_uid = 75; // mock here
 用户在从哪个链接可以兑换积分？
+网页和微信访问是相同的操作和规则吗?
