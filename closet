@@ -1,0 +1,5 @@
+D:\website\abc\source\modules\icard\site.php
+// checkauth(true,false,false); // mock here
+$weid = 1; // mock here
+$from_uid = 75; // mock here
+用户在从哪个链接可以兑换积分？
