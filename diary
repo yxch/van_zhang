@@ -9,8 +9,7 @@
    4. GET传送的数据量较小，不能大于2KB。POST传送的数据量较大，一般被默认为不受限制。但理论上，IIS4中最大量为80KB，IIS5中为100KB。
    5. GET安全性非常低，POST安全性较高。  
    
-IOS推送消息，PHP作为推送服务器进行分批推送 : http://1679554191.iteye.com/blog/1740055
-http://www.kuitao8.com/20160712/4414.shtml
+http://www.imooc.com/learn/156  AngularJS视频教程
 
 http://developer.baidu.com/  百度云开发中心
 http://developer.baidu.com/wiki/index.php?title=docs/pcs/sdk
