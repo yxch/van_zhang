@@ -8,7 +8,8 @@
    3. 对于GET方式，服务器端用Request.QueryString获取变量的值，对于POST方式，服务器端用Request.Form获取提交的数据。
    4. GET传送的数据量较小，不能大于2KB。POST传送的数据量较大，一般被默认为不受限制。但理论上，IIS4中最大量为80KB，IIS5中为100KB。
    5. GET安全性非常低，POST安全性较高。  
-   
+
+http://www.imooc.com/learn/245   ThinkPHP
 http://www.imooc.com/learn/156  AngularJS视频教程
 http://wenku.baidu.com/link?url=Wet5nvrVkGaN595KAslcAboFI7IJLZIcJnPP8Xny6NjwGLlSy4ptrLkgABBgarm9iO4pkJnQCbOq7BBtwNC0MeEBPWv21CC1PhROCBUccGO
 
