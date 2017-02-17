@@ -1,4 +1,15 @@
 
+快速查看服务器软件的编译参数：
+1、nginx编译参数： 
+your_nginx_dir/sbin/nginx -v 
+2、apache编译参数： 
+cat your_apache_dir/build/config.nice 
+3、php编译参数： 
+your_php_dir/bin/php -i |grep configure 
+4、mysql编译参数： 
+cat your_mysql_dir/bin/mysqlbug |grep configure
+
+
 
 二、$_POST、$_GET的区别和特点
 
