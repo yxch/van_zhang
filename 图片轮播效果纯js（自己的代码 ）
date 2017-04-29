@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TODO supply a title</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<style>
+		body{margin:0;padding:0;}
+
+		#wrapper{ width:100%;height:10em;overflow:hidden;margin-bottom:3em;}
+		#wrapper #roller{ height:100%;padding:0;font-size:0;}
+		#wrapper #roller a{ position:relative;display:inline-block;height:100%;}
+		#wrapper #roller a img{position:absolute;left:0;top:0;right:0;bottom:0;margin:auto;height:100%;}
+
+		ul{ list-style-type:none;margin:0;padding:0; }
+		#container{ /*background-color:lavender;*/ width:30em;height:10em;margin:auto;overflow:hidden; }
+		#overlay{ position:relative;width:100%; }
+		#overlay li{ position:relative;width:100%; }
+		#overlay li img{ position:absolute;left:0;top:0;right:0;bottom:0;margin:auto; }
+
+	</style>
+
+</head>
+<body>
+
+	<div id="wrapper">
+		<div id="roller">
+			<a href="#"><img src="/asset/img/test1.jpg" alt="puss in boots1"></a>
+			<a href="#"><img src="/asset/img/test2.jpg" alt="puss in boots1"></a>
+			<a href="#"><img src="/asset/img/test3.jpg" alt="puss in boots1"></a>
+			<a href="#"><img src="/asset/img/test4.jpg" alt="puss in boots1"></a>
+			<a href="#"><img src="/asset/img/test5.jpg" alt="puss in boots1"></a>
+		</div>
+	</div>
+
+	<div id="container">
+		<ul id="overlay">
+			<li href="#"><img src="/asset/img/test11.jpg" alt="puss in boots1"></li>
+			<li href="#"><img src="/asset/img/test12.jpg" alt="puss in boots1"></li>
+			<li href="#"><img src="/asset/img/test13.jpg" alt="puss in boots1"></li>
+			<li href="#"><img src="/asset/img/test14.jpg" alt="puss in boots1"></li>
+			<li href="#"><img src="/asset/img/test15.jpg" alt="puss in boots1"></li>
+		</ul>
+	</div>
+
+
+	<script>
+		var conf = {
+			wrapper : "wrapper",
+			roller : "roller",
+			timer : 3000,
+			speed : 10
+		};
+
+		var player = new Player(conf);
+		player.play();
+
+		window.onresize = function(){
+			player.stop();
+			player.start();
+		};
+
+		var conf2 = {
+			wrapper : "container",
+			roller : "overlay",
+			timer : 3000,
+			speed : 1
+		};
+
+		var roller = new Roller(conf2);
+		roller.roll();
+
+
+
+
+		function Player( conf )
+		{
+			var X = new Object;
+			// 外包装容器
+			X.wrapper = document.getElementById(conf.wrapper || 'wrapper');
+			// 屏宽
+			X.sw =  (X.wrapper).offsetWidth;
+			// 轮播外框
+			X.roller = document.getElementById(conf.roller || 'roller');
+			X.timer = conf.timer || 3000;
+			// 轮播图片数
+			X.len = X.roller.getElementsByTagName("a").length;
+			X.playTimer = 0;
+			X.rollerTimer = 0;
+			X.direct = 0;
+			X.n = 1;
+			X.move = true;
+			// 设置roller的宽度
+			X.roller.style.width = X.sw * X.len + "px";
+			X.frm = X.roller.getElementsByTagName("a");
+			for(var i=0;i<X.len;i++){ X.frm[i].style.width = X.sw + "px";	}
+			X.frm[0].style.right = "0px";
+			// 监听鼠标事件
+			for(var j=0;j<X.len;j++)
+			{
+				X.frm[j].onmouseenter = function(){	X.stop(); };
+				X.frm[j].onmouseleave = function(){	X.start();};
+			}
+			// 停止
+			X.stop = function(){
+				clearTimeout(X.playTimer);
+				clearInterval(X.rollerTimer);
+				X.move = false;
+			};
+
+			// 启动
+			X.start = function(){
+				if(X.move === true){ return false; }
+				X.play();
+			};
+
+			// 设置图片序号通常是小圈圈
+			X.circle = function(i)
+			{
+				var index = i || 1;
+				// 以下就是一些设置小圈样式的代码了
+				//console.log(index);
+			};
+
+			// 设置速度
+			var speed = parseInt( X.sw / (conf.speed || 10) ),dist = 0;
+			X.play = function(){
+
+				X.playTimer = setTimeout(function(){
+
+					if(X.n === X.len){ X.direct = 1; }
+					if(X.n === 1){ X.direct = 0; }
+
+					X.rollerTimer = setInterval(function(){
+						if(X.direct === 0) {
+							dist = parseInt( dist + speed );
+							X.frm[X.n].style.right = dist + "px";
+							X.frm[X.n - 1].style.right = dist + "px";
+							if( parseInt(( dist / X.sw) ) === X.n)
+							{
+								clearInterval(X.rollerTimer);
+								X.frm[X.n - 1].style.right = (X.n - 1) * X.sw + "px";
+								X.play(); X.n++;
+								X.circle(X.n);
+							}
+						}
+						if(X.direct === 1)
+						{
+							dist = parseInt( dist - speed );
+							X.frm[X.n - 1].style.right = dist + "px";
+							X.frm[X.n - 2].style.right = dist + "px";
+							if(Math.ceil(dist / X.sw) === X.n - 2)
+							{
+								clearInterval(X.rollerTimer);
+								X.frm[X.n - 2].style.right = (X.n - 2) * X.sw + "px";
+								X.play(); X.n--;
+								X.circle(X.n);
+							}
+						}
+					},100);
+				},X.timer);
+			};
+			return X;
+		}
+
+		function Roller()
+		{
+			var X = new Object;
+			X.sh = document.getElementById(conf.container || 'container').offsetHeight;
+			X.roller = document.getElementById(conf.overlay || 'overlay');
+			X.frm = X.roller.getElementsByTagName("li");
+			// 图片张数
+			X.len = X.frm.length;
+			// 设置overlay的高度
+			X.roller.style.height = X.sh * X.len + "px";
+			// 设置每幅图片的外包装高度
+			for(var i=0;i<X.len;i++){
+				X.frm[i].style.height = X.sh + "px";
+				X.frm[i].getElementsByTagName("img")[0].style.height = X.sh + "px";
+			}
+			// 设置每幅图片的最大高度
+			X.frm[0].style.bottom = "0px";
+			X.playTimer = 0;
+			X.rollerTimer = 0;
+			X.timer = conf.timer || 3000;
+			X.direct = 0;
+			X.n = 1;
+			X.move = true;
+
+			// 监听鼠标事件
+			for(var j=0;j<X.len;j++)
+			{
+				X.frm[j].onmouseenter = function(){	X.stop(); };
+				X.frm[j].onmouseleave = function(){	X.start();};
+			}
+			// 停止
+			X.stop = function(){
+				clearTimeout(X.playTimer);
+				clearInterval(X.rollerTimer);
+				X.move = false;
+			};
+
+			// 启动
+			X.start = function(){
+				if(X.move === true){ return false; }
+				X.roll();
+			};
+
+			// 设置图片序号通常是小圈圈
+			X.circle = function(i)
+			{
+				var index = i || 1;
+				// 以下就是一些设置小圈样式的代码了
+				// console.log(index);
+			};
+
+			// 设置速度
+			var speed = parseInt( X.sh / (conf.speed || 10) );
+			var dist = 0;
+			X.roll = function(){
+				X.playTimer = setTimeout(function(){
+					if(X.n === X.len){ X.direct = 1; }
+					if(X.n === 1){ X.direct = 0; }
+					X.rollerTimer = setInterval(function(){
+						if(X.direct === 0) {
+							dist = parseInt( dist + speed );
+							X.frm[X.n].style.bottom = dist + "px";
+							X.frm[X.n - 1].style.bottom = dist + "px";
+							if( parseInt(( dist / X.sh) ) === X.n)
+							{
+								clearInterval(X.rollerTimer);
+								X.roll(); X.n++;
+								X.circle(X.n);
+							}
+						}
+						if(X.direct === 1)
+						{
+							dist = parseInt( dist - speed );
+							X.frm[X.n - 1].style.bottom = dist + "px";
+							X.frm[X.n - 2].style.bottom = dist + "px";
+							if(Math.ceil(dist / X.sh) === X.n - 2)
+							{
+								clearInterval(X.rollerTimer);
+								X.roll(); X.n--;
+								X.circle(X.n);
+							}
+						}
+					},100);
+				},X.timer);
+			};
+
+			return X;
+		}
+
+
+
+
+
+	</script>
+
+</body>
+</html>
