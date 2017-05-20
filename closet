@@ -1,5 +1,0 @@
-HTTP/2 client preface string missing or corrupt. Hex dump for received bytes: 504f5354202f332f6465766963652f363331396638366534
-
-Warning: stream_socket_client(): SSL operation failed with code 1. OpenSSL Error messages: error:14090086:SSL routines:ssl3_get_server_certificate:certificate verify failed in /usr/local/nginx/html/main/push.php on line 27
-
-Warning: stream_socket_client(): Failed to enable crypto in /usr/local/nginx/html/main/push.php on line 27
