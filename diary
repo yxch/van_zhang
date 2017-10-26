@@ -1,4 +1,6 @@
 
+#F6F6F6  #F5F2F0
+
 快速查看服务器软件的编译参数：
 1、nginx编译参数： 
 your_nginx_dir/sbin/nginx -v 
